@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-11-10 12:37:34
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-10 17:44:13
+ * @LastEditTime: 2019-11-10 17:58:58
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -84,7 +84,12 @@ fn fnDelDir dirDel =
 
 fn fnCopyFilesFromTo sDir tDir =
 (
-	
+	local tempFilesArr = SIODir.GetFiles(sDir)
+	for sFile in tempFilesArr do 
+	( 
+		local tFile = tDir + (substring sFile (sDir.count + 1) -1)
+		SIOFile.Copy sFile tFile 
+	)
 )
 
 rollout mzpDialog " BulletTools 安装工具 " width:500 height:385
