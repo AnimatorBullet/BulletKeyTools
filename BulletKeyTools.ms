@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-09 22:05:08
+ * @LastEditTime: 2019-11-10 12:56:54
  * @Email: animator.bullet@foxmail.com
  */
 -- getKeyTime $.rotation.controller 1
@@ -897,7 +897,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 
 	on btnCSTools pressed do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts" + "\\cstools.ms")
+		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\cstools.ms")
 	)
 
 	on btnBoneTraj pressed do ------显示bone的轨迹

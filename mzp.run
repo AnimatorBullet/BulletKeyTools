@@ -1,16 +1,11 @@
-name "BulletTools"
+name "runBulletKeyTools"
 description "Bullet.S Scripts"
-version 0.6
+version 0.7
 
 extract to $temp
 
-treeMove "BulletS" to "$scripts"
-treeMove "BulletScripts" to "$scripts"
-treeMove "DTools" to "$scripts"
-treeMove "cstoolIcons" to "$UI_ln\\Icons\\"
-
-run "runBulletTools.ms"
-drop "runBulletTools.ms"
+run "runBulletKeyTools.ms"
+drop "runBulletKeyTools.ms"
 
 clear temp on MAX exit
 clear temp on reset
