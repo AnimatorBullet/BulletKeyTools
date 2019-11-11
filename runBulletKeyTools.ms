@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-11-10 12:37:34
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-10 17:58:58
+ * @LastEditTime: 2019-11-11 14:14:11
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -26,6 +26,8 @@ Global arrScriptFiles = #(file1) 							----脚本数组
 Global arrScriptDirs = #("BulletScripts") 	----脚本文件夹数组
 Global arrIconsDirs = #("cstoolIcons")
 Global numBgPic = 2
+
+Global fnDelFile
 -----------------------------------------------------------------------------------------------------------------INSTALL FILES
 
 fn fnAddUpdateLog arrLog =
@@ -82,19 +84,27 @@ fn fnDelDir dirDel =
 	)
 )
 
-fn fnCopyFilesFromTo sDir tDir =
+fn fnCopyDirectory sourceDir targetDir = 
 (
-	local tempFilesArr = SIODir.GetFiles(sDir)
-	for sFile in tempFilesArr do 
-	( 
-		local tFile = tDir + (substring sFile (sDir.count + 1) -1)
-		SIOFile.Copy sFile tFile 
+	local SearchOption = dotNetClass "System.IO.SearchOption";
+	local allFiles     = SIODir.GetFiles sourceDir \
+										"*.*" \
+										SearchOption.AllDirectories;
+
+	for sourceFile in allFiles do
+	(
+		local targetFile    = targetDir + (substring sourceFile (sourceDir.count + 1) -1);
+		local targetFileDir = getFilenamePath targetFile;
+		if (not (SIODir.Exists targetFileDir)) do
+			SIODir.CreateDirectory targetFileDir;
+			fnDelFile targetFile
+			SIOFile.Copy sourceFile targetFile;
 	)
 )
 
-rollout mzpDialog " BulletTools 安装工具 " width:500 height:385
+rollout mzpDialog " BulletKeyTools  安装工具 " width:500 height:385
 (
-	local textUpdateLink = (" BulletTools 安装 --- [ 当前版本 v"+ (numVer/10) as string + "." + ((mod numVer 10)as integer) as string + " ]")
+	local textUpdateLink = (" BulletKeyTools  安装工具 ")
 
 	dotNetControl tbxResult "textBox" readonly:true Multiline:true height:100 width:195 pos:[10,25]
 
@@ -152,21 +162,23 @@ rollout mzpDialog " BulletTools 安装工具 " width:500 height:385
 		-- if rolUpdateLog != undefined then closeRolloutFloater rolUpdateLog
 		fnAddUpdateLog arrLog
 		fnRefreshBG numBgPic
+		grbInstall.caption = " 安装 ---------[ 当前版本 v"+ (numVer/10) as string + "." + ((mod numVer 10)as integer) as string + " ]"
 	)
 	
 	on mzpDialog close do
 	(
 		arrCleanFiles = getFiles (getDir #temp + "\\*.*")
+		arrCleanDirs = getDirectories (getDir #temp + "\\*")
 		for f in arrCleanFiles do
 		(
 			fnDelFile f --delete any file with the same name on this location
 		)
-		arrCleanDirs = getDirectories (getDir #temp + "\\*")
 		for d in arrCleanDirs do
 		(
 			dir = substring d 1 (d.count - 1)
 			fnDelDir dir --delete any file with the same name on this location
 		)
+		print " max temp 已清理! "
 	)
 	
 		-----------------------------------------------------------------------------------------
@@ -210,11 +222,11 @@ rollout mzpDialog " BulletTools 安装工具 " width:500 height:385
 		(
 			local strIconDir = (getdir #UI_ln) + "\\Icons\\" + i
 			fnDelDir strIconDir
-			fnCopyFilesFromTo ((getDir #temp)+ "\\" + i) ((getdir #UI_ln) + "\\Icons\\")
+			fnCopyDirectory ((getDir #temp)+ "\\" + i) strIconDir
 		)
 		for i in arrScriptDirs do
 		(
-			SIODir.move(((getDir #temp)+ "\\" + i),(getdir #Scripts))
+			fnCopyDirectory ((getDir #temp)+ "\\" + i) ((getdir #Scripts) + "\\" + i)
 		)
 		fnDelFile ((getDir #userMacros)+ "\\" + theMacroFile) --delete the macro
 		copyFile ((getDir #temp) + "\\" + theMacroFile) ((getDir #userMacros)+ "\\" + theMacroFile) --move the macro to the usermacros
@@ -236,7 +248,7 @@ rollout mzpDialog " BulletTools 安装工具 " width:500 height:385
 			--delete any file with the same name on this location
 		)
 
-		local theArray = fn_checkScriptFilePresence()
+		local theArray  = fn_checkScriptFilePresence()
 		local myMessage = "已解除该脚本自启\r\n( 并不是卸载~ )\r\n( 重新安装可打开自启 )"
 		fn_updateInterface tbxResult myMessage theArray btnRemove
 		btnRemove.enabled = false

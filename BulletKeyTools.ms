@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-10 12:56:54
+ * @LastEditTime: 2019-11-11 17:24:56
  * @Email: animator.bullet@foxmail.com
  */
 -- getKeyTime $.rotation.controller 1
@@ -238,15 +238,15 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		pos:[160,95] toolTip:"移动关键帧,\r\n左键带帧栏范围增减,\r\n右键范围不变~" border:false
 -- 		label labTips "--- 未选即处理全部, 注意无限帧! --" \
 -- 		pos:[10,130]
-		button btnCSTools "❤ CS选择" pos:[10,130] width:60 height:20 \
+		button btnCSTools "❤ CS选择" pos:[10,132] width:60 height:20 \
 		tooltip:"CS选择工具" border:false
-		button btnIsoDisplay "◐ 独显" pos:[70,130] width:50 height:20 \
+		button btnIsoDisplay "◐ 独显" pos:[70,132] width:50 height:20 \
 		tooltip:"左键隐藏未选中\r\n右键显示全部" border:false
-		button btnSpringMagic "✿ 飘带插件" pos:[120,130] width:70 height:20 \
+		button btnSpringMagic "✿ 飘带插件" pos:[120,132] width:70 height:20 \
 		tooltip:"左点新版,右点旧版\r\n不久可能会有强化版~" border:false
-		button btnQuickSave "✪ 快速备份" pos:[10,150] width:70 height:20 \
+		button btnQuickSave "✪ 快速备份" pos:[10,155] width:70 height:20 \
 		toolTip:"左键快速备份\r\n右键另存文件" border:false
-		button btnSetFpsAndSpeed " " pos:[80,150] width:110 height:20 \
+		button btnSetFpsAndSpeed " " pos:[80,155] width:110 height:20 \
 		toolTip:"左键设置帧率\r\n右键播放速度" border:false
 	
 	groupbox gbxMinTools "小工具" pos:[200,5] width:140 height:225
@@ -257,6 +257,8 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		pos:[260,45] toolTip:"左键切换显示单个Biped轨迹,\r\n右键切换显示所有Biped轨迹~"
 		button btnFnFrame "● 整小数帧" width:75 height:20 \
 		pos:[260,65] tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿"
+		button btnSelByColor "◪ 同色选择" width:75 height:20 \
+		pos:[260,85] tooltip:"选择同颜色物体"
 		button btnFnTCB "☯  TCB 互转" height:20 width:75\
 		pos:[260,125] tooltip:"欧拉和TCB互转"
 		button btnEulerFilter "✈ 欧拉过滤" height:20 width:75 \
@@ -1206,7 +1208,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 	)
 
-	on btnToKeysRange pressed do   ---------------帧栏显示首尾帧范围
+	on btnToKeysRange pressed do with undo on  ---------------帧栏显示首尾帧范围
 	(
 		fnCollectKeys ()
 		if (arrKeysTime.count != 0) then
