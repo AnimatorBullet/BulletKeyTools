@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-11 17:24:56
+ * @LastEditTime: 2019-11-15 13:17:57
  * @Email: animator.bullet@foxmail.com
  */
 -- getKeyTime $.rotation.controller 1
@@ -25,16 +25,25 @@
 
 try(destroydialog rolloutBulletKeyTools)catch()
 
-Global posMouX = mouse.screenpos.x  
-Global posMouY = mouse.screenpos.y  --获取鼠标位置
-Global posMouMoved = [0,0]
-Global fnMouseState = false
+Global posMouX      = mouse.screenpos.x
+Global posMouY      = mouse.screenpos.y  --获取鼠标位置
+Global posMouMoved  = [0,0]
+Global switchMouseState = false
+Global switchSelKeyRange = 0
+Global switchToolPanel = 0
+Global arrLastSelRange = #(animationrange.start,animationrange.end)
+Global switchAllKeyRange = 0
+Global arrLastAllRange = #(animationrange.start,animationrange.end)
 
-Global arrKeysTime = #()  ----------biped和bone的首尾帧
-Global arrLinkKeys = #()  -----------存link帧
--- Global arrBipedKeys = #()
+Global arrKeysTime     = #()  ----------biped和bone的首尾帧
+Global arrLinkKeys     = #()  -----------存link帧
+Global arrKeysSelected = #()  -----------存选中的帧
+--     Global arrBipedKeys = #()
 Global keyFirst
 Global keyEnd
+Global keySelFirst
+Global keySelEnd
+Global fnFindFirstEndKey
 Global fnAddKyes
 Global fnSelectKeys
 Global fnSelLinkKeys
@@ -45,8 +54,9 @@ Global iniPos  --位置保存记录
 Global keyMovedOffset = 5
 Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
-Global arrTraj = #()  ---轨迹存放数组,方便删除
-
+Global arrTraj = #()  ---轨迹存放数组, 方便删除
+-- Global bipedRoot = #()   -------判断选择了几个biped骨架
+-- Global numLayers = 0   ------biped层级数
 ------------------全局变量-------------------------------------------------------------------
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
@@ -57,11 +67,13 @@ fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方�
 fn fnSaveConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
 	iniPos = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" ([posMouX,posMouY] as string)
+	switchToolPanel = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
 )
 fnSaveConfig () --初始执行一遍
 fn fnSetConfig =  --保存参数,脚本位置
 (
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "Pos" (iniPos as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
 )
 ---------------配合BulletTools工具的ini文件保存位置信息-----------------
 
@@ -238,11 +250,13 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		pos:[160,95] toolTip:"移动关键帧,\r\n左键带帧栏范围增减,\r\n右键范围不变~" border:false
 -- 		label labTips "--- 未选即处理全部, 注意无限帧! --" \
 -- 		pos:[10,130]
-		button btnCSTools "❤ CS选择" pos:[10,132] width:60 height:20 \
+		button btnCutFrameDisplay " ◐ 帧预览" pos:[10,128] width:55 height:25 \
+		tooltip:"左：预览选择帧范围\r\n右：预览全部帧范围\r\n再点回到上次帧范围\r\n别晃晕了。╮(￣▽￣)╭" border:false
+		button btnCSTools "❤ CS选择" pos:[65,128] width:60 height:25 \
 		tooltip:"CS选择工具" border:false
-		button btnIsoDisplay "◐ 独显" pos:[70,132] width:50 height:20 \
-		tooltip:"左键隐藏未选中\r\n右键显示全部" border:false
-		button btnSpringMagic "✿ 飘带插件" pos:[120,132] width:70 height:20 \
+		-- button btnIsoDisplay "◐ 独显" pos:[70,132] width:50 height:20 \
+		-- tooltip:"左键隐藏未选中\r\n右键显示全部" border:false
+		button btnSpringMagic "✿ 飘带插件" pos:[125,128] width:65 height:25 \
 		tooltip:"左点新版,右点旧版\r\n不久可能会有强化版~" border:false
 		button btnQuickSave "✪ 快速备份" pos:[10,155] width:70 height:20 \
 		toolTip:"左键快速备份\r\n右键另存文件" border:false
@@ -269,18 +283,18 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		pos:[260,185] tooltip:"自动备份设置"
 		button btnSetHotKey "✎ 改 K 帧键" height:20 width:75 \
 		pos:[260,205] tooltip:"自定义K帧快捷键"
-		button btnClearSelKeys "▲ 消帧" tooltip:"取消关键帧选择 (非删除帧)" \
-		pos:[205,25] height:20 width:50
-		button btnToKeysRange "〇 卡帧" tooltip:"帧范围变成首尾帧 !\r\n小心无限帧~ 后果未知..." \
-		pos:[205,45] height:20 width:50
+		button btnClearSelKeys "▲ 消帧"  height:20 width:50 \
+		pos:[205,25] tooltip:"取消关键帧选择 (非删除帧)" \
+		-- button btnToKeysRange "〇 卡帧" tooltip:"帧范围变成首尾帧 !\r\n小心无限帧~ 后果未知..." \
+		-- pos:[205,45] height:20 width:50
 		button btnDelOutKeys "✖ 删帧" height:20 width:50 \
-		pos:[205,65] toolTip:"左键清除选择帧\r\n右键清范围外帧(无限帧)"
+		pos:[205,45] toolTip:"左键清除选择帧\r\n右键清范围外帧(无限帧)"
 		button btnFreezeMesh "✲ 冻模" height:20 width:50 \
-		pos:[205,90] toolTip:"冻结模型"
+		pos:[205,65] toolTip:"冻结模型"
 		button btnHideBones "☁ 藏骨" height:20 width:50 \
-		pos:[205,110] toolTip:"隐藏骨骼"
+		pos:[205,90] toolTip:"隐藏骨骼"
 		button btnSelBoneBiped "☑ 选骨" height:20 width:50 \
-		pos:[205,130] toolTip:"左键选择所有biped\r\n右键选择所有bone"
+		pos:[205,110] toolTip:"左键选择所有biped\r\n右键选择所有bone"
 		button btnEndBone "✚ 末端" height:20 width:50 \
 		pos:[205,185] toolTip:"骨骼以Box显示"
 		button btnFnBox "㊣ BOX" height:20 width:50 \
@@ -295,6 +309,40 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		label labmiHoYo "--- TECH OTAKUS SAVE THE WORLD --" \
 		pos:[7,210]
 ----------------------------------UI及作者ID------------------------------------------------
+	fn fnRefreshMagicBtn =
+	(
+		if switchToolPanel == 0 then
+		(
+			rolloutBulletKeyTools.width = 200
+			rolloutBulletKeyTools.gbxMinTools.visible  = false
+			btnMagicBtn.text = "✧(≖ ◡ ≖"
+		)
+		else
+		(
+			rolloutBulletKeyTools.width = 345
+			rolloutBulletKeyTools.gbxMinTools.visible  = true
+			btnMagicBtn.text = "( = `▽`)"
+		)
+	)
+
+	fn fnSwitchMagicBtn =
+	(
+		if switchToolPanel == 1 then
+		(
+			rolloutBulletKeyTools.width = 200
+			rolloutBulletKeyTools.gbxMinTools.visible  = false
+			btnMagicBtn.text = "✧(≖ ◡ ≖"
+			switchToolPanel = 0
+		)
+		else
+		(
+			rolloutBulletKeyTools.width = 345
+			rolloutBulletKeyTools.gbxMinTools.visible  = true
+			btnMagicBtn.text = "( = `▽`)"
+			switchToolPanel = 1
+		)
+	)
+
 	Fn CleanOutRangeKeys inputObject =  ---清理无限帧,以前收集的,找不到来源了,大概是遍历子动画
 	(
 		startTime = AnimationRange.Start
@@ -331,6 +379,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 						for i in tempObj.controller[i].keys do 
 						(
 							appendIfUnique arrLinkKeys i  ---------添加link帧到数组
+							if i.selected == true then appendIfUnique arrKeysSelected i.time
 						)
 					)
 				)
@@ -361,6 +410,10 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 									keyTimeEndTemp = tempLinkController[i].keys[tempLinkController[i].keys.count].time
 									appendIfUnique arrKeysTime keyTimeStartTemp
 									appendIfUnique arrKeysTime keyTimeEndTemp
+									for i in tempLinkController[i].keys do 
+									(
+										if i.selected == true then appendIfUnique arrKeysSelected i.time
+									)
 								)
 							)
 						)
@@ -389,6 +442,10 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 					keyTimeEndTemp = tempObj.controller[i].keys[tempObj.controller[i].keys.count].time
 					appendIfUnique arrKeysTime keyTimeStartTemp
 					appendIfUnique arrKeysTime keyTimeEndTemp
+					for i in tempObj.controller[i].keys do 
+					(
+						if i.selected == true then appendIfUnique arrKeysSelected i.time
+					)
 				)
 			)
 		-- )
@@ -400,49 +457,63 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		local keyTimeEndTemp
 		local subanimBipedScale
 
-		if tempObj.controller.keys[1] != undefined then --筛选出非质心的biped帧
+		if classof tempObj.controller != Footsteps then
 		(
-			for i in tempObj.controller.keys do 
+			if classof tempObj.controller != Vertical_Horizontal_Turn then --筛选出非质心的biped帧
 			(
-				appendIfUnique arrKeysTime i.time   ---添加到数组
-			)
-			subanimBipedScale = GetSubAnim tempObj.controller[1] 1
-			if ((subanimBipedScale != undefined) and \
-			(GetSubAnimName subanimBipedScale 1 == #ScaleXYZ)) then  ----筛选出biped的缩放帧
-			(
-				if subanimBipedScale[1].keys[1] != undefined then
+				if (tempObj.controller.keys[1] != undefined) then
 				(
-					keyTimeStartTemp = subanimBipedScale[1].keys[1].time
-					keyTimeEndTemp = subanimBipedScale[1].keys[subanimBipedScale[1].keys.count].time
-					appendIfUnique arrKeysTime keyTimeStartTemp
-					appendIfUnique arrKeysTime keyTimeEndTemp
-				)
-			)
-		)
-		else
-		(-------------------下面是收集质心的关键帧,坑在于中英文turning名字还不一样...
-			if classof tempObj.controller == Vertical_Horizontal_Turn then
-			(
-				bipCtrl = tempObj.controller
-				vertCtrl = bipCtrl.vertical.controller
-				horzCtrl = bipCtrl.horizontal.controller
-				if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
-					(turnCtrl = bipCtrl.flip.controller)
-					else(turnCtrl = bipCtrl.turning.controller)
-				bipCtrlTemp = #(vertCtrl,horzCtrl,turnCtrl)
-				for c in bipCtrlTemp do
-				(
-					if c.keys[1] != undefined then
+					for i in tempObj.controller.keys do 
 					(
-						keyTimeStartTemp = c.keys[1].time
-						keyTimeEndTemp = c.keys[c.keys.count].time
+						appendIfUnique arrKeysTime i.time   ---添加到数组
+						if i.selected == true then appendIfUnique arrKeysSelected i.time
+					)
+				)
+				subanimBipedScale = GetSubAnim tempObj.controller[1] 1
+				if ((subanimBipedScale != undefined) and \
+				(GetSubAnimName subanimBipedScale 1 == #ScaleXYZ)) then  ----筛选出biped的缩放帧
+				(
+					if subanimBipedScale[1].keys[1] != undefined then
+					(
+						keyTimeStartTemp = subanimBipedScale[1].keys[1].time
+						keyTimeEndTemp = subanimBipedScale[1].keys[subanimBipedScale[1].keys.count].time
 						appendIfUnique arrKeysTime keyTimeStartTemp
 						appendIfUnique arrKeysTime keyTimeEndTemp
+						for i in subanimBipedScale[1].keys do 
+						(
+							if i.selected == true then appendIfUnique arrKeysSelected i.time
+						)
+					)
+				)
+			)
+			else
+			(-------------------下面是收集质心的关键帧,坑在于中英文turning名字还不一样...
+				if classof tempObj.controller == Vertical_Horizontal_Turn then
+				(
+					bipCtrl = tempObj.controller
+					vertCtrl = bipCtrl.vertical.controller
+					horzCtrl = bipCtrl.horizontal.controller
+					if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
+						(turnCtrl = bipCtrl.flip.controller)
+						else(turnCtrl = bipCtrl.turning.controller)
+					bipCtrlTemp = #(vertCtrl,horzCtrl,turnCtrl)
+					for c in bipCtrlTemp do
+					(
+						if c.keys[1] != undefined then
+						(
+							keyTimeStartTemp = c.keys[1].time
+							keyTimeEndTemp = c.keys[c.keys.count].time
+							appendIfUnique arrKeysTime keyTimeStartTemp
+							appendIfUnique arrKeysTime keyTimeEndTemp
+							for i in c.keys do 
+							(
+								if i.selected == true then appendIfUnique arrKeysSelected i.time
+							)
+						)
 					)
 				)
 			)
 		)
-
 	)
 
 	fn fnAddKyes tempObj fnLink =   ---添加帧(主要是首尾帧),加个判断是否勾选link
@@ -499,31 +570,51 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 			)
 			else
 			(
-				fnAddBipedKeys tempObj
+				fnAddBipedKeys tempObj   ---------biped帧
 			)
 		)----------------收集各种帧
 		-- arrKeysTime = makeUniqueArray arrKeysTime  ---去除重复帧数
 		sort arrKeysTime  ----帧数排序
-		if ((arrKeysTime.count != 0) and (arrKeysTime.count > 1)) then
+		sort arrKeysSelected
+		if (arrKeysTime.count != 0) then
 		(
-			keyFirst = arrKeysTime[1]            ------找到首帧
-			keyEnd = arrKeysTime[arrKeysTime.count]   -----------找到尾帧
-		)
-		else  --防止首尾同帧的保险
-		(
-			if (arrKeysTime.count == 1) then
+			case of 
 			(
-				keyFirst = arrKeysTime[1]
-				keyEnd = keyFirst + 1
+				(arrKeysTime.count > 1):
+				(
+					keyFirst = arrKeysTime[1]            ------找到首帧
+					keyEnd = arrKeysTime[arrKeysTime.count]   -----------找到尾帧
+				)
+				(arrKeysTime.count == 1):   --防止首尾同帧的保险
+				(
+					keyFirst = arrKeysTime[1]
+					keyEnd = keyFirst + 1
+				)
+			)
+		)
+		if (arrKeysSelected.count != 0) then
+		(
+			case of 
+			(
+				(arrKeysSelected.count > 1):
+				(
+					keySelFirst = arrKeysSelected[1]            ------找到首帧
+					keySelEnd = arrKeysSelected[arrKeysSelected.count]   -----------找到尾帧
+				)
+				(arrKeysSelected.count == 1):   --防止首尾同帧的保险
+				(
+					keySelFirst = arrKeysSelected[1]
+					keySelEnd = keySelFirst + 1
+				)
 			)
 		)
 	)
 
 	fn fnCollectKeys = ---------收集关键帧
 	(
-		arrKeysTime = #()
-		-- arrBipedKeys = #() ----------------先清空数组
-		arrLinkKeys = #()
+		arrKeysTime     = #()
+		arrKeysSelected = #() ----------------先清空数组
+		arrLinkKeys     = #()
 		case of  -----------处理选中,未选中则处理全部
 		(
 			(selection.count == 0):
@@ -693,7 +784,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 				biped.moveKeys nodeBiped.controller offsetFrame #selection
 			)
 		)
-	)	
+	)		
 
 	mapped fn fnMoveBipedScaleKeys tempObj offsetFrame =  -------移动biped的缩放帧
 	(
@@ -703,6 +794,58 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 			if ((ctrlBiped[1][1] != undefined) and ((getSubAnimName ctrlBiped[1][1] 1) == #ScaleXYZ)) then
 			(
 				movekeys ctrlBiped[1][1][1] offsetFrame #selection
+			)
+		)
+	)
+
+	fn fnMoveAllKeys keyMovedOffset =
+	(
+		local rangEnd = animationrange.end
+		local rangeStart = animationrange.start
+		local n = 0  --n来判定是否有选中biped
+
+		if keyMovedOffset != undefined then
+		(
+			if selection.count != 0 then
+			(
+				for i in selection where (i.ishidden == false) do
+				(
+					if classof i != Biped_Object then
+					(
+						fnMoveKeysAndLinkKeys i keyMovedOffset symbol
+					)
+					else 
+					(
+						fnMoveBipedScaleKeys i keyMovedOffset
+						n += 1
+					)
+				)
+				if n != 0 then  ----------分开解决biped多移动的问题,傻瓜式方法
+				(
+					fnMoveBipedKeys keyMovedOffset
+				)
+			)
+			else  ---跟上面一样,只是对所有物体
+			(
+				for i in objects where (i.ishidden == false) do
+				(
+					if classof i != Biped_Object then
+					(
+						fnMoveKeysAndLinkKeys i keyMovedOffset symbol
+					)
+					else fnMoveBipedScaleKeys i keyMovedOffset
+				)
+				fnMoveBipedKeys keyMovedOffset
+			)
+			if keyMovedOffset > 0 then 
+			(
+				rangEnd = animationrange.end + keyMovedOffset
+				animationrange = interval animationrange.start rangEnd
+			)
+			else if keyMovedOffset < 0 then 
+			(
+				rangeStart = animationrange.start + keyMovedOffset
+				animationrange = interval rangeStart animationrange.end
 			)
 		)
 	)
@@ -779,6 +922,47 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		saveMaxFile fileSave
 	)
 
+	fn fnCutDisplayKeyRange keyFirst keyEnd =  ---显示首尾帧范围
+	(
+		if (arrKeysTime.count != 0) then
+		(
+			if (arrLinkKeys.count != 0) then
+			(
+				case of  ------万恶的link帧导致更多判定
+				(
+					((arrLinkKeys[1].time >= keyFirst) and (arrLinkKeys[arrLinkKeys.count].time <= keyEnd)):
+					(animationrange = (interval keyFirst keyEnd))
+					((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time <= keyEnd)):
+					(animationrange = (interval arrLinkKeys[1].time keyEnd))
+					((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time >= keyEnd)):
+					(animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time))
+					((arrLinkKeys[1].time >= keyFirst) and (arrLinkKeys[arrLinkKeys.count].time > keyEnd)):
+					(animationrange = (interval keyFirst arrLinkKeys[arrLinkKeys.count].time))
+					((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time > keyEnd)):
+					(animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time))
+				)
+			)
+			else
+			(
+				animationrange = interval keyFirst keyEnd
+			)
+		)
+		else 
+		(
+			if ((arrLinkKeys.count != 0) and (arrLinkKeys.count > 1)) then 
+			(
+				animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time)
+			)
+			else 
+			(
+				if (arrLinkKeys.count == 1) then
+				(
+					animationrange = (interval arrLinkKeys[1].time (arrLinkKeys[1].time + 1))
+				)
+			)
+		)
+	)
+
 	on rolloutBulletKeyTools open do  ----打开脚本时操作
 	(------刷新图标, 图标是max自带的,主要是懒得做
 		btnSelBeforeKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,3,3,3,3,true,true) 
@@ -795,6 +979,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		rolloutBulletKeyTools.gbxMinTools.visible  = false
 		judgePlaySpeedValue ()  -----判断播放速度
 		rolloutBulletKeyTools.btnSetFpsAndSpeed.text = "  |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
+		fnRefreshMagicBtn ()
 	)
 	
 	on rolloutBulletKeyTools close do -- 关闭记忆浮动窗口位置
@@ -811,17 +996,17 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	on rolloutBulletKeyTools lbuttondown posMou do
 	(
 		posMouMoved = posMou
-		fnMouseState = on
+		switchMouseState = on
 	)
 	
 	on rolloutBulletKeyTools lbuttonup posMou do
 	(
-		fnMouseState = off
+		switchMouseState = off
 	)
 	
 	on rolloutBulletKeyTools mouseMove pos do
 	(
-		if fnMouseState == on then
+		if switchMouseState == on then
 		(
 			SetDialogPos rolloutBulletKeyTools (mouse.screenpos - posMouMoved)			
 		)
@@ -883,18 +1068,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	
 	on btnMagicBtn pressed do  -------------切换整数帧小数帧,方便拖动滑条平滑预览
 	(
-		if rolloutBulletKeyTools.gbxMinTools.visible  == true then
-		(
-			rolloutBulletKeyTools.width = 200
-			rolloutBulletKeyTools.gbxMinTools.visible  = false
-			btnMagicBtn.text = "✧(≖ ◡ ≖"
-		)
-		else
-		(
-			rolloutBulletKeyTools.width = 345
-			rolloutBulletKeyTools.gbxMinTools.visible  = true
-			btnMagicBtn.text = "( = `▽`)"
-		)
+		fnSwitchMagicBtn ()
 	)
 
 	on btnCSTools pressed do 
@@ -999,54 +1173,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	)
 	on btnMoveKeys pressed do with undo on   ------移动选定帧
 	(
-		local rangEnd = animationrange.end
-		local rangeStart = animationrange.start
-		local n = 0  --n来判定是否有选中biped
-
-		if keyMovedOffset != undefined then
-		(
-			if selection.count != 0 then
-			(
-				for i in selection where (i.ishidden == false) do
-				(
-					if classof i != Biped_Object then
-					(
-						fnMoveKeysAndLinkKeys i keyMovedOffset symbol
-					)
-					else 
-					(
-						fnMoveBipedScaleKeys i keyMovedOffset
-						n += 1
-					)
-				)
-				if n != 0 then  ----------分开解决biped多移动的问题,傻瓜式方法
-				(
-					fnMoveBipedKeys keyMovedOffset
-				)
-			)
-			else  ---跟上面一样,只是对所有物体
-			(
-				for i in objects where (i.ishidden == false) do
-				(
-					if classof i != Biped_Object then
-					(
-						fnMoveKeysAndLinkKeys i keyMovedOffset symbol
-					)
-					else fnMoveBipedScaleKeys i keyMovedOffset
-				)
-				fnMoveBipedKeys keyMovedOffset
-			)
-			if keyMovedOffset > 0 then 
-			(
-				rangEnd = animationrange.end + keyMovedOffset
-				animationrange = interval animationrange.start rangEnd
-			)
-			else if keyMovedOffset < 0 then 
-			(
-				rangeStart = animationrange.start + keyMovedOffset
-				animationrange = interval rangeStart animationrange.end
-			)
-		)
+		fnMoveAllKeys keyMovedOffset
 	)
 	on btnMoveKeys rightclick do with undo on
 	(
@@ -1182,7 +1309,23 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		fnCollectKeys ()
 		if arrKeysTime.count != 0 then  ----清除非link帧
 		(
-			for i in objects where (i.ishidden == false) do deselectKeys i
+			for i in objects where (i.ishidden == false) do 
+			(
+				deselectKeys i
+				if classof i == Biped_Object then
+				(
+					ctrlBiped      = i.controller
+					numLayers      = biped.numLayers ctrlBiped
+					idCurrentLayer = biped.getCurrentLayer ctrlBiped
+					while numLayers >= 0 do
+					(
+						biped.setCurrentLayer ctrlBiped numLayers
+						deselectKeys i
+						numLayers -= 1
+					)
+					biped.setCurrentLayer ctrlBiped idCurrentLayer
+				)
+			)
 			if arrLinkKeys.count != 0 then
 			(
 				for i in arrLinkKeys do i.selected = false
@@ -1206,49 +1349,9 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 				for i in arrLinkKeys do i.selected = false
 			)
 		)
+		else fnCollectKeys ()
 	)
 
-	on btnToKeysRange pressed do with undo on  ---------------帧栏显示首尾帧范围
-	(
-		fnCollectKeys ()
-		if (arrKeysTime.count != 0) then
-		(
-			if (arrLinkKeys.count != 0) then
-			(
-				case of  ------万恶的link帧导致更多判定
-				(
-					((arrLinkKeys[1].time >= keyFirst) and (arrLinkKeys[arrLinkKeys.count].time <= keyEnd)):
-					(animationrange = (interval keyFirst keyEnd))
-					((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time <= keyEnd)):
-					(animationrange = (interval arrLinkKeys[1].time keyEnd))
-					((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time >= keyEnd)):
-					(animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time))
-					((arrLinkKeys[1].time >= keyFirst) and (arrLinkKeys[arrLinkKeys.count].time > keyEnd)):
-					(animationrange = (interval keyFirst arrLinkKeys[arrLinkKeys.count].time))
-					((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time > keyEnd)):
-					(animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time))
-				)
-			)
-			else
-			(
-				animationrange = interval keyFirst keyEnd
-			)
-		)
-		else 
-		(
-			if ((arrLinkKeys.count != 0) and (arrLinkKeys.count > 1)) then 
-			(
-				animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time)
-			)
-			else 
-			(
-				if (arrLinkKeys.count == 1) then
-				(
-					animationrange = (interval arrLinkKeys[1].time (arrLinkKeys[1].time + 1))
-				)
-			)
-		)
-	)
 	on btnDelOutKeys rightclick do with undo on-----------清理范围外帧(无限帧)
 	(
 		if (selection as array).count == 0 then 
@@ -1328,9 +1431,36 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		max file saveas
 	)
 
-	on btnIsoDisplay pressed do actionMan.executeAction 0 "281"  -- Tools: Hide Unselected
-
-	on btnIsoDisplay rightclick do actionMan.executeAction 0 "277"  -- Tools: Unhide All
+	on btnCutFrameDisplay pressed do with undo on  ---------------帧栏显示首尾帧范围
+	(
+		if switchSelKeyRange == 0 then
+		(
+			arrLastRange = #(animationrange.start,animationrange.end)
+			fnCollectKeys ()
+			animationrange = interval keySelFirst keySelEnd
+			switchSelKeyRange = 1
+		)
+		else 
+		(
+			animationrange = interval arrLastRange[1] arrLastRange[2]
+			switchSelKeyRange = 0
+		)
+	)
+	on btnCutFrameDisplay rightclick do with undo on  ---------------帧栏显示首尾帧范围
+	(
+		if switchAllKeyRange == 0 then
+		(
+			arrLastAllRange = #(animationrange.start,animationrange.end)
+			fnCollectKeys ()
+			fnCutDisplayKeyRange keyFirst keyEnd
+			switchAllKeyRange = 1
+		)
+		else 
+		(
+			animationrange = interval arrLastAllRange[1] arrLastAllRange[2]
+			switchAllKeyRange = 0
+		)
+	)
 )
 Createdialog rolloutBulletKeyTools fgcolor:(color 255 20 100) pos:iniPos style:#()
 clearListener()  ---------清除侦听器
