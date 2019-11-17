@@ -3,25 +3,9 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-15 13:17:57
+ * @LastEditTime: 2019-11-17 14:43:35
  * @Email: animator.bullet@foxmail.com
  */
--- getKeyTime $.rotation.controller 1
--- selectKeys $ (getKeyTime $.rotation.controller 1) ($.rotation.controller.keys[$.rotation.controller.keys.count].time)
--- slidertime
-
---$.controller.子动画数量, 若子动画.keys 不为空 则取之加入数组  参考清理无限帧递归
-
--- $.controller[2].keys[1].selected = true
--- SubAnim:Link_Times 移动帧特殊处理 取link帧 $.controller[2].keys
--- if (getSubanimname $.controller 2) == #Link_Times then  判断为link帧
-
--- movekeys $.controller 5 #selection  移动帧
--- biped.moveKeys
--- 左键+右键-
--- v0.6 针对link帧大优化,可选是否有link帧,方便操作,增加移动帧功能,有问题随时反馈~
--- 优化todo:只判断link子动画,不遍历所有,加快多骨骼的收集帧效率
--- 增加神器按钮,打开小数帧,拖帧更平滑
 
 try(destroydialog rolloutBulletKeyTools)catch()
 
@@ -55,8 +39,12 @@ Global keyMovedOffset = 5
 Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
 Global arrTraj = #()  ---轨迹存放数组, 方便删除
--- Global bipedRoot = #()   -------判断选择了几个biped骨架
--- Global numLayers = 0   ------biped层级数
+Global arrToolC1 = #()  ----------工具按钮数组
+Global arrToolC2 = #()  ----------工具按钮数组
+Global arrToolC3 = #()  ----------工具按钮数组
+Global arrToolC4 = #()  ----------工具按钮数组
+Global arrToolC5 = #()  ----------工具按钮数组
+Global idBtn = 1
 ------------------全局变量-------------------------------------------------------------------
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
@@ -68,12 +56,14 @@ fn fnSaveConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
 	iniPos = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" ([posMouX,posMouY] as string)
 	switchToolPanel = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
+	idBtn = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
 )
 fnSaveConfig () --初始执行一遍
 fn fnSetConfig =  --保存参数,脚本位置
 (
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "Pos" (iniPos as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "idBtn" (idBtn as string)
 )
 ---------------配合BulletTools工具的ini文件保存位置信息-----------------
 
@@ -221,15 +211,13 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	---------------------------------UI--------------------------------------
 	groupbox gbxMainUI "[ K 帧工具_v0.7 ] ------ 中键关闭" pos:[5,5] width:190 height:175
 	
-		label lblRangeTimeText "| 起始帧 |      | 结尾帧 |" pos:[10,25] width:180 \
+		label lblRangeTimeText "| 起始帧 |      | 结束帧 |" pos:[10,25] width:180 \
 		spinner spiStartTime "" pos:[10,43] width:50 type:#integer \
 		range:[-999999999,999999999,animationrange.start] scale:1
--- 		setKeyBrackets:true
 		label lblTo "▃"  pos:[65,39] tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" \
 		width:20 height:20
 		spinner spiEndTime "" pos:[80,43] width:50 type:#integer \
 		range:[-999999999,999999999,animationrange.end] scale:1
--- 		setKeyBrackets:true
 		button btnMagicBtn "✧(≖ ◡ ≖" pos:[135,30] width:55 height:30 border:false \
 		tooltip:"点我点我点我~\r\n左点小工具,\r\n右点帮助说明."
 		edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
@@ -237,7 +225,6 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnSet5 "5f" width:35 pos:[90,70]
 		button btnSetAdd "+5f" width:35 pos:[125,70]
 		button btnSetOpposite "负" width:30 pos:[160,70]
--- 		checkbox <name> [<caption>] [checked:<boolean>]
 		checkBox btnJudgeLinkKey "Link?" \
 		pos:[18,104] tooltip:"是否存在Link帧?" checked:false 
 		button btnSelBeforeKeys " " \
@@ -248,14 +235,10 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		pos:[130,95] width:30 height:30 toolTip:"选择滑条后面关键帧" border:false
 		button btnMoveKeys " " width:30 height:30 \
 		pos:[160,95] toolTip:"移动关键帧,\r\n左键带帧栏范围增减,\r\n右键范围不变~" border:false
--- 		label labTips "--- 未选即处理全部, 注意无限帧! --" \
--- 		pos:[10,130]
 		button btnCutFrameDisplay " ◐ 帧预览" pos:[10,128] width:55 height:25 \
 		tooltip:"左：预览选择帧范围\r\n右：预览全部帧范围\r\n再点回到上次帧范围\r\n别晃晕了。╮(￣▽￣)╭" border:false
 		button btnCSTools "❤ CS选择" pos:[65,128] width:60 height:25 \
 		tooltip:"CS选择工具" border:false
-		-- button btnIsoDisplay "◐ 独显" pos:[70,132] width:50 height:20 \
-		-- tooltip:"左键隐藏未选中\r\n右键显示全部" border:false
 		button btnSpringMagic "✿ 飘带插件" pos:[125,128] width:65 height:25 \
 		tooltip:"左点新版,右点旧版\r\n不久可能会有强化版~" border:false
 		button btnQuickSave "✪ 快速备份" pos:[10,155] width:70 height:20 \
@@ -265,41 +248,77 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	
 	groupbox gbxMinTools "小工具" pos:[200,5] width:140 height:225
 	
-		button btnBoneTraj "◆ Bone轨迹"  width:75 height:20 \
-		pos:[260,25] toolTip:"切换显示Bone轨迹,\r\n右键清除所有Bone轨迹"
-		button btnBipedTraj "★ Biped轨迹"  width:75 height:20 \
-		pos:[260,45] toolTip:"左键切换显示单个Biped轨迹,\r\n右键切换显示所有Biped轨迹~"
-		button btnFnFrame "● 整小数帧" width:75 height:20 \
-		pos:[260,65] tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿"
-		button btnSelByColor "◪ 同色选择" width:75 height:20 \
-		pos:[260,85] tooltip:"选择同颜色物体"
-		button btnFnTCB "☯  TCB 互转" height:20 width:75\
-		pos:[260,125] tooltip:"欧拉和TCB互转"
-		button btnEulerFilter "✈ 欧拉过滤" height:20 width:75 \
-		pos:[260,145] tooltip:"Bone骨骼过滤欧拉旋转"
-		button btnBoneTool "❁ 骨骼工具" height:20 width:75 \
-		pos:[260,165] tooltip:"左键骨骼工具,\r\n右键BoneOn切换"
-		button btnAutoBack "✔ 备份设置" height:20 width:75 \
-		pos:[260,185] tooltip:"自动备份设置"
-		button btnSetHotKey "✎ 改 K 帧键" height:20 width:75 \
-		pos:[260,205] tooltip:"自定义K帧快捷键"
-		button btnClearSelKeys "▲ 消帧"  height:20 width:50 \
-		pos:[205,25] tooltip:"取消关键帧选择 (非删除帧)" \
-		-- button btnToKeysRange "〇 卡帧" tooltip:"帧范围变成首尾帧 !\r\n小心无限帧~ 后果未知..." \
-		-- pos:[205,45] height:20 width:50
-		button btnDelOutKeys "✖ 删帧" height:20 width:50 \
-		pos:[205,45] toolTip:"左键清除选择帧\r\n右键清范围外帧(无限帧)"
-		button btnFreezeMesh "✲ 冻模" height:20 width:50 \
-		pos:[205,65] toolTip:"冻结模型"
-		button btnHideBones "☁ 藏骨" height:20 width:50 \
-		pos:[205,90] toolTip:"隐藏骨骼"
-		button btnSelBoneBiped "☑ 选骨" height:20 width:50 \
-		pos:[205,110] toolTip:"左键选择所有biped\r\n右键选择所有bone"
-		button btnEndBone "✚ 末端" height:20 width:50 \
-		pos:[205,185] toolTip:"骨骼以Box显示"
-		button btnFnBox "㊣ BOX" height:20 width:50 \
-		pos:[205,205] toolTip:"骨骼以Box显示"
-		
+		button btnC1 "- 骨骼 -" height:40 width:45 border:false \
+		pos:[205,24] toolTip:""
+		button btnC2 "- 帧操 -" width:45 height:40 border:false \
+		pos:[205,64] toolTip:""
+		button btnC3 "- 显示 -" width:45 height:40 border:false \
+		pos:[205,104] toolTip:""
+		button btnC4 "- 选择 -" width:45 height:40 border:false \
+		pos:[205,144] toolTip:""
+		button btnC5 "- 配置 -" width:45 height:40 border:false \
+		pos:[205,184] toolTip:""
+
+		button btnBoneTraj "◆ Bone轨迹" width:75 height:32 visible:false border:false \
+		toolTip:"切换显示Bone轨迹,\r\n右键清除所有Bone轨迹"
+		button btnBipedTraj "★ Biped轨迹" width:75 height:32 visible:false border:false \
+		toolTip:"左键切换显示单个Biped轨迹,\r\n右键切换显示所有Biped轨迹~"
+		button btnFnFrame "● 整小数帧" width:75 height:32 visible:false border:false \
+		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿"
+		button btnSelByColor "◪ 同色选择" width:75 height:32 visible:false border:false \
+		tooltip:"选择同颜色物体"
+		button btnFnTCB "☯ TCB 互转" width:75 height:32 visible:false border:false \
+		tooltip:"欧拉和TCB互转"
+		button btnEulerFilter "✈ 欧拉过滤" width:75 height:32 visible:false border:false \
+		tooltip:"Bone骨骼过滤欧拉旋转"
+		button btnBoneTool "❁ 骨骼工具" width:75 height:32 visible:false border:false \
+		tooltip:"左键骨骼工具,\r\n右键BoneOn切换"
+		button btnAutoBack "✔ 备份设置" width:75 height:32 visible:false border:false \
+		tooltip:"自动备份设置"
+		button btnSetHotKey " ✎ 改 K 帧键" width:75 height:32 visible:false border:false \
+		tooltip:"自定义K帧快捷键"
+		button btnClearSelKeys "▲ 取消选帧" width:75 height:32 visible:false border:false \
+		tooltip:"取消关键帧选择 (非删除帧)" width:75 height:32 visible:false border:false \
+		button btnDelOutKeys "✖ 删关键帧" width:75 height:32 visible:false border:false \
+		toolTip:"左键清除选择帧\r\n右键清范围外帧(无限帧)"
+		button btnFreezeMesh "✲ 冻结模型" width:75 height:32 visible:false border:false \
+		toolTip:"冻结模型"
+		button btnHideBones "☁ 隐藏骨骼" width:75 height:32 visible:false border:false \
+		toolTip:"隐藏骨骼"
+		button btnSelBoneBiped "☑ 选择骨骼" width:75 height:32 visible:false border:false \
+		toolTip:"左键选择所有biped\r\n右键选择所有bone"
+		button btnEndBone "✚ 末端操作" width:75 height:32 visible:false border:false \
+		toolTip:"添加清除隐藏Bone末端"
+		button btnFnBox "㊣ BOX显示" width:75 height:32 visible:false border:false \
+		toolTip:"骨骼以Box显示"
+		button btnNull1 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull2 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull3 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull4 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull5 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull6 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull7 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull8 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull9 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull10 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull11 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull12 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull13 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
+		button btnNull14 " < 未定义 > " width:75 height:32 visible:false border:false \
+		toolTip:"功能待添加"
 	
 	groupbox gbxTips "" pos:[5,180] width:190 height:50
 	
@@ -313,15 +332,15 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	(
 		if switchToolPanel == 0 then
 		(
-			rolloutBulletKeyTools.width = 200
-			rolloutBulletKeyTools.gbxMinTools.visible  = false
-			btnMagicBtn.text = "✧(≖ ◡ ≖"
+			rolloutBulletKeyTools.width               = 200
+			rolloutBulletKeyTools.gbxMinTools.visible = false
+			btnMagicBtn.text                          = "✧(≖ ◡ ≖"
 		)
 		else
 		(
-			rolloutBulletKeyTools.width = 345
-			rolloutBulletKeyTools.gbxMinTools.visible  = true
-			btnMagicBtn.text = "( = `▽`)"
+			rolloutBulletKeyTools.width               = 345
+			rolloutBulletKeyTools.gbxMinTools.visible = true
+			btnMagicBtn.text                          = "( = `▽`)"
 		)
 	)
 
@@ -329,18 +348,67 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	(
 		if switchToolPanel == 1 then
 		(
-			rolloutBulletKeyTools.width = 200
-			rolloutBulletKeyTools.gbxMinTools.visible  = false
-			btnMagicBtn.text = "✧(≖ ◡ ≖"
-			switchToolPanel = 0
+			rolloutBulletKeyTools.width               = 200
+			rolloutBulletKeyTools.gbxMinTools.visible = false
+			btnMagicBtn.text                          = "✧(≖ ◡ ≖"
+			switchToolPanel                           = 0
 		)
 		else
 		(
-			rolloutBulletKeyTools.width = 345
-			rolloutBulletKeyTools.gbxMinTools.visible  = true
-			btnMagicBtn.text = "( = `▽`)"
-			switchToolPanel = 1
+			rolloutBulletKeyTools.width               = 345
+			rolloutBulletKeyTools.gbxMinTools.visible = true
+			btnMagicBtn.text                          = "( = `▽`)"
+			switchToolPanel                           = 1
 		)
+	)
+
+	fn fnSwitchToolsBtn idBtn =
+	(
+		arrToolC1 = #(rolloutBulletKeyTools.btnFnTCB,\
+						rolloutBulletKeyTools.btnBoneTool,\
+						rolloutBulletKeyTools.btnEndBone,\
+						rolloutBulletKeyTools.btnNull1,\
+						rolloutBulletKeyTools.btnNull2,\
+						rolloutBulletKeyTools.btnNull3)
+		arrToolC2 = #(rolloutBulletKeyTools.btnClearSelKeys,\
+						rolloutBulletKeyTools.btnDelOutKeys,\
+						rolloutBulletKeyTools.btnEulerFilter,\
+						rolloutBulletKeyTools.btnNull4,\
+						rolloutBulletKeyTools.btnNull5,\
+						rolloutBulletKeyTools.btnNull6)
+		arrToolC3 = #(rolloutBulletKeyTools.btnBoneTraj,\
+						rolloutBulletKeyTools.btnBipedTraj,\
+						rolloutBulletKeyTools.btnFnFrame,\
+						rolloutBulletKeyTools.btnHideBones,\
+						rolloutBulletKeyTools.btnFnBox,\
+						rolloutBulletKeyTools.btnNull7)
+		arrToolC4 = #(rolloutBulletKeyTools.btnFreezeMesh,\
+						rolloutBulletKeyTools.btnSelByColor,\
+						rolloutBulletKeyTools.btnSelBoneBiped,\
+						rolloutBulletKeyTools.btnNull8,\
+						rolloutBulletKeyTools.btnNull9,\
+						rolloutBulletKeyTools.btnNull10)
+		arrToolC5 = #(rolloutBulletKeyTools.btnAutoBack,\
+						rolloutBulletKeyTools.btnSetHotKey,\
+						rolloutBulletKeyTools.btnNull11,\
+						rolloutBulletKeyTools.btnNull12,\
+						rolloutBulletKeyTools.btnNull13,\
+						rolloutBulletKeyTools.btnNull14)
+
+		local arrBtnAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4 + arrToolC5
+		
+		for b in arrBtnAll do
+		(
+			b.visible = false
+		)
+
+		str  = "for b = 1 to arrToolC" + idBtn as string + ".count do" + "\r\n"
+		str += "(" + "\r\n"
+		str += "	arrToolC" + idBtn as string + "[b].visible = true" + "\r\n"
+		str += "	arrToolC" + idBtn as string + "[b].pos = [260,26 + (b - 1) * 32]" + "\r\n"
+		str += ")"
+		
+		execute str
 	)
 
 	Fn CleanOutRangeKeys inputObject =  ---清理无限帧,以前收集的,找不到来源了,大概是遍历子动画
@@ -980,6 +1048,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		judgePlaySpeedValue ()  -----判断播放速度
 		rolloutBulletKeyTools.btnSetFpsAndSpeed.text = "  |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
 		fnRefreshMagicBtn ()
+		fnSwitchToolsBtn idBtn
 	)
 	
 	on rolloutBulletKeyTools close do -- 关闭记忆浮动窗口位置
@@ -1074,6 +1143,14 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	on btnCSTools pressed do 
 	(
 		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\cstools.ms")
+	)
+	on btnSpringMagic pressed do 
+	(
+		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\springmagic_v1.1.mse")
+	)
+	on btnSpringMagic rightclick do 
+	(
+		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\springmagic_v0.9.mse")
 	)
 
 	on btnBoneTraj pressed do ------显示bone的轨迹
@@ -1435,14 +1512,14 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	(
 		if switchSelKeyRange == 0 then
 		(
-			arrLastRange = #(animationrange.start,animationrange.end)
+			arrLastSelRange = #(animationrange.start,animationrange.end)
 			fnCollectKeys ()
 			animationrange = interval keySelFirst keySelEnd
 			switchSelKeyRange = 1
 		)
 		else 
 		(
-			animationrange = interval arrLastRange[1] arrLastRange[2]
+			animationrange = interval arrLastSelRange[1] arrLastSelRange[2]
 			switchSelKeyRange = 0
 		)
 	)
@@ -1461,6 +1538,14 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 			switchAllKeyRange = 0
 		)
 	)
+
+	------------切换工具栏分类--------------------------------------------
+	on btnC1 pressed do (idBtn = 1;fnSwitchToolsBtn idBtn)
+	on btnC2 pressed do (idBtn = 2;fnSwitchToolsBtn idBtn)
+	on btnC3 pressed do (idBtn = 3;fnSwitchToolsBtn idBtn)
+	on btnC4 pressed do (idBtn = 4;fnSwitchToolsBtn idBtn)
+	on btnC5 pressed do (idBtn = 5;fnSwitchToolsBtn idBtn)
+	--------------------------------------------------------------------
 )
 Createdialog rolloutBulletKeyTools fgcolor:(color 255 20 100) pos:iniPos style:#()
 clearListener()  ---------清除侦听器
