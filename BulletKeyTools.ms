@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-17 16:51:49
+ * @LastEditTime: 2019-11-17 21:20:56
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -280,7 +280,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnClearSelKeys "▲ 取消选帧" width:75 height:32 visible:false border:false \
 		tooltip:"取消关键帧选择 (非删除帧)" width:75 height:32 visible:false border:false \
 		button btnDelOutKeys "✖ 删关键帧" width:75 height:32 visible:false border:false \
-		toolTip:"左键清除选择或所有帧\r\n右键清范围外帧(无限帧)"
+		toolTip:"左键清除选择或所有帧\r\nLink帧请手动删~\r\n右键清范围外帧(无限帧)"
 		button btnFreezeMesh "✲ 冻结模型" width:75 height:32 visible:false border:false \
 		toolTip:"冻结模型"
 		button btnHideBones "☁ 隐藏骨骼" width:75 height:32 visible:false border:false \
@@ -411,7 +411,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		execute str
 	)
 
-	Fn CleanOutRangeKeys inputObject =  ---清理无限帧,以前收集的,找不到来源了,大概是遍历子动画
+	Fn fnCleanOutRangeKeys inputObject =  ---清理无限帧,以前收集的,找不到来源了,大概是遍历子动画
 	(
 		startTime = AnimationRange.Start
 		endTime = AnimationRange.End
@@ -430,7 +430,36 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 				outStartKeysIndex = for i = 1 to tempKeyList.Count where  tempKeyList[i].Time < startTime collect i
 				for i = 1 to outStartKeysIndex.Count do DeleteKey tempKeyList 1
 			)
-			if tempSubAnim.numSubs > 0 do CleanOutRangeKeys tempSubAnim
+			if tempSubAnim.numSubs > 0 do fnCleanOutRangeKeys tempSubAnim
+		)
+	)
+
+	fn fnDelSelKeys =
+	(
+		for o in selection where (o.ishidden == false) do 
+		(
+			if (classof o == Biped_Object) then
+			(
+				if classof o.controller == Vertical_Horizontal_Turn then  --清理质心帧
+				(
+					biped.deleteKeys o.controller.vertical #selection
+					biped.deleteKeys o.controller.horizontal #selection
+					if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
+						(biped.deleteKeys o.controller.flip #selection)
+						else(biped.deleteKeys o.controller.turning #selection)
+				)
+				else if classof o.controller == BipSlave_Control then  --清理biped正常帧
+				(
+					biped.deleteKeys o.controller #selection
+					subanimBipedScale = GetSubAnim o.controller[1] 1
+					if ((subanimBipedScale != undefined) and \
+					(GetSubAnimName subanimBipedScale 1 == #ScaleXYZ)) then  --清理biped的缩放针
+					(
+						deleteKeys subanimBipedScale.controller #selection
+					)
+				)
+			)
+			else deleteKeys o #selection   ---清理非biped帧
 		)
 	)
 
@@ -1433,40 +1462,27 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	(
 		if (selection as array).count == 0 then 
 		(
-			for tempObject in (objects as Array) do CleanOutRangeKeys tempObject
+			for tempObject in (objects as Array) do fnCleanOutRangeKeys tempObject
 		)
 		else
 		(
-			for tempObject in (selection as Array) do CleanOutRangeKeys tempObject
+			for tempObject in (selection as Array) do fnCleanOutRangeKeys tempObject
 		)
 	)
 
 	on btnDelOutKeys pressed do with undo on-----------清理选择帧
 	(
-		for o in selection where ((classof o == Biped_Object) and (o.ishidden == false)) do 
+		if selection.count != 0 then fnDelSelKeys ()
+		else
 		(
-			if classof o.controller == Vertical_Horizontal_Turn then  --清理质心帧
+			actionMan.executeAction 0 "40021"  -- Selection: Select All
+			fnCollectKeys ()
+			fnSelKeys keyFirst keyEnd 2
+			fnDelSelKeys ()
+			if arrLinkKeys.count != 0 then
 			(
-				biped.deleteKeys o.controller.vertical #selection
-				biped.deleteKeys o.controller.horizontal #selection
-				if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
-					(biped.deleteKeys o.controller.flip #selection)
-					else(biped.deleteKeys o.controller.turning #selection)
+				fnSelLinkKeys arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time 2
 			)
-			else if classof o.controller == BipSlave_Control then  --清理biped正常帧
-			(
-				biped.deleteKeys o.controller #selection
-				subanimBipedScale = GetSubAnim o.controller[1] 1
-				if ((subanimBipedScale != undefined) and \
-				(GetSubAnimName subanimBipedScale 1 == #ScaleXYZ)) then  --清理biped的缩放针
-				(
-					deleteKeys subanimBipedScale.controller #selection
-				)
-			)
-		)
-		for o in selection where ((classof o != Biped_Object) and (o.ishidden == false)) do  ---清理非biped帧
-		(
-			deleteKeys o #selection
 		)
 	)
 
