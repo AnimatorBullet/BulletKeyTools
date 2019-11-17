@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-17 14:43:35
+ * @LastEditTime: 2019-11-17 16:51:49
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -280,7 +280,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnClearSelKeys "▲ 取消选帧" width:75 height:32 visible:false border:false \
 		tooltip:"取消关键帧选择 (非删除帧)" width:75 height:32 visible:false border:false \
 		button btnDelOutKeys "✖ 删关键帧" width:75 height:32 visible:false border:false \
-		toolTip:"左键清除选择帧\r\n右键清范围外帧(无限帧)"
+		toolTip:"左键清除选择或所有帧\r\n右键清范围外帧(无限帧)"
 		button btnFreezeMesh "✲ 冻结模型" width:75 height:32 visible:false border:false \
 		toolTip:"冻结模型"
 		button btnHideBones "☁ 隐藏骨骼" width:75 height:32 visible:false border:false \
