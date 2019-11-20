@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-11-10 12:37:34
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-11 14:14:11
+ * @LastEditTime: 2019-11-20 14:43:53
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -21,7 +21,7 @@ Global SIODir = dotNetClass "System.IO.Directory"		---文件夹操作
 --these are the locations the mzp package extracted the files to
 Global dirScripts = (getdir #scripts) + "\\BulletScripts\\"
 Global file1 = "BulletKeyTools.ms"							----脚本主要文件
-Global theMacroFile = "_[BulletTools]-BulletKeyTools.mcr"	----工具栏文件
+-- Global theMacroFile = "_[BulletTools]-BulletKeyTools.mcr"	----工具栏文件
 Global arrScriptFiles = #(file1) 							----脚本数组
 Global arrScriptDirs = #("BulletScripts") 	----脚本文件夹数组
 Global arrIconsDirs = #("cstoolIcons")
@@ -228,10 +228,10 @@ rollout mzpDialog " BulletKeyTools  安装工具 " width:500 height:385
 		(
 			fnCopyDirectory ((getDir #temp)+ "\\" + i) ((getdir #Scripts) + "\\" + i)
 		)
-		fnDelFile ((getDir #userMacros)+ "\\" + theMacroFile) --delete the macro
-		copyFile ((getDir #temp) + "\\" + theMacroFile) ((getDir #userMacros)+ "\\" + theMacroFile) --move the macro to the usermacros
-		--execute the macro. this puts the script in a button
-		fileIn ((getDir #userMacros) + "\\" +theMacroFile)
+		-- fnDelFile ((getDir #userMacros)+ "\\" + theMacroFile) --delete the macro
+		-- copyFile ((getDir #temp) + "\\" + theMacroFile) ((getDir #userMacros)+ "\\" + theMacroFile) --move the macro to the usermacros
+		-- --execute the macro. this puts the script in a button
+		-- fileIn ((getDir #userMacros) + "\\" +theMacroFile)
 		--update the interface
 		local theArray = fn_checkScriptFilePresence()
 		local myMessage = "工具安装成功. 你可以在\r\n \"Customize\" -- \"Customize user interface...\" -- \"Toolbars\" -- \"_[BulletTools]\" Category (最上) \r\n中找到,并拖到工具栏~"

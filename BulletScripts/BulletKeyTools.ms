@@ -3,11 +3,12 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-17 14:43:35
+ * @LastEditTime: 2019-11-19 11:51:35
  * @Email: animator.bullet@foxmail.com
  */
 
 try(destroydialog rolloutBulletKeyTools)catch()
+try(destroydialog rolFnKeys)catch()
 
 Global posMouX      = mouse.screenpos.x
 Global posMouY      = mouse.screenpos.y  --获取鼠标位置
@@ -205,6 +206,123 @@ rcmenu menuSetSpeed
 )
 ------------------帧率,播放速度------------------------------------------------------------
 
+---------------------滑动帧切换rollout---------------------------------
+rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
+(
+	group ""
+	(
+		checkbox chkLHand "左手" pos:[24,20] width:50 height:20 color:Blue
+		checkbox chkRHand "右手" pos:[96,20] width:50 height:20 color:Green
+		checkbox chkLFoot "左脚" pos:[24,55] width:50 height:20 color:Blue checked:true
+		checkbox chkRFoot "右脚" pos:[96,55] width:50 height:20 color:Green checked:true
+		button btnPlanted "固定关键帧" pos:[184,20] width:80 height:25 toolTip:"Set Planted Key"
+		button btnSliding "滑动关键帧" pos:[184,50] width:80 height:25 toolTip:"Set Sliding Key"
+		button btnFree "自由关键帧" pos:[184,80] width:80 height:25 toolTip:"Set Free Key"
+		label lblMe "[2019.05.28]  Bullet.S" pos:[24,92] width:120 height:16 color:Green
+	)
+	
+	Fn fnSetKeyType keyType = 
+	(
+		sliderTime = animationRange.start
+		for obj in selection where ((classof obj.baseObject == Biped_Object) and (biped.getCurrentLayer obj.controller == 0)) do
+		(
+			bipCtrl = obj.controller
+			if chkLHand.checked then 
+			(
+				sel_obj1 = (biped.getNode bipCtrl #larm)
+				k = numKeys sel_obj1.controller
+					for i=1 to k do
+					(
+					t = (biped.getkey sel_obj1.controller i).time
+						slidertime = t
+						with animate on --at time t		
+						(
+							case of
+							(
+								(keyType == 1):(biped.SetPlantedKey sel_obj1)
+								(keyType == 2):(biped.SetSlidingKey sel_obj1)
+								(keyType == 3):(biped.SetFreeKey sel_obj1)
+							)
+						)
+					)
+			)
+			if chkRHand.checked then 
+			(
+				sel_obj2 = (biped.getNode bipCtrl #rarm)
+				k = numKeys sel_obj2.controller
+					for i=1 to k do
+					(
+					t = (biped.getkey sel_obj2.controller i).time
+						slidertime = t
+						with animate on --at time t		
+						(
+							case of
+							(
+								(keyType == 1):(biped.SetPlantedKey sel_obj2)
+								(keyType == 2):(biped.SetSlidingKey sel_obj2)
+								(keyType == 3):(biped.SetFreeKey sel_obj2)
+							)
+						)
+					)
+			)
+			if chkLFoot.checked then 
+			(
+				sel_obj3 = (biped.getNode bipCtrl #lleg)
+				k = numKeys sel_obj3.controller
+					for i=1 to k do
+					(
+					t = (biped.getkey sel_obj3.controller i).time
+						slidertime = t
+						with animate on --at time t		
+						(
+							case of
+							(
+								(keyType == 1):(biped.SetPlantedKey sel_obj3)
+								(keyType == 2):(biped.SetSlidingKey sel_obj3)
+								(keyType == 3):(biped.SetFreeKey sel_obj3)
+							)
+						)
+					)
+			)
+			if chkRFoot.checked then 
+			(
+				sel_obj4 = (biped.getNode bipCtrl #rleg)
+				k = numKeys sel_obj4.controller
+					for i=1 to k do
+					(
+					t = (biped.getkey sel_obj4.controller i).time
+						slidertime = t
+						with animate on --at time t		
+						(
+							case of
+							(
+								(keyType == 1):(biped.SetPlantedKey sel_obj4)
+								(keyType == 2):(biped.SetSlidingKey sel_obj4)
+								(keyType == 3):(biped.SetFreeKey sel_obj4)
+							)
+						)
+					)
+			)
+		)
+	)
+	
+	on btnPlanted pressed  do
+	(
+		fnSetKeyType 1
+	)
+	
+	on btnSliding pressed  do
+	(
+		fnSetKeyType 2
+	)
+	
+	on btnFree pressed  do
+	(
+		fnSetKeyType 3
+	)
+)
+-----------------------------------------------------------------
+
 -------------主UI-----------------------------------------------------------------
 rollout rolloutBulletKeyTools "" width:200 height:235
 (
@@ -248,15 +366,15 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	
 	groupbox gbxMinTools "小工具" pos:[200,5] width:140 height:225
 	
-		button btnC1 "- 骨骼 -" height:40 width:45 border:false \
+		button btnC1 "- 帧操 -" width:45 height:40 border:false \
 		pos:[205,24] toolTip:""
-		button btnC2 "- 帧操 -" width:45 height:40 border:false \
+		button btnC2 "- 显示 -" width:45 height:40 border:false \
 		pos:[205,64] toolTip:""
-		button btnC3 "- 显示 -" width:45 height:40 border:false \
+		button btnC3 "- 选择 -" width:45 height:40 border:false \
 		pos:[205,104] toolTip:""
-		button btnC4 "- 选择 -" width:45 height:40 border:false \
+		button btnC4 "- 骨骼 -" height:40 width:45 border:false \
 		pos:[205,144] toolTip:""
-		button btnC5 "- 配置 -" width:45 height:40 border:false \
+		button btnC5 "- 系统 -" width:45 height:40 border:false \
 		pos:[205,184] toolTip:""
 
 		button btnBoneTraj "◆ Bone轨迹" width:75 height:32 visible:false border:false \
@@ -280,7 +398,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnClearSelKeys "▲ 取消选帧" width:75 height:32 visible:false border:false \
 		tooltip:"取消关键帧选择 (非删除帧)" width:75 height:32 visible:false border:false \
 		button btnDelOutKeys "✖ 删关键帧" width:75 height:32 visible:false border:false \
-		toolTip:"左键清除选择帧\r\n右键清范围外帧(无限帧)"
+		toolTip:"左键清除选择或所有帧\r\nLink帧请手动删~\r\n右键清范围外帧(无限帧)"
 		button btnFreezeMesh "✲ 冻结模型" width:75 height:32 visible:false border:false \
 		toolTip:"冻结模型"
 		button btnHideBones "☁ 隐藏骨骼" width:75 height:32 visible:false border:false \
@@ -289,22 +407,22 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		toolTip:"左键选择所有biped\r\n右键选择所有bone"
 		button btnEndBone "✚ 末端操作" width:75 height:32 visible:false border:false \
 		toolTip:"添加清除隐藏Bone末端"
-		button btnFnBox "㊣ BOX显示" width:75 height:32 visible:false border:false \
-		toolTip:"骨骼以Box显示"
+		checkbutton ckbFnBoxDisplay "㊣ BOX切显" width:75 height:32 visible:false border:false \
+		toolTip:"左:骨骼切换Box显示\r\n右:Clay显示开关"
 		button btnNull1 " < 未定义 > " width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
 		button btnNull2 " < 未定义 > " width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
 		button btnNull3 " < 未定义 > " width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
-		button btnNull4 " < 未定义 > " width:75 height:32 visible:false border:false \
+		button btnFnKeyType "♣ 黄帧切换" width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
 		button btnNull5 " < 未定义 > " width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
 		button btnNull6 " < 未定义 > " width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
-		button btnNull7 " < 未定义 > " width:75 height:32 visible:false border:false \
-		toolTip:"功能待添加"
+		checkbutton ckbFnMtlDisplay "▣ 白模切显" width:75 height:32 visible:false border:false \
+		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:\r\n注意：暂不支持子材质..."
 		button btnNull8 " < 未定义 > " width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
 		button btnNull9 " < 未定义 > " width:75 height:32 visible:false border:false \
@@ -364,30 +482,30 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 
 	fn fnSwitchToolsBtn idBtn =
 	(
-		arrToolC1 = #(rolloutBulletKeyTools.btnFnTCB,\
-						rolloutBulletKeyTools.btnBoneTool,\
-						rolloutBulletKeyTools.btnEndBone,\
-						rolloutBulletKeyTools.btnNull1,\
-						rolloutBulletKeyTools.btnNull2,\
-						rolloutBulletKeyTools.btnNull3)
-		arrToolC2 = #(rolloutBulletKeyTools.btnClearSelKeys,\
+		arrToolC1 = #(rolloutBulletKeyTools.btnClearSelKeys,\
 						rolloutBulletKeyTools.btnDelOutKeys,\
 						rolloutBulletKeyTools.btnEulerFilter,\
-						rolloutBulletKeyTools.btnNull4,\
+						rolloutBulletKeyTools.btnFnKeyType,\
 						rolloutBulletKeyTools.btnNull5,\
 						rolloutBulletKeyTools.btnNull6)
-		arrToolC3 = #(rolloutBulletKeyTools.btnBoneTraj,\
+		arrToolC2 = #(rolloutBulletKeyTools.btnBoneTraj,\
 						rolloutBulletKeyTools.btnBipedTraj,\
 						rolloutBulletKeyTools.btnFnFrame,\
 						rolloutBulletKeyTools.btnHideBones,\
-						rolloutBulletKeyTools.btnFnBox,\
-						rolloutBulletKeyTools.btnNull7)
-		arrToolC4 = #(rolloutBulletKeyTools.btnFreezeMesh,\
+						rolloutBulletKeyTools.ckbFnBoxDisplay,\
+						rolloutBulletKeyTools.ckbFnMtlDisplay)
+		arrToolC3 = #(rolloutBulletKeyTools.btnFreezeMesh,\
 						rolloutBulletKeyTools.btnSelByColor,\
 						rolloutBulletKeyTools.btnSelBoneBiped,\
 						rolloutBulletKeyTools.btnNull8,\
 						rolloutBulletKeyTools.btnNull9,\
 						rolloutBulletKeyTools.btnNull10)
+		arrToolC4 = #(rolloutBulletKeyTools.btnFnTCB,\
+						rolloutBulletKeyTools.btnBoneTool,\
+						rolloutBulletKeyTools.btnEndBone,\
+						rolloutBulletKeyTools.btnNull1,\
+						rolloutBulletKeyTools.btnNull2,\
+						rolloutBulletKeyTools.btnNull3)
 		arrToolC5 = #(rolloutBulletKeyTools.btnAutoBack,\
 						rolloutBulletKeyTools.btnSetHotKey,\
 						rolloutBulletKeyTools.btnNull11,\
@@ -411,7 +529,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		execute str
 	)
 
-	Fn CleanOutRangeKeys inputObject =  ---清理无限帧,以前收集的,找不到来源了,大概是遍历子动画
+	Fn fnCleanOutRangeKeys inputObject =  ---清理无限帧,以前收集的,找不到来源了,大概是遍历子动画
 	(
 		startTime = AnimationRange.Start
 		endTime = AnimationRange.End
@@ -430,7 +548,36 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 				outStartKeysIndex = for i = 1 to tempKeyList.Count where  tempKeyList[i].Time < startTime collect i
 				for i = 1 to outStartKeysIndex.Count do DeleteKey tempKeyList 1
 			)
-			if tempSubAnim.numSubs > 0 do CleanOutRangeKeys tempSubAnim
+			if tempSubAnim.numSubs > 0 do fnCleanOutRangeKeys tempSubAnim
+		)
+	)
+
+	fn fnDelSelKeys =
+	(
+		for o in selection where (o.ishidden == false) do 
+		(
+			if (classof o == Biped_Object) then
+			(
+				if classof o.controller == Vertical_Horizontal_Turn then  --清理质心帧
+				(
+					biped.deleteKeys o.controller.vertical #selection
+					biped.deleteKeys o.controller.horizontal #selection
+					if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
+						(biped.deleteKeys o.controller.flip #selection)
+						else(biped.deleteKeys o.controller.turning #selection)
+				)
+				else if classof o.controller == BipSlave_Control then  --清理biped正常帧
+				(
+					biped.deleteKeys o.controller #selection
+					subanimBipedScale = GetSubAnim o.controller[1] 1
+					if ((subanimBipedScale != undefined) and \
+					(GetSubAnimName subanimBipedScale 1 == #ScaleXYZ)) then  --清理biped的缩放针
+					(
+						deleteKeys subanimBipedScale.controller #selection
+					)
+				)
+			)
+			else deleteKeys o #selection   ---清理非biped帧
 		)
 	)
 
@@ -1433,40 +1580,27 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	(
 		if (selection as array).count == 0 then 
 		(
-			for tempObject in (objects as Array) do CleanOutRangeKeys tempObject
+			for tempObject in (objects as Array) do fnCleanOutRangeKeys tempObject
 		)
 		else
 		(
-			for tempObject in (selection as Array) do CleanOutRangeKeys tempObject
+			for tempObject in (selection as Array) do fnCleanOutRangeKeys tempObject
 		)
 	)
 
 	on btnDelOutKeys pressed do with undo on-----------清理选择帧
 	(
-		for o in selection where ((classof o == Biped_Object) and (o.ishidden == false)) do 
+		if selection.count != 0 then fnDelSelKeys ()
+		else
 		(
-			if classof o.controller == Vertical_Horizontal_Turn then  --清理质心帧
+			actionMan.executeAction 0 "40021"  -- Selection: Select All
+			fnCollectKeys ()
+			fnSelKeys keyFirst keyEnd 2
+			fnDelSelKeys ()
+			if arrLinkKeys.count != 0 then
 			(
-				biped.deleteKeys o.controller.vertical #selection
-				biped.deleteKeys o.controller.horizontal #selection
-				if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
-					(biped.deleteKeys o.controller.flip #selection)
-					else(biped.deleteKeys o.controller.turning #selection)
+				fnSelLinkKeys arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time 2
 			)
-			else if classof o.controller == BipSlave_Control then  --清理biped正常帧
-			(
-				biped.deleteKeys o.controller #selection
-				subanimBipedScale = GetSubAnim o.controller[1] 1
-				if ((subanimBipedScale != undefined) and \
-				(GetSubAnimName subanimBipedScale 1 == #ScaleXYZ)) then  --清理biped的缩放针
-				(
-					deleteKeys subanimBipedScale.controller #selection
-				)
-			)
-		)
-		for o in selection where ((classof o != Biped_Object) and (o.ishidden == false)) do  ---清理非biped帧
-		(
-			deleteKeys o #selection
 		)
 	)
 
@@ -1475,12 +1609,12 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		if hideByCategory.bones == false then 
 		(
 			hideByCategory.bones = true
-			btnHideBones.text = " ☼ 显骨"
+			btnHideBones.text = " ☼ 显示骨骼"
 		)
 		else 
 		(
 			hideByCategory.bones = false
-			btnHideBones.text = "☁ 藏骨"
+			btnHideBones.text = "☁ 隐藏骨骼"
 		)
 -- 		redrawviews()
 		slidertime -= 1
@@ -1546,6 +1680,82 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	on btnC4 pressed do (idBtn = 4;fnSwitchToolsBtn idBtn)
 	on btnC5 pressed do (idBtn = 5;fnSwitchToolsBtn idBtn)
 	--------------------------------------------------------------------
+
+	on btnFnTCB pressed do 
+	(
+		for i in selection where classof i == BoneGeometry do
+		(
+			if classof i.rotation.controller == tcb_rotation then
+				(i.rotation.controller = Euler_XYZ ())
+				else (i.rotation.controller = tcb_rotation ())
+		)
+	)
+
+	on btnBoneTool pressed do (macros.run "Animation Tools" "BoneAdjustmentTools")
+
+	on btnBoneTool rightclick do 
+	(
+		for i in selection where classof i == BoneGeometry do
+		(
+			if i.boneEnable == false then i.boneEnable = true
+			else i.boneEnable = false
+		)
+	)
+	
+	on btnFnKeyType pressed do 
+	(
+		try(destroydialog rolFnKeys)catch()
+		Createdialog rolFnKeys fgcolor:(color 255 20 100)
+	)
+
+	on btnEulerFilter pressed do 
+	(
+		for i in selection where classof i == BoneGeometry do
+		(
+			if classof i.rotation.controller == Euler_XYZ then
+			(
+				i.rotation.controller = tcb_rotation ()
+				i.rotation.controller = Euler_XYZ ()
+			)
+		)
+	)
+
+	on ckbFnBoxDisplay changed state do 
+	(
+		for o in Geometry where (o.isHidden == false) do 
+		(
+			if ((classof o == BoneGeometry) or (classof o == Biped_Object)) then
+			(
+				if state == on then o.boxmode = on 
+				else o.boxmode = off
+			)
+		)
+	)
+	on ckbFnBoxDisplay rightclick do 
+	(
+		local disp = NitrousGraphicsManager.GetActiveViewportSetting() 
+		if disp.VisualStyleMode == #clay then disp.VisualStyleMode = #Realistic
+		else disp.VisualStyleMode =  #clay
+	)
+	
+	on ckbFnMtlDisplay changed state do 
+	(
+		if state == off then
+		(
+			for mat in (getClassInstances vrayMtl processAllAnimatables:true) do showTextureMap mat on
+			for mat in (getClassInstances standard processAllAnimatables:true) do showTextureMap mat on
+		)
+		else
+		(
+			for mat in (getClassInstances vrayMtl processAllAnimatables:true) do showTextureMap mat off
+			for mat in (getClassInstances standard processAllAnimatables:true) do showTextureMap mat off
+		)
+	)
+
+	-- on ckbFnMtlDisplay rightclick do 
+	-- (
+		
+	-- )
 )
 Createdialog rolloutBulletKeyTools fgcolor:(color 255 20 100) pos:iniPos style:#()
 clearListener()  ---------清除侦听器
