@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-19 11:51:35
+ * @LastEditTime: 2019-11-20 14:39:25
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -1759,3 +1759,18 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 )
 Createdialog rolloutBulletKeyTools fgcolor:(color 255 20 100) pos:iniPos style:#()
 clearListener()  ---------清除侦听器
+
+
+------------------------toolbar----------------------------------------------------
+macroScript BulletKeyTools
+category:"_[BulletTools]"
+buttonText:"K帧工具"
+toolTip:"K帧工具"
+-- Icon:#("Systems",2)
+(
+	on execute do
+	(
+		fileIn ((getDir #Scripts)+ "\\BulletScripts\\" + "BulletKeyTools.ms")
+	)
+)
+-------------------------------------------------------------------------------------
