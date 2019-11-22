@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-20 14:39:25
+ * @LastEditTime: 2019-11-22 14:35:28
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -16,9 +16,9 @@ Global posMouMoved  = [0,0]
 Global switchMouseState = false
 Global switchSelKeyRange = 0
 Global switchToolPanel = 0
-Global arrLastSelRange = #(animationrange.start,animationrange.end)
+Global arrLastSelRange = #()
 Global switchAllKeyRange = 0
-Global arrLastAllRange = #(animationrange.start,animationrange.end)
+Global arrLastAllRange = #()
 
 Global arrKeysTime     = #()  ----------biped和bone的首尾帧
 Global arrLinkKeys     = #()  -----------存link帧
@@ -108,7 +108,7 @@ fn fnSetFps numFps =
     framerate = numFps
     valueFps = numFps
     strCurrentFps = framerate as string + " FPS"
-	rolloutBulletKeyTools.btnSetFpsAndSpeed.text = "  |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
+	rolloutBulletKeyTools.btnSetFpsAndSpeed.text = " |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
     slidertime -= 1
     slidertime += 1
 )
@@ -129,7 +129,7 @@ fn fnSetSpeed numSpeed =
 (
     timeConfiguration.playbackSpeed = numSpeed
     judgePlaySpeedValue ()
-	rolloutBulletKeyTools.btnSetFpsAndSpeed.text = "  |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
+	rolloutBulletKeyTools.btnSetFpsAndSpeed.text = " |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
 )
 
 rcmenu menuSetFps
@@ -352,17 +352,17 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnSelAfterKeys " " \
 		pos:[130,95] width:30 height:30 toolTip:"选择滑条后面关键帧" border:false
 		button btnMoveKeys " " width:30 height:30 \
-		pos:[160,95] toolTip:"移动关键帧,\r\n左键带帧栏范围增减,\r\n右键范围不变~" border:false
-		button btnCutFrameDisplay " ◐ 帧预览" pos:[10,128] width:55 height:25 \
+		pos:[160,95] toolTip:"移动关键帧,\r\n左：帧栏范围同步增减,\r\n右：帧栏范围保持不变~" border:false
+		button btnFileOpen "★ 快速打开" pos:[10,128] width:70 height:25 \
+		tooltip:"快速打开max文件\r\n可收藏常用目录" border:false
+		button btnCutFrameDisplay "◐ 帧预览" pos:[80,128] width:60 height:25 \
 		tooltip:"左：预览选择帧范围\r\n右：预览全部帧范围\r\n再点回到上次帧范围\r\n别晃晕了。╮(￣▽￣)╭" border:false
-		button btnCSTools "❤ CS选择" pos:[65,128] width:60 height:25 \
-		tooltip:"CS选择工具" border:false
-		button btnSpringMagic "✿ 飘带插件" pos:[125,128] width:65 height:25 \
+		button btnSpringMagic "✿ 飘带" pos:[140,128] width:50 height:25 \
 		tooltip:"左点新版,右点旧版\r\n不久可能会有强化版~" border:false
 		button btnQuickSave "✪ 快速备份" pos:[10,155] width:70 height:20 \
-		toolTip:"左键快速备份\r\n右键另存文件" border:false
+		toolTip:"左：快速备份\r\n右：另存文件" border:false
 		button btnSetFpsAndSpeed " " pos:[80,155] width:110 height:20 \
-		toolTip:"左键设置帧率\r\n右键播放速度" border:false
+		toolTip:"左：设置帧率\r\n右：播放速度" border:false
 	
 	groupbox gbxMinTools "小工具" pos:[200,5] width:140 height:225
 	
@@ -378,9 +378,9 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		pos:[205,184] toolTip:""
 
 		button btnBoneTraj "◆ Bone轨迹" width:75 height:32 visible:false border:false \
-		toolTip:"切换显示Bone轨迹,\r\n右键清除所有Bone轨迹"
-		button btnBipedTraj "★ Biped轨迹" width:75 height:32 visible:false border:false \
-		toolTip:"左键切换显示单个Biped轨迹,\r\n右键切换显示所有Biped轨迹~"
+		toolTip:"左：切换显示Bone轨迹,\r\n右：清除所有Bone轨迹"
+		button btnBipedTraj "◇ Biped轨迹" width:75 height:32 visible:false border:false \
+		toolTip:"左：切换显示单个Biped轨迹,\r\n右：切换显示所有Biped轨迹~"
 		button btnFnFrame "● 整小数帧" width:75 height:32 visible:false border:false \
 		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿"
 		button btnSelByColor "◪ 同色选择" width:75 height:32 visible:false border:false \
@@ -390,36 +390,36 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnEulerFilter "✈ 欧拉过滤" width:75 height:32 visible:false border:false \
 		tooltip:"Bone骨骼过滤欧拉旋转"
 		button btnBoneTool "❁ 骨骼工具" width:75 height:32 visible:false border:false \
-		tooltip:"左键骨骼工具,\r\n右键BoneOn切换"
-		button btnAutoBack "✔ 备份设置" width:75 height:32 visible:false border:false \
-		tooltip:"自动备份设置"
-		button btnSetHotKey " ✎ 改 K 帧键" width:75 height:32 visible:false border:false \
-		tooltip:"自定义K帧快捷键"
+		tooltip:"左：骨骼工具,\r\n右：BoneOn切换"
+		button btnNiceSet "✎ 易用设置" width:75 height:32 visible:false border:false \
+		tooltip:"改K帧键，自动备份等设置"
+		button btnNull13 " < 未定义 > " width:75 height:32 visible:false border:false \
+		tooltip:"功能待添加"
 		button btnClearSelKeys "▲ 取消选帧" width:75 height:32 visible:false border:false \
 		tooltip:"取消关键帧选择 (非删除帧)" width:75 height:32 visible:false border:false \
 		button btnDelOutKeys "✖ 删关键帧" width:75 height:32 visible:false border:false \
-		toolTip:"左键清除选择或所有帧\r\nLink帧请手动删~\r\n右键清范围外帧(无限帧)"
+		toolTip:"左：清除选择或所有帧\r\nLink帧请手动删~\r\n右：清范围外帧(无限帧)"
 		button btnFreezeMesh "✲ 冻结模型" width:75 height:32 visible:false border:false \
 		toolTip:"冻结模型"
 		button btnHideBones "☁ 隐藏骨骼" width:75 height:32 visible:false border:false \
-		toolTip:"隐藏骨骼"
+		toolTip:"左：隐藏bone\r\n右：隐藏biped和bone"
 		button btnSelBoneBiped "☑ 选择骨骼" width:75 height:32 visible:false border:false \
-		toolTip:"左键选择所有biped\r\n右键选择所有bone"
+		toolTip:"左：选择所有biped\r\n右：选择所有bone"
 		button btnEndBone "✚ 末端操作" width:75 height:32 visible:false border:false \
 		toolTip:"添加清除隐藏Bone末端"
 		checkbutton ckbFnBoxDisplay "㊣ BOX切显" width:75 height:32 visible:false border:false \
 		toolTip:"左:骨骼切换Box显示\r\n右:Clay显示开关"
-		button btnNull1 " < 未定义 > " width:75 height:32 visible:false border:false \
+		button btnFastAlign "▌ 快速对齐" width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
 		button btnNull2 " < 未定义 > " width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
 		button btnNull3 " < 未定义 > " width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
-		button btnFnKeyType "♣ 黄帧切换" width:75 height:32 visible:false border:false \
+		button btnFnKeyType "♣  黄帧切换" width:75 height:32 visible:false border:false \
+		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置"
+		button btnCopyKeyTools "✔ 暴力粘贴" width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
-		button btnNull5 " < 未定义 > " width:75 height:32 visible:false border:false \
-		toolTip:"功能待添加"
-		button btnNull6 " < 未定义 > " width:75 height:32 visible:false border:false \
+		button btnAnimMirror "〼 动画镜像" width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
 		checkbutton ckbFnMtlDisplay "▣ 白模切显" width:75 height:32 visible:false border:false \
 		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:\r\n注意：暂不支持子材质..."
@@ -427,15 +427,15 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		toolTip:"功能待添加"
 		button btnNull9 " < 未定义 > " width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
-		button btnNull10 " < 未定义 > " width:75 height:32 visible:false border:false \
+		button btnCSTools "❤  CS 选择" width:75 height:32 visible:false border:false \
+		toolTip:"快速选择CS骨骼\r\n右键添加或解除自启"
+		button btnCutSequence "✄ 时间标签 " width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
-		button btnNull11 " < 未定义 > " width:75 height:32 visible:false border:false \
+		button btnPoseTool "♚ Pose 存取" width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
-		button btnNull12 " < 未定义 > " width:75 height:32 visible:false border:false \
-		toolTip:"功能待添加"
-		button btnNull13 " < 未定义 > " width:75 height:32 visible:false border:false \
-		toolTip:"功能待添加"
-		button btnNull14 " < 未定义 > " width:75 height:32 visible:false border:false \
+		button btnMopherSlider "☺ 表情滑条" width:75 height:32 visible:false border:false \
+		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~"
+		button btnImportOut "◮ 导入导出" width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
 	
 	groupbox gbxTips "" pos:[5,180] width:190 height:50
@@ -484,10 +484,10 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	(
 		arrToolC1 = #(rolloutBulletKeyTools.btnClearSelKeys,\
 						rolloutBulletKeyTools.btnDelOutKeys,\
-						rolloutBulletKeyTools.btnEulerFilter,\
-						rolloutBulletKeyTools.btnFnKeyType,\
-						rolloutBulletKeyTools.btnNull5,\
-						rolloutBulletKeyTools.btnNull6)
+						rolloutBulletKeyTools.btnFastAlign,\
+						rolloutBulletKeyTools.btnCopyKeyTools,\
+						rolloutBulletKeyTools.btnAnimMirror,\
+						rolloutBulletKeyTools.btnFnKeyType)
 		arrToolC2 = #(rolloutBulletKeyTools.btnBoneTraj,\
 						rolloutBulletKeyTools.btnBipedTraj,\
 						rolloutBulletKeyTools.btnFnFrame,\
@@ -499,19 +499,19 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 						rolloutBulletKeyTools.btnSelBoneBiped,\
 						rolloutBulletKeyTools.btnNull8,\
 						rolloutBulletKeyTools.btnNull9,\
-						rolloutBulletKeyTools.btnNull10)
+						rolloutBulletKeyTools.btnCSTools)
 		arrToolC4 = #(rolloutBulletKeyTools.btnFnTCB,\
-						rolloutBulletKeyTools.btnBoneTool,\
+						rolloutBulletKeyTools.btnEulerFilter,\
 						rolloutBulletKeyTools.btnEndBone,\
-						rolloutBulletKeyTools.btnNull1,\
+						rolloutBulletKeyTools.btnNull3,\
 						rolloutBulletKeyTools.btnNull2,\
-						rolloutBulletKeyTools.btnNull3)
-		arrToolC5 = #(rolloutBulletKeyTools.btnAutoBack,\
-						rolloutBulletKeyTools.btnSetHotKey,\
-						rolloutBulletKeyTools.btnNull11,\
-						rolloutBulletKeyTools.btnNull12,\
+						rolloutBulletKeyTools.btnBoneTool)
+		arrToolC5 = #(rolloutBulletKeyTools.btnPoseTool,\
+						rolloutBulletKeyTools.btnMopherSlider,\
+						rolloutBulletKeyTools.btnCutSequence,\
+						rolloutBulletKeyTools.btnImportOut,\
 						rolloutBulletKeyTools.btnNull13,\
-						rolloutBulletKeyTools.btnNull14)
+						rolloutBulletKeyTools.btnNiceSet)
 
 		local arrBtnAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4 + arrToolC5
 		
@@ -1193,7 +1193,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		registerTimeCallback fnChangetRangeTime  -------------帧范围改变添加回调
 		rolloutBulletKeyTools.gbxMinTools.visible  = false
 		judgePlaySpeedValue ()  -----判断播放速度
-		rolloutBulletKeyTools.btnSetFpsAndSpeed.text = "  |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
+		rolloutBulletKeyTools.btnSetFpsAndSpeed.text = " |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
 		fnRefreshMagicBtn ()
 		fnSwitchToolsBtn idBtn
 	)
@@ -1293,11 +1293,11 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	)
 	on btnSpringMagic pressed do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\springmagic_v1.1.mse")
+		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_New.mse")
 	)
 	on btnSpringMagic rightclick do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\springmagic_v0.9.mse")
+		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_Old.mse")
 	)
 
 	on btnBoneTraj pressed do ------显示bone的轨迹
@@ -1609,7 +1609,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		if hideByCategory.bones == false then 
 		(
 			hideByCategory.bones = true
-			btnHideBones.text = " ☼ 显示骨骼"
+			btnHideBones.text = "☀ 显示骨骼"
 		)
 		else 
 		(
@@ -1655,6 +1655,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		(
 			animationrange = interval arrLastSelRange[1] arrLastSelRange[2]
 			switchSelKeyRange = 0
+			arrLastSelRange = #()
 		)
 	)
 	on btnCutFrameDisplay rightclick do with undo on  ---------------帧栏显示首尾帧范围
@@ -1670,6 +1671,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		(
 			animationrange = interval arrLastAllRange[1] arrLastAllRange[2]
 			switchAllKeyRange = 0
+			arrLastAllRange = #()
 		)
 	)
 
@@ -1756,6 +1758,11 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	-- (
 		
 	-- )
+
+	on btnMopherSlider pressed do 
+	(
+		macros.run "Tools" "MorphSliders"
+	)
 )
 Createdialog rolloutBulletKeyTools fgcolor:(color 255 20 100) pos:iniPos style:#()
 clearListener()  ---------清除侦听器
