@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-27 19:56:43
+ * @LastEditTime: 2019-11-27 20:00:46
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -341,7 +341,7 @@ rollout rolBsOpenTools "" width:320 height:365
 		rolBsOpenTools.ltbFilterPrefix.items = arrPreItems
 	)
 
-	fn fnLoadBip ()
+	fn fnLoadBip =
 	(
 		-- biped.loadBipFile <biped_ctrl> <file_name> \
 		-- [#matchFileStruct] [#zeroHgt] [#noRedraw] \
@@ -350,6 +350,7 @@ rollout rolBsOpenTools "" width:320 height:365
 		-- [#loadSelectedMaxObjects nodename_array] \
 		-- [#loadSelectedSubAnimControllers bipednodename_array int_array]
 
+		print "待添加"
 		
 	)
 
