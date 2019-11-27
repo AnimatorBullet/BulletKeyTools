@@ -3,26 +3,26 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-22 14:35:28
+ * @LastEditTime: 2019-11-27 14:38:09
  * @Email: animator.bullet@foxmail.com
  */
 
 try(destroydialog rolloutBulletKeyTools)catch()
 try(destroydialog rolFnKeys)catch()
 
-Global posMouX      = mouse.screenpos.x
-Global posMouY      = mouse.screenpos.y  --获取鼠标位置
-Global posMouMoved  = [0,0]
-Global switchMouseState = false
+Global posMouX           = mouse.screenpos.x
+Global posMouY           = mouse.screenpos.y  --获取鼠标位置
+Global posMouMoved       = [0,0]
+Global switchMouseState  = false
 Global switchSelKeyRange = 0
-Global switchToolPanel = 0
-Global arrLastSelRange = #()
+Global switchToolPanel   = 0
+Global arrLastSelRange   = #()
 Global switchAllKeyRange = 0
-Global arrLastAllRange = #()
+Global arrLastAllRange   = #()
 
-Global arrKeysTime     = #()  ----------biped和bone的首尾帧
-Global arrLinkKeys     = #()  -----------存link帧
-Global arrKeysSelected = #()  -----------存选中的帧
+Global arrKeysTime         = #()  ----------biped和bone的首尾帧
+Global arrLinkKeys         = #()  -----------存link帧
+Global arrKeysSelected     = #()  -----------存选中的帧
 --     Global arrBipedKeys = #()
 Global keyFirst
 Global keyEnd
@@ -39,13 +39,14 @@ Global iniPos  --位置保存记录
 Global keyMovedOffset = 5
 Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
-Global arrTraj = #()  ---轨迹存放数组, 方便删除
-Global arrToolC1 = #()  ----------工具按钮数组
-Global arrToolC2 = #()  ----------工具按钮数组
-Global arrToolC3 = #()  ----------工具按钮数组
-Global arrToolC4 = #()  ----------工具按钮数组
-Global arrToolC5 = #()  ----------工具按钮数组
-Global idBtn = 1
+Global arrTraj         = #()  ---轨迹存放数组, 方便删除
+Global arrToolC1       = #()  ----------工具按钮数组
+Global arrToolC2       = #()  ----------工具按钮数组
+Global arrToolC3       = #()  ----------工具按钮数组
+Global arrToolC4       = #()  ----------工具按钮数组
+Global arrToolC5       = #()  ----------工具按钮数组
+Global iniArrMyScripts = #()
+Global idBtn           = 1
 ------------------全局变量-------------------------------------------------------------------
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
@@ -55,9 +56,10 @@ fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方�
 )
 fn fnSaveConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
-	iniPos = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" ([posMouX,posMouY] as string)
+	iniPos          = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" ([posMouX,posMouY] as string)
 	switchToolPanel = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
-	idBtn = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
+	idBtn           = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
+	iniArrMyScripts = fnGetConfig iniArrMyScripts "BsOpenToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
 )
 fnSaveConfig () --初始执行一遍
 fn fnSetConfig =  --保存参数,脚本位置
@@ -65,6 +67,7 @@ fn fnSetConfig =  --保存参数,脚本位置
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "Pos" (iniPos as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "idBtn" (idBtn as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
 )
 ---------------配合BulletTools工具的ini文件保存位置信息-----------------
 
@@ -337,7 +340,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		spinner spiEndTime "" pos:[80,43] width:50 type:#integer \
 		range:[-999999999,999999999,animationrange.end] scale:1
 		button btnMagicBtn "✧(≖ ◡ ≖" pos:[135,30] width:55 height:30 border:false \
-		tooltip:"点我点我点我~\r\n左点小工具,\r\n右点帮助说明."
+		tooltip:"点我点我点我~\r\n左点小工具,\r\n右点帮助."
 		edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
 		pos:[10,72] labelOnTop:false text:"5f" bold:true readOnly:false 
 		button btnSet5 "5f" width:35 pos:[90,70]
@@ -399,8 +402,8 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		tooltip:"取消关键帧选择 (非删除帧)" width:75 height:32 visible:false border:false \
 		button btnDelOutKeys "✖ 删关键帧" width:75 height:32 visible:false border:false \
 		toolTip:"左：清除选择或所有帧\r\nLink帧请手动删~\r\n右：清范围外帧(无限帧)"
-		button btnFreezeMesh "✲ 冻结模型" width:75 height:32 visible:false border:false \
-		toolTip:"冻结模型"
+		checkbutton ckbFreezeMesh "✲ 冻结模型" width:75 height:32 visible:false border:false \
+		toolTip:"冻结解冻模型"
 		button btnHideBones "☁ 隐藏骨骼" width:75 height:32 visible:false border:false \
 		toolTip:"左：隐藏bone\r\n右：隐藏biped和bone"
 		button btnSelBoneBiped "☑ 选择骨骼" width:75 height:32 visible:false border:false \
@@ -438,6 +441,14 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnImportOut "◮ 导入导出" width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
 	
+	groupbox gbxMyScripts "" pos:[5,230] width:335 height:45
+
+		button btnMyScripts1 "< ＋＋＋ >" pos:[12,242] width:60 height:25 border:false
+		button btnMyScripts2 "< ＋＋＋ >" pos:[77,242] width:60 height:25 border:false
+		button btnMyScripts3 "< ＋＋＋ >" pos:[142,242] width:60 height:25 border:false
+		button btnMyScripts4 "< ＋＋＋ >" pos:[207,242] width:60 height:25 border:false
+		button btnMyScripts5 "< ＋＋＋ >" pos:[272,242] width:60 height:25 border:false
+
 	groupbox gbxTips "" pos:[5,180] width:190 height:50
 	
 		HyperLink lnkLink "---  | 2019.9  miHoYo_Bullet.S |  - ？ --"
@@ -451,12 +462,14 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		if switchToolPanel == 0 then
 		(
 			rolloutBulletKeyTools.width               = 200
+			rolloutBulletKeyTools.height              = 235
 			rolloutBulletKeyTools.gbxMinTools.visible = false
 			btnMagicBtn.text                          = "✧(≖ ◡ ≖"
 		)
 		else
 		(
 			rolloutBulletKeyTools.width               = 345
+			rolloutBulletKeyTools.height              = 280
 			rolloutBulletKeyTools.gbxMinTools.visible = true
 			btnMagicBtn.text                          = "( = `▽`)"
 		)
@@ -467,6 +480,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		if switchToolPanel == 1 then
 		(
 			rolloutBulletKeyTools.width               = 200
+			rolloutBulletKeyTools.height              = 235
 			rolloutBulletKeyTools.gbxMinTools.visible = false
 			btnMagicBtn.text                          = "✧(≖ ◡ ≖"
 			switchToolPanel                           = 0
@@ -474,6 +488,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		else
 		(
 			rolloutBulletKeyTools.width               = 345
+			rolloutBulletKeyTools.height              = 280
 			rolloutBulletKeyTools.gbxMinTools.visible = true
 			btnMagicBtn.text                          = "( = `▽`)"
 			switchToolPanel                           = 1
@@ -494,7 +509,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 						rolloutBulletKeyTools.btnHideBones,\
 						rolloutBulletKeyTools.ckbFnBoxDisplay,\
 						rolloutBulletKeyTools.ckbFnMtlDisplay)
-		arrToolC3 = #(rolloutBulletKeyTools.btnFreezeMesh,\
+		arrToolC3 = #(rolloutBulletKeyTools.ckbFreezeMesh,\
 						rolloutBulletKeyTools.btnSelByColor,\
 						rolloutBulletKeyTools.btnSelBoneBiped,\
 						rolloutBulletKeyTools.btnNull8,\
@@ -1300,6 +1315,11 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_Old.mse")
 	)
 
+	on btnFileOpen pressed do 
+	(
+		FileIn ((getDir #scripts) + "\\BulletScripts" + "\\BsOpenTools.ms")
+	)
+
 	on btnBoneTraj pressed do ------显示bone的轨迹
 	(
 		for i in (selection as array) where (classof i != Biped_Object) do
@@ -1629,6 +1649,32 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 	)
 
+	on ckbFreezeMesh changed state do 
+	(
+		if state == on then
+		(
+			for o in objects where (((classof o == Editable_mesh) \
+			or (classof o == Editable_Poly) or (classof o == PolyMeshObject)) \
+			and (o.isHidden == false)) do
+			(
+				freeze o
+				o.showFrozenInGray = off
+			)
+			ckbFreezeMesh.text = "☀ 解冻模型"
+		)
+		else
+		(
+			for o in objects where (((classof o == Editable_mesh) \
+			or (classof o == Editable_Poly) or (classof o == PolyMeshObject)) \
+			and (o.isHidden == false)) do
+			(
+				unfreeze o
+				o.showFrozenInGray = off
+			)
+			ckbFreezeMesh.text = "✲ 冻结模型"
+		)
+	)
+
 	on btnQuickSave pressed do 
 	(
 		if maxFilePath == "" then 
@@ -1648,7 +1694,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		(
 			arrLastSelRange = #(animationrange.start,animationrange.end)
 			fnCollectKeys ()
-			animationrange = interval keySelFirst keySelEnd
+			fnCutDisplayKeyRange keySelFirst keySelEnd
 			switchSelKeyRange = 1
 		)
 		else 
