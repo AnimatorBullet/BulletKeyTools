@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-27 13:50:42
+ * @LastEditTime: 2019-11-27 19:56:43
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -341,6 +341,18 @@ rollout rolBsOpenTools "" width:320 height:365
 		rolBsOpenTools.ltbFilterPrefix.items = arrPreItems
 	)
 
+	fn fnLoadBip ()
+	(
+		-- biped.loadBipFile <biped_ctrl> <file_name> \
+		-- [#matchFileStruct] [#zeroHgt] [#noRedraw] \
+		-- [#loadMaxObjects][#promptForDuplicates] [#retargetHeight] \
+		-- [#retargetLimbSizes] [#scaleIKObjectSize] [#loadSubAnimControllers] \
+		-- [#loadSelectedMaxObjects nodename_array] \
+		-- [#loadSelectedSubAnimControllers bipednodename_array int_array]
+
+		
+	)
+
 	----------------------------------------------------------------------------------------------------
 	
 	on rolBsOpenTools open do 
@@ -509,6 +521,8 @@ rollout rolBsOpenTools "" width:320 height:365
 						case of 
 						(
 							(rdoFileType.state == 1):(loadMaxFile (arrFiles[idFile]))
+							(rdoFileType.state == 2):(importFile arrFiles[idFile] #noPrompt using:FBXIMP)
+							(rdoFileType.state == 3):(fnLoadBip ())
 						)
 					)
 				)
@@ -538,7 +552,7 @@ rollout rolBsOpenTools "" width:320 height:365
 	on btnAutobackDir pressed do 
 	(
 		rdoFileType.state  = 1
-		fnRefreshList (getdir #autoback) type:".max*"
+		fnRefreshList (getdir #autoback) type:".max"
 	)
 
 	on btnScriptsDir pressed do
