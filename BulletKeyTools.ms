@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-27 14:38:09
+ * @LastEditTime: 2019-11-29 19:46:20
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -36,6 +36,7 @@ Global fnAddLinkTimesKeys
 Global fnAddLinkParamsKeys
 Global BulletConfig = ((getDir #scripts) + "\\BulletConfig.ini")  --配置文件路径
 Global iniPos  --位置保存记录
+Global iniHelpBtn = off--记录是否打开帮助模式
 Global keyMovedOffset = 5
 Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
@@ -59,7 +60,8 @@ fn fnSaveConfig =  --引用上面方法提出需要的参数
 	iniPos          = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" ([posMouX,posMouY] as string)
 	switchToolPanel = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
 	idBtn           = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
-	iniArrMyScripts = fnGetConfig iniArrMyScripts "BsOpenToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
+	iniArrMyScripts = fnGetConfig iniArrMyScripts "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
+	iniHelpBtn      = fnGetConfig iniHelpBtn "BulletKeyToolsSet"  "HelpBtn" (iniHelpBtn as string)
 )
 fnSaveConfig () --初始执行一遍
 fn fnSetConfig =  --保存参数,脚本位置
@@ -68,6 +70,7 @@ fn fnSetConfig =  --保存参数,脚本位置
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "idBtn" (idBtn as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "HelpBtn" (iniHelpBtn as string)
 )
 ---------------配合BulletTools工具的ini文件保存位置信息-----------------
 
@@ -78,7 +81,8 @@ Global strCurrentFps = framerate as string + " FPS"
 
 rollout rolCustomFps ""
 (
-    edittext edtFpsValue "FPS: "  pos:[10,10] width:60 usePercentageWidth:true percentageWidth:44.0 labelOnTop:false text:"60" bold:true readOnly:false --帧率数值
+	edittext edtFpsValue "FPS: "  pos:[10,10] width:60 usePercentageWidth:true \
+	percentageWidth:44.0 labelOnTop:false text:"60" bold:true readOnly:false --帧率数值
     button btnSetFps "Set" pos:[80,8]
     label labTips strCurrentFps
 
@@ -165,7 +169,8 @@ rcmenu menuSetFps
     on menuCustomFps picked do
     (
         try (destroyDialog rolCustomFps) catch()
-        createdialog rolCustomFps 120 55 fgcolor:(color 255 20 100) pos:[mouse.screenpos.x,mouse.screenpos.y]
+		createdialog rolCustomFps 120 55 fgcolor:(color 255 20 100) \
+		pos:[mouse.screenpos.x,mouse.screenpos.y]
     )
 )
 
@@ -227,7 +232,8 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 	Fn fnSetKeyType keyType = 
 	(
 		sliderTime = animationRange.start
-		for obj in selection where ((classof obj.baseObject == Biped_Object) and (biped.getCurrentLayer obj.controller == 0)) do
+		for obj in selection where ((classof obj.baseObject == Biped_Object) \
+		and (biped.getCurrentLayer obj.controller == 0)) do
 		(
 			bipCtrl = obj.controller
 			if chkLHand.checked then 
@@ -332,35 +338,37 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	---------------------------------UI--------------------------------------
 	groupbox gbxMainUI "[ K 帧工具_v0.7 ] ------ 中键关闭" pos:[5,5] width:190 height:175
 	
-		label lblRangeTimeText "| 起始帧 |      | 结束帧 |" pos:[10,25] width:180 \
-		spinner spiStartTime "" pos:[10,43] width:50 type:#integer \
+		label lblRangeTimeText "| 起始帧 |      | 结束帧 |" pos:[10,27] width:180 \
+		spinner spiStartTime "" pos:[10,50] width:50 type:#integer \
 		range:[-999999999,999999999,animationrange.start] scale:1
-		label lblTo "▃"  pos:[65,39] tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" \
+		label lblTo "▃"  pos:[65,46] tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" \
 		width:20 height:20
-		spinner spiEndTime "" pos:[80,43] width:50 type:#integer \
+		spinner spiEndTime "" pos:[80,50] width:50 type:#integer \
 		range:[-999999999,999999999,animationrange.end] scale:1
-		button btnMagicBtn "✧(≖ ◡ ≖" pos:[135,30] width:55 height:30 border:false \
+		checkbutton ckbHelpBtn "？帮助" pos:[135,23] width:55 height:20 border:false \
+		tooltip:"打开帮助模式！"
+		button btnMagicBtn "✧(≖ ◡ ≖" pos:[135,45] width:55 height:25 border:false \
 		tooltip:"点我点我点我~\r\n左点小工具,\r\n右点帮助."
 		edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
-		pos:[10,72] labelOnTop:false text:"5f" bold:true readOnly:false 
-		button btnSet5 "5f" width:35 pos:[90,70]
-		button btnSetAdd "+5f" width:35 pos:[125,70]
-		button btnSetOpposite "负" width:30 pos:[160,70]
+		pos:[10,78] labelOnTop:false text:"5f" bold:true readOnly:false 
+		button btnSet5 "5f" width:35 pos:[90,75]
+		button btnSetAdd "+5f" width:35 pos:[125,75]
+		button btnSetOpposite "负" width:30 pos:[160,75]
 		checkBox btnJudgeLinkKey "Link?" \
-		pos:[18,104] tooltip:"是否存在Link帧?" checked:false 
+		pos:[18,109] tooltip:"是否存在Link帧?" checked:false 
 		button btnSelBeforeKeys " " \
-		pos:[70,95] width:30 height:30 toolTip:"选择滑条前面关键帧" border:false
+		pos:[70,100] width:30 height:30 toolTip:"选择滑条前面关键帧" border:false
 		button btnSelAllKeys " " \
-		pos:[100,95] width:30 height:30 toolTip:"选择所有关键帧" border:false
+		pos:[100,100] width:30 height:30 toolTip:"选择所有关键帧" border:false
 		button btnSelAfterKeys " " \
-		pos:[130,95] width:30 height:30 toolTip:"选择滑条后面关键帧" border:false
+		pos:[130,100] width:30 height:30 toolTip:"选择滑条后面关键帧" border:false
 		button btnMoveKeys " " width:30 height:30 \
-		pos:[160,95] toolTip:"移动关键帧,\r\n左：帧栏范围同步增减,\r\n右：帧栏范围保持不变~" border:false
-		button btnFileOpen "★ 快速打开" pos:[10,128] width:70 height:25 \
+		pos:[160,100] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~" border:false
+		button btnFileOpen "★ 快速打开" pos:[10,133] width:70 height:20 \
 		tooltip:"快速打开max文件\r\n可收藏常用目录" border:false
-		button btnCutFrameDisplay "◐ 帧预览" pos:[80,128] width:60 height:25 \
+		button btnCutFrameDisplay "◐ 帧预览" pos:[80,133] width:60 height:20 \
 		tooltip:"左：预览选择帧范围\r\n右：预览全部帧范围\r\n再点回到上次帧范围\r\n别晃晕了。╮(￣▽￣)╭" border:false
-		button btnSpringMagic "✿ 飘带" pos:[140,128] width:50 height:25 \
+		button btnSpringMagic "✿ 飘带" pos:[140,133] width:50 height:20 \
 		tooltip:"左点新版,右点旧版\r\n不久可能会有强化版~" border:false
 		button btnQuickSave "✪ 快速备份" pos:[10,155] width:70 height:20 \
 		toolTip:"左：快速备份\r\n右：另存文件" border:false
@@ -369,15 +377,15 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	
 	groupbox gbxMinTools "小工具" pos:[200,5] width:140 height:225
 	
-		button btnC1 "- 帧操 -" width:45 height:40 border:false \
+		button btnC1 "- 帧 -" width:35 height:35 border:false \
 		pos:[205,24] toolTip:""
-		button btnC2 "- 显示 -" width:45 height:40 border:false \
+		button btnC2 "- 显 -" width:35 height:35 border:false \
 		pos:[205,64] toolTip:""
-		button btnC3 "- 选择 -" width:45 height:40 border:false \
+		button btnC3 "- 选 -" width:35 height:35 border:false \
 		pos:[205,104] toolTip:""
-		button btnC4 "- 骨骼 -" height:40 width:45 border:false \
+		button btnC4 "- 骨 -" width:35 height:35 border:false \
 		pos:[205,144] toolTip:""
-		button btnC5 "- 系统 -" width:45 height:40 border:false \
+		button btnC5 "- 乱 -" width:35 height:35 border:false \
 		pos:[205,184] toolTip:""
 
 		button btnBoneTraj "◆ Bone轨迹" width:75 height:32 visible:false border:false \
@@ -441,13 +449,13 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnImportOut "◮ 导入导出" width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
 	
-	groupbox gbxMyScripts "" pos:[5,230] width:335 height:45
+	-- groupbox gbxMyScripts "" pos:[5,230] width:335 height:45
 
-		button btnMyScripts1 "< ＋＋＋ >" pos:[12,242] width:60 height:25 border:false
-		button btnMyScripts2 "< ＋＋＋ >" pos:[77,242] width:60 height:25 border:false
-		button btnMyScripts3 "< ＋＋＋ >" pos:[142,242] width:60 height:25 border:false
-		button btnMyScripts4 "< ＋＋＋ >" pos:[207,242] width:60 height:25 border:false
-		button btnMyScripts5 "< ＋＋＋ >" pos:[272,242] width:60 height:25 border:false
+		button btnMyScripts1 "< ＋＋＋ >" pos:[5,232] width:60 height:20 border:false
+		button btnMyScripts2 "< ＋＋＋ >" pos:[74,232] width:60 height:20 border:false
+		button btnMyScripts3 "< ＋＋＋ >" pos:[143,232] width:60 height:20 border:false
+		button btnMyScripts4 "< ＋＋＋ >" pos:[212,232] width:60 height:20 border:false
+		button btnMyScripts5 "< ＋＋＋ >" pos:[280,232] width:60 height:20 border:false
 
 	groupbox gbxTips "" pos:[5,180] width:190 height:50
 	
@@ -456,6 +464,8 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		pos:[7,190] address:"https://space.bilibili.com/2031113"
 		label labmiHoYo "--- TECH OTAKUS SAVE THE WORLD --" \
 		pos:[7,210]
+
+		
 ----------------------------------UI及作者ID------------------------------------------------
 	fn fnRefreshMagicBtn =
 	(
@@ -469,7 +479,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		else
 		(
 			rolloutBulletKeyTools.width               = 345
-			rolloutBulletKeyTools.height              = 280
+			rolloutBulletKeyTools.height              = 255
 			rolloutBulletKeyTools.gbxMinTools.visible = true
 			btnMagicBtn.text                          = "( = `▽`)"
 		)
@@ -488,7 +498,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		else
 		(
 			rolloutBulletKeyTools.width               = 345
-			rolloutBulletKeyTools.height              = 280
+			rolloutBulletKeyTools.height              = 255
 			rolloutBulletKeyTools.gbxMinTools.visible = true
 			btnMagicBtn.text                          = "( = `▽`)"
 			switchToolPanel                           = 1
@@ -609,6 +619,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 						for i in tempObj.controller[i].keys do 
 						(
 							appendIfUnique arrLinkKeys i  ---------添加link帧到数组
+							appendIfUnique arrKeysTime i.time
 							if i.selected == true then appendIfUnique arrKeysSelected i.time
 						)
 					)
@@ -926,8 +937,9 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 	)
 	
-	mapped fn fnMoveKeysAndLinkKeys obj offset symbol =  ----https://forums.cgsociety.org/t/moving-keys-from-link-constraint-keys-access/1575053
+	mapped fn fnMoveKeysAndLinkKeys obj offset =  ----https://forums.cgsociety.org/t/moving-keys-from-link-constraint-keys-access/1575053
 	(
+		local arrTargetID  = #()
 		moveKeys obj offset #selection  ---先移动非link帧
 		if rolloutBulletKeyTools.btnJudgeLinkKey.checked == true then 
 		(
@@ -937,33 +949,28 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	
 				if nTargets > 0 do
 				(
-					--SORT THE LINK CONSTRAINT TARGETS
-					obj.controller.setFrameNo 1 (obj.controller.getFrameNo 1)
-								
+					for i = nTargets to 1 by -1 do  ------如果大于0则从最后link帧开始移
+					(
+						fNumber = obj.controller.getFrameNo i
+						if ((fNumber >= keySelFirst) and (fNumber <= keySelEnd)) then
+						(
+							appendIfUnique arrTargetID i
+						)
+					)
 					if offset > 0 then  --------判断向前还是向后移动帧
 					(
-						for i = nTargets to 1 by -1 do  ------如果大于0则从第一个link帧开始移
+						for i = arrTargetID.count to 1 by -1 do  ------如果大于0则从最后link帧开始移
 						(
-							fNumber = obj.controller.getFrameNo i
-							case of  -------------判断link帧位置,数字是随便取的方便判断情况
-							(
-								(symbol == 0):(if fNumber <= sliderTime then (obj.controller.setFrameNo i (fNumber + offset)))
-								(symbol == 1):(if fNumber >= sliderTime then (obj.controller.setFrameNo i (fNumber + offset)))
-								(symbol == 2):((obj.controller.setFrameNo i (fNumber + offset)))
-							)
+							fNumber = obj.controller.getFrameNo arrTargetID[i]
+							obj.controller.setFrameNo i (fNumber + offset)
 						)
 					)
 					else
 					(
-						for i = 1 to nTargets do  ---如果移动帧小于0,从最后link帧开始移
+						for i = 1 to arrTargetID.count do  ---如果移动帧小于0,从第一个link帧开始移
 						(
-							fNumber = obj.controller.getFrameNo i
-							case of  -------------判断link帧位置,数字是随便取的方便判断情况
-							(
-								(symbol == 0):(if fNumber <= sliderTime then (obj.controller.setFrameNo i (fNumber + offset)))
-								(symbol == 1):(if fNumber >= sliderTime then (obj.controller.setFrameNo i (fNumber + offset)))
-								(symbol == 2):((obj.controller.setFrameNo i (fNumber + offset)))
-							)			
+							fNumber = obj.controller.getFrameNo arrTargetID[i]
+							obj.controller.setFrameNo i (fNumber + offset)
 						)
 					)
 				)
@@ -1028,7 +1035,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 	)
 
-	fn fnMoveAllKeys keyMovedOffset =
+	fn fnMoveAllKeys keyMovedOffset fnRange:off =
 	(
 		local rangEnd = animationrange.end
 		local rangeStart = animationrange.start
@@ -1042,7 +1049,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 				(
 					if classof i != Biped_Object then
 					(
-						fnMoveKeysAndLinkKeys i keyMovedOffset symbol
+						fnMoveKeysAndLinkKeys i keyMovedOffset
 					)
 					else 
 					(
@@ -1061,22 +1068,27 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 				(
 					if classof i != Biped_Object then
 					(
-						fnMoveKeysAndLinkKeys i keyMovedOffset symbol
+						fnMoveKeysAndLinkKeys i keyMovedOffset
 					)
 					else fnMoveBipedScaleKeys i keyMovedOffset
 				)
 				fnMoveBipedKeys keyMovedOffset
 			)
-			if keyMovedOffset > 0 then 
+			if fnRange == on then
 			(
-				rangEnd = animationrange.end + keyMovedOffset
-				animationrange = interval animationrange.start rangEnd
+				if keyMovedOffset > 0 then 
+				(
+					rangEnd = animationrange.end + keyMovedOffset
+					animationrange = interval animationrange.start rangEnd
+				)
+				else if keyMovedOffset < 0 then 
+				(
+					rangeStart = animationrange.start + keyMovedOffset
+					animationrange = interval rangeStart animationrange.end
+				)
 			)
-			else if keyMovedOffset < 0 then 
-			(
-				rangeStart = animationrange.start + keyMovedOffset
-				animationrange = interval rangeStart animationrange.end
-			)
+			keySelFirst += keyMovedOffset
+			keySelEnd  += keyMovedOffset
 		)
 	)
 
@@ -1200,8 +1212,8 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		btnSelAllKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,26,26,26,26,true,true)
 		btnMoveKeys.images = #("ViewportNavigationControls_24i.bmp","ViewportNavigationControls_24i.bmp",46,39,39,39,39,true,true)
 -- 		btnMoveAfterKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,13,13,13,13,true,true)
-		
-		timeDIsTemp = timeDisplayMode  ----小数帧还是整数帧
+		ckbHelpBtn.checked = iniHelpBtn
+		timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
 		-- iniPos = (GetDialogPos rolloutBulletKeyTools) 
 		fnSaveConfig ()  ---------------脚本位置赋值
 		fnSetConfig ()  ----------------保存位置信息到ini文件
@@ -1300,6 +1312,12 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	on btnMagicBtn pressed do  -------------切换整数帧小数帧,方便拖动滑条平滑预览
 	(
 		fnSwitchMagicBtn ()
+	)
+
+	on ckbHelpBtn changed state do 
+	(
+		iniHelpBtn = state
+		
 	)
 
 	on btnCSTools pressed do 
@@ -1417,45 +1435,11 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	)
 	on btnMoveKeys pressed do with undo on   ------移动选定帧
 	(
-		fnMoveAllKeys keyMovedOffset
+		fnMoveAllKeys keyMovedOffset fnRange:off
 	)
 	on btnMoveKeys rightclick do with undo on
 	(
-		local n = 0
-		if keyMovedOffset != undefined then  ---跟前面一样,只是不改变帧栏范围
-		(
-			if selection.count != 0 then
-			(
-				for i in selection where (i.ishidden == false) do
-				(
-					if classof i != Biped_Object then
-					(
-						fnMoveKeysAndLinkKeys i keyMovedOffset symbol
-					)
-					else 
-					(
-						fnMoveBipedScaleKeys i keyMovedOffset
-						n += 1
-					)
-				)
-				if n != 0 then
-				(
-					fnMoveBipedKeys keyMovedOffset
-				)
-			)
-			else 
-			(
-				for i in objects where (i.ishidden == false) do
-				(
-					if classof i != Biped_Object then
-					(
-						fnMoveKeysAndLinkKeys i keyMovedOffset symbol
-					)
-					else fnMoveBipedScaleKeys i keyMovedOffset
-				)
-				fnMoveBipedKeys keyMovedOffset
-			)
-		)
+		fnMoveAllKeys keyMovedOffset fnRange:on
 	)
 	on btnSelBeforeKeys pressed do  ------------选择滑条之前帧
 	(

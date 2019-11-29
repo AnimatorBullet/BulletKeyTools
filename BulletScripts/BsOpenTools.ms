@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-27 20:00:46
+ * @LastEditTime: 2019-11-28 23:22:59
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -11,18 +11,21 @@
 try(destroydialog rolBsOpenTools)catch()
 try(destroydialog rolAddItem)catch()
 
+struct itemsFolder (name,dir)
+
 Global iniPosOpenTools
-Global posMouScreen   = mouse.screenpos
-Global posMouMove     = [0,0]
-Global switchMouState = false
-Global iniSelectedID  = 1
-Global arrFolders     = #()
-Global arrFoldersName = #()
-Global arrFiles       = #()
-Global arrFilesName   = #()
-Global dirLiked       = ""
-Global dirOpened      = ""
-Global tempLastFolder
+Global iniWidthOpenTools  = 300
+Global iniDesktop         = (itemsFolder name:"Desktop" dir:"")
+Global posMouScreen       = mouse.screenpos
+Global posMouMove         = [0,0]
+Global switchMouState     = false
+Global iniSelectedID      = 1
+Global arrFolders         = #()
+Global arrFoldersName     = #()
+Global arrFiles           = #()
+Global arrFilesName       = #()
+Global dirLiked           = ""
+Global dirOpened          = ""
 Global arrDirItems        = #()
 Global arrPreItems        = #()
 Global iniLikedFolder     = #()
@@ -32,13 +35,12 @@ Global arrRecentFilesName = #()
 Global arrFileType        = #(".max",".fbx",".bip",".ms*")
 Global rolBsOpenTools
 Global fnRefreshList
-
-struct itemsFolder (name,dir)
+Global tempLastFolder
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
 (
 	attr = (GetINISetting BulletConfig nameAttrClass nameAttr) as string  --先提取文件中的记录
-	if nameAttr == "LikedFolder" then
+	if ((nameAttr == "LikedFolder") or (nameAttr == "Desktop"))then
 	(
 		attr = substituteString attr "dir:" "dir:@"
 	)
@@ -48,8 +50,10 @@ fn fnSaveConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
 	iniPosOpenTools   = fnGetConfig iniPosOpenTools "BsOpenToolsSet" "PosOpenTools" (posMouScreen as string)
 	iniSelectedID     = fnGetConfig iniSelectedID "BsOpenToolsSet" "SelectedID" (iniSelectedID as string)
-	iniLikedFolder  = fnGetConfig iniLikedFolder "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
-	iniFilterPrefix = fnGetConfig iniFilterPrefix "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)
+	iniLikedFolder    = fnGetConfig iniLikedFolder "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
+	iniFilterPrefix   = fnGetConfig iniFilterPrefix "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)
+	iniWidthOpenTools = fnGetConfig iniWidthOpenTools "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
+	iniDesktop        = fnGetConfig iniDesktop "BsOpenToolsSet"  "Desktop" (iniDesktop as string)
 )
 fnSaveConfig () --初始执行一遍
 fn fnSetConfig =  --保存参数,脚本位置
@@ -58,6 +62,8 @@ fn fnSetConfig =  --保存参数,脚本位置
 	SetINISetting BulletConfig "BsOpenToolsSet"  "SelectedID" (iniSelectedID as string)
 	SetINISetting BulletConfig "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
 	SetINISetting BulletConfig "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)
+	SetINISetting BulletConfig "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
+	SetINISetting BulletConfig "BsOpenToolsSet"  "Desktop" (iniDesktop as string)
 )
 ---------------配合BulletTools工具的ini文件保存位置信息----------------------------------
 
@@ -65,12 +71,12 @@ rollout rolAddItem "添加" width:320 height:130
 (
 	groupbox gbxAddDir "添加常用目录 ---- Tips：右击选中条目删除" width:310 height:70 pos:[5,5]
 	
-	edittext edtAddDir "命名" pos:[10,25] width:225 height:20 labelOnTop:false text:""
+	edittext edtAddDir "命名" pos:[10,25] fieldWidth:200 height:20 labelOnTop:false text:""
 	button btnOpenDir "选择目录"  pos:[240,25] width:70 height:20 tooltip:"选择添加目录，默认打开当前文件目录"
-	edittext edtDirStr "" pos:[5,50] width:305 readOnly:true
+	edittext edtDirStr "" pos:[5,50] fieldWidth:302 readOnly:true
 	
 	groupbox gbxAddPre "添加过滤前缀  ---------- Tips：右击框内条目删除 "  width:310 height:70 pos:[5,5]
-	edittext edtPrefix ""  text:"" width:305 height:25 pos:[5,35]
+	edittext edtPrefix ""  text:"" fieldWidth:302 height:25 pos:[5,35]
 
 	groupbox gbxAddBtn ""  width:310 height:50 pos:[5,75]
 	button btnAddItems "> > > > > > > >     ✚  添加  ✚     < < < < < < < <" width:300 height:35 pos:[10,85]
@@ -84,77 +90,116 @@ rollout rolAddItem "添加" width:320 height:130
 		)
 	)
 
+	on edtAddDir changed txt do 
+	(
+		tempText = substituteString txt "\n" ""
+		edtAddDir.text = tempText
+		-- print edtAddDir.text
+	)
+
+	on edtPrefix changed txt do 
+	(
+		tempText = substituteString txt "\n" ""
+		edtPrefix.text = tempText
+		-- print edtPrefix.text
+	)
+
 	on btnAddItems pressed do 
 	(
-		if ((edtDirStr.text != "") and (edtDirStr.visible == true)) then
+		if ((edtDirStr.text != "") and (edtAddDir.text != "") and (edtDirStr.visible == true)) then
 		(
-			append iniLikedFolder (itemsFolder edtAddDir.text edtDirStr.text)
-			arrDirItems = #()
-			for i = iniLikedFolder.count to 1 by -1 do
+			local fnExist = 0
+			for i = 1 to iniLikedFolder.count do 
 			(
-				append arrDirItems iniLikedFolder[i].name
+				if matchPattern iniLikedFolder[i].dir pattern:edtDirStr.text then 
+				(
+					fnExist = 1
+				)
 			)
-			rolBsOpenTools.ddlLikedFolder.items = arrDirItems
-			rolBsOpenTools.ddlLikedFolder.selection = 1
-			rolBsOpenTools.ddlLikedFolder.tooltip = iniLikedFolder[iniLikedFolder.count].dir
-			-- fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[rolBsOpenTools.rdoFileType.state]
+			if fnExist == 0 then
+			(
+				append iniLikedFolder (itemsFolder edtAddDir.text edtDirStr.text)
+				arrDirItems = #()
+				for i = iniLikedFolder.count to 1 by -1 do
+				(
+					append arrDirItems iniLikedFolder[i].name
+				)
+				rolBsOpenTools.ddlLikedFolder.items = arrDirItems
+				rolBsOpenTools.ddlLikedFolder.selection = 1
+				rolBsOpenTools.ddlLikedFolder.tooltip = iniLikedFolder[iniLikedFolder.count].dir
+				-- fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[rolBsOpenTools.rdoFileType.state]
+			)
+			else (messagebox "----------------------------------------\r\n可能常用目录中已存在此目录~")
 		)
 		if ((edtPrefix.text != "") and (edtPrefix.visible == true)) then
 		(
-			append iniFilterPrefix edtPrefix.text
-			arrPreItems = #()
-			for i = iniFilterPrefix.count to 1 by -1 do
+			if (findItem iniFilterPrefix edtPrefix.text) != 0 then 
 			(
-				append arrPreItems iniFilterPrefix[i]
+				messagebox "-------------------------------------\r\n可能过滤词缀中已存在~"
 			)
-			rolBsOpenTools.ltbFilterPrefix.items = arrPreItems
-			rolBsOpenTools.ltbFilterPrefix.selection = 1
-			-- fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[rolBsOpenTools.rdoFileType.state]
+			else
+			(
+				append iniFilterPrefix edtPrefix.text
+				arrPreItems = #()
+				for i = iniFilterPrefix.count to 1 by -1 do
+				(
+					append arrPreItems iniFilterPrefix[i]
+				)
+				rolBsOpenTools.ltbFilterPrefix.items = arrPreItems
+				rolBsOpenTools.ltbFilterPrefix.selection = 1
+				-- fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[rolBsOpenTools.rdoFileType.state]
+			)
 		)
 	)
 )
 
-rollout rolBsOpenTools "" width:320 height:365
+rollout rolBsOpenTools "" width:300 height:390
 (
-	groupbox grpMain "快速打开_v0.1 ------ 此处拖动,中键关闭,右击上层目录 " width:310 height:360 pos:[5,0]
-	
+	groupbox grpMain " 时光机_v0.1 --- 此处拖动,中键关闭,右击上层目录 " \
+	width:290 height:385 pos:[5,0]
 	editText edtBrowseFolder "" text:"" labelOnTop:true align:#right \
-	height:20 width:240 pos:[70,20] readOnly:true
-	button btnOpenAddress "..." align:#right \
+	height:20 fieldWidth:220 pos:[70,20] readOnly:true 
+	button btnOpenAddress "..." align:#right tooltip:"选择打开目录" \
 	height:20 width:30 pos:[37,20] 
 	-- button btnRemoveFolder "━" align:#left \
 	-- height:20 width:25 pos:[10,20] tooltip:"删除选中的收藏目录"
 	-- button btnAddFolder "✚" align:#left border:false \
 	-- height:20 width:20 pos:[35,20] tooltip:"新增常用目录"
 	button btnRefreshFolder "R" align:#left \
-	height:20 width:25 pos:[10,20] tooltip:"刷新当前目录"
+	height:20 width:25 pos:[10,20] tooltip:"左：刷新当前文件目录\r\n右：打开右侧目录文件夹"
 	button btnLikedFolder "↓ 添加常用 ↓" border:false \
 	height:23 width:70 pos:[10,43] tooltip:"新增常用目录，右击选中条目删除"
 	dropdownlist ddlLikedFolder "" align:#left selection:1 \
 	height:15 width:70 pos:[10,70]
 	listBox ltbFilesList "" align:#right selection:0 \
-	height:20 width:225 pos:[85,70]
+	height:20 width:205 pos:[85,70]
 	button btnFilterPrefix "✚过滤词缀✚" border:false \
 	height:20 width:70 pos:[10,95] tooltip:"左：添加过滤\r\n右：取消过滤\r\n选中过滤列表\r\n右击删除条目"
 	listBox ltbFilterPrefix "" align:#left selection:0 \
 	height:6 width:70 pos:[10,117]
-	radioButtons rdoFileType "" columns:4 \
-	pos:[82,48] labels:#(".max",".fbx",".bip",".ms") offsets:#([10,0],[10,0],[10,0],[10,0])
+	radioButtons rdoFileType "" columns:4 offsets:#([7,0],[7,0],[7,0],[7,0]) \
+	pos:[82,48] labels:#(".max",".fbx",".bip",".ms") 
 	button btnCountTips "" border:false enabled:false \
-	height:20 width:70 pos:[10,335]
+	height:20 width:70 pos:[10,342]
 
 	button btnRecentFileDir "~念念不忘~" border:false \
-	height:25 width:70 pos:[10,205] tooltip:"最近打开文件"
+	height:25 width:70 pos:[10,206] tooltip:"最近打开文件"
 	button btnDesktopDir "• 希望之地 •" border:false \
-	height:25 width:70 pos:[10,230] tooltip:"桌面文件夹"
+	height:25 width:70 pos:[10,232] tooltip:"自定文件夹，默认桌面，右键可设"
 	button btnAutobackDir "×崩坏神域×" border:false \
-	height:25 width:70 pos:[10,255] tooltip:"自动保存目录"
+	height:25 width:70 pos:[10,258] tooltip:"自动保存目录"
 	button btnScriptsDir "★逆商科技★" border:false \
-	height:25 width:70 pos:[10,280] tooltip:"脚本文件夹\r\n左：根目录\r\n右：自启目录"
+	height:25 width:70 pos:[10,284] tooltip:"脚本文件夹\r\n左：根目录\r\n右：自启目录"
 	button btnPreviewDir "<轮回梦境>" border:false \
-	height:25 width:70 pos:[10,305] tooltip:"左：预览视频默认文件夹\r\n右：快速拍屏渲染预览动画"
-	label labmiHoYo "- TECH OTAKUS SAVE THE WORLD -- Bullet.S -" \
-	pos:[85,340]
+	height:25 width:70 pos:[10,310] tooltip:"左：预览视频默认文件夹\r\n右：快速拍屏渲染预览动画"
+	HyperLink lnkLink ""
+	color:(color 255 20 100) hovercolor:(color 255 0 255) visitedcolor:(color 255 20 100) \
+	pos:[390,343] address:"https://space.bilibili.com/2031113"
+	checkbutton ckbLockWidth "" pos:[88,343] width:16 height:20 border:false \
+	toolTip:"是否解锁宽度调节\r\n右：重置宽度" checked:false
+	slider sldSetWidth pos:[111,340] range:[300,500,iniWidthOpenTools] ticks:0 \
+	width:184 type:#integer toolTip:"调节面板宽度,以显示更多字" enabled:false
+	label labLogo "-------------------------  TECH OTAKUS SAVE THE WORLD -" pos:[12,365]
 	------------------------------------------------- ↑ UI -------------------------------------
 	
 	-- global charClass = dotNetClass "System.Char" --dotnet charclass used for isDigit comparisment
@@ -250,7 +295,8 @@ rollout rolBsOpenTools "" width:320 height:365
 			(
 				for i in arrFilesBeforeFilter do 
 				(
-					if (matchpattern (getfilenamefile i) pattern:("*" + rolBsOpenTools.ltbFilterPrefix.selected + "*")) then 
+					if (matchpattern (getfilenamefile i) \
+					pattern:("*" + rolBsOpenTools.ltbFilterPrefix.selected + "*")) then 
 					(append arrFiles i)
 				)
 			)
@@ -341,7 +387,7 @@ rollout rolBsOpenTools "" width:320 height:365
 		rolBsOpenTools.ltbFilterPrefix.items = arrPreItems
 	)
 
-	fn fnLoadBip =
+	fn fnLoadBip fBip =
 	(
 		-- biped.loadBipFile <biped_ctrl> <file_name> \
 		-- [#matchFileStruct] [#zeroHgt] [#noRedraw] \
@@ -350,34 +396,63 @@ rollout rolBsOpenTools "" width:320 height:365
 		-- [#loadSelectedMaxObjects nodename_array] \
 		-- [#loadSelectedSubAnimControllers bipednodename_array int_array]
 
-		print "待添加"
-		
+		local numSelbiped = #()   -------判断选择了几个biped骨架
+		if selection.count != 0 then
+		(
+			for i in (selection as array) where ((classof i == Biped_Object) and (i.ishidden == false)) do  
+			(
+				appendIfUnique numSelbiped i.controller.rootNode  --添加到骨架数组
+			)
+			for b in numSelbiped do 
+			(
+				biped.loadBipFile b.controller fBip #noRedraw
+			)
+		)
 	)
 
 	----------------------------------------------------------------------------------------------------
 	
 	on rolBsOpenTools open do 
 	(
+		sldSetWidth.value         = iniWidthOpenTools
+		rolBsOpenTools.width      = iniWidthOpenTools
+		btnRefreshFolder.images   = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,3,3,3,3,true,false)
+		ckbLockWidth.images       = #("LockButtonExt_i.bmp","LockButtonExt_i.bmp",2,1,1,2,2,true,false)
 		fnRefreshAddress ()
-		fnRefreshList maxFilePath type:arrFileType[rdoFileType.state]
+		fnRefreshList maxFilePath type: arrFileType[rdoFileType.state]
 		btnCountTips.text = "文件：" + arrFiles.count as string
 		fnSaveConfig ()  ---------------脚本位置等赋值
 		fnSetConfig ()  ----------------保存位置信息到ini文件
 		fnRefLikedFolderItems ()
-		-- rolBsOpenTools.ddlLikedFolder.selection = iniSelectedID
-		btnRefreshFolder.images = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,3,3,3,3,true,false)
 		ltbFilterPrefix.selection = 0
 		fnRefreshFilterItems ()
+		ddlLikedFolder.selection = iniSelectedID
 	)
 
 	on rolBsOpenTools close do -- 关闭记忆浮动窗口位置
 	(
-		iniPosOpenTools = (GetDialogPos rolBsOpenTools)
-		iniSelectedID   = rolBsOpenTools.ddlLikedFolder.selection
+		iniPosOpenTools   = (GetDialogPos rolBsOpenTools)
+		iniSelectedID     = rolBsOpenTools.ddlLikedFolder.selection
+		iniWidthOpenTools = sldSetWidth.value
 		fnSetConfig ()
 	)
 
+	on sldSetWidth changed ticks do
+	(
+		rolBsOpenTools.width = ticks
+	)
 	------------------------------------------------------------------------------
+
+	on rolBsOpenTools resized pos do
+	(
+		grpMain.width         = rolBsOpenTools.width - 10
+		edtBrowseFolder.width = rolBsOpenTools.width - 80
+		ltbFilesList.width    = rolBsOpenTools.width - 95
+		if rolBsOpenTools.width == 500 then \
+		lnkLink.caption = "---  | 2019.11  miHoYo_Bullet.S |  ---"
+		else lnkLink.caption = ""
+	)
+
 	on rolBsOpenTools mbuttondown pos do 
 	(
 		try (destroydialog rolBsOpenTools) catch ()
@@ -416,14 +491,34 @@ rollout rolBsOpenTools "" width:320 height:365
 		fnRefreshList edtBrowseFolder.text type:arrFileType[rdoFileType.state]
 	)
 
-	on edtBrowseFolder changed text do
+	on btnRefreshFolder rightclick do 
 	(
-		fnRefreshList text type:arrFileType[rdoFileType.state]
+		if (doesDirectoryExist edtBrowseFolder.text) then
+		(
+			shellLaunch "explorer.exe" edtBrowseFolder.text
+		)
+	)
+
+	on edtBrowseFolder changed txt do
+	(
+		fnRefreshList txt type:arrFileType[rdoFileType.state]
 	)
 
 	on rdoFileType changed state do
 	(
 		fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[state]
+	)
+
+	on ckbLockWidth changed state do 
+	(
+		if state == on then sldSetWidth.enabled = true 
+		else sldSetWidth.enabled = false
+	)
+
+	on ckbLockWidth rightclick do
+	(
+		rolBsOpenTools.width = 300
+		sldSetWidth.value    = 300
 	)
 
 	on btnOpenAddress pressed do 
@@ -521,9 +616,14 @@ rollout rolBsOpenTools "" width:320 height:365
 						local idFile = id - arrFolders.count
 						case of 
 						(
-							(rdoFileType.state == 1):(loadMaxFile (arrFiles[idFile]))
+							(rdoFileType.state == 1):
+							(
+								CheckForSave ()
+								loadMaxFile (arrFiles[idFile]) useFileUnits:true quiet:true
+							)
 							(rdoFileType.state == 2):(importFile arrFiles[idFile] #noPrompt using:FBXIMP)
-							(rdoFileType.state == 3):(fnLoadBip ())
+							(rdoFileType.state == 3):(fnLoadBip arrFiles[idFile])
+							(rdoFileType.state == 4):(fileIn arrFiles[idFile])
 						)
 					)
 				)
@@ -545,9 +645,21 @@ rollout rolBsOpenTools "" width:320 height:365
 
 	on btnDesktopDir pressed do 
 	(
-		local tempUserName = (filterString  (getdir #userscripts) @"\")[3]
-		rdoFileType.state  = 1
-		fnRefreshList (@"C:\Users\" + tempUserName + @"\Desktop\")
+		if iniDesktop.dir == "" then 
+		(
+			iniDesktop.dir = (@"C:\Users\" + (filterString  (getdir #userscripts) @"\")[3] + @"\Desktop\")
+		)
+		fnRefreshList iniDesktop.dir type:arrFileType[rdoFileType.state]
+	)
+
+	on btnDesktopDir rightclick do 
+	(
+		dirOpened = getSavePath caption:"请设置桌面路径:" initialDir:(maxFilePath)
+        if (dirOpened != undefined) then
+        (
+            iniDesktop.dir = dirOpened
+            fnRefreshList iniDesktop.dir type:arrFileType[rdoFileType.state]
+        )
 	)
 
 	on btnAutobackDir pressed do 
@@ -599,4 +711,19 @@ rollout rolBsOpenTools "" width:320 height:365
 		btnCountTips.text = "文件：" + arrRecentFiles.count as string
 	)
 )
-CreateDialog rolBsOpenTools pos:iniPosOpenTools fgcolor:(color 255 20 100) style:#()
+CreateDialog rolBsOpenTools pos:iniPosOpenTools fgcolor:(color 255 20 100) \
+style:#() lockHeight:true
+
+------------------------toolbar----------------------------------------------------
+macroScript BsOpenTools
+category:"_[BulletTools]"
+buttonText:"时光机"
+toolTip:"时光机"
+-- Icon:#("Systems",2)
+(
+	on execute do
+	(
+		fileIn ((getDir #Scripts)+ "\\BulletScripts\\" + "BsOpenTools.ms")
+	)
+)
+-------------------------------------------------------------------------------------

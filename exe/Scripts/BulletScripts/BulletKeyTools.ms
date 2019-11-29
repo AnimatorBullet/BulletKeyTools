@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-27 14:38:09
+ * @LastEditTime: 2019-11-29 13:49:53
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -78,7 +78,8 @@ Global strCurrentFps = framerate as string + " FPS"
 
 rollout rolCustomFps ""
 (
-    edittext edtFpsValue "FPS: "  pos:[10,10] width:60 usePercentageWidth:true percentageWidth:44.0 labelOnTop:false text:"60" bold:true readOnly:false --帧率数值
+	edittext edtFpsValue "FPS: "  pos:[10,10] width:60 usePercentageWidth:true \
+	percentageWidth:44.0 labelOnTop:false text:"60" bold:true readOnly:false --帧率数值
     button btnSetFps "Set" pos:[80,8]
     label labTips strCurrentFps
 
@@ -165,7 +166,8 @@ rcmenu menuSetFps
     on menuCustomFps picked do
     (
         try (destroyDialog rolCustomFps) catch()
-        createdialog rolCustomFps 120 55 fgcolor:(color 255 20 100) pos:[mouse.screenpos.x,mouse.screenpos.y]
+		createdialog rolCustomFps 120 55 fgcolor:(color 255 20 100) \
+		pos:[mouse.screenpos.x,mouse.screenpos.y]
     )
 )
 
@@ -227,7 +229,8 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 	Fn fnSetKeyType keyType = 
 	(
 		sliderTime = animationRange.start
-		for obj in selection where ((classof obj.baseObject == Biped_Object) and (biped.getCurrentLayer obj.controller == 0)) do
+		for obj in selection where ((classof obj.baseObject == Biped_Object) \
+		and (biped.getCurrentLayer obj.controller == 0)) do
 		(
 			bipCtrl = obj.controller
 			if chkLHand.checked then 
@@ -355,7 +358,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnSelAfterKeys " " \
 		pos:[130,95] width:30 height:30 toolTip:"选择滑条后面关键帧" border:false
 		button btnMoveKeys " " width:30 height:30 \
-		pos:[160,95] toolTip:"移动关键帧,\r\n左：帧栏范围同步增减,\r\n右：帧栏范围保持不变~" border:false
+		pos:[160,95] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~" border:false
 		button btnFileOpen "★ 快速打开" pos:[10,128] width:70 height:25 \
 		tooltip:"快速打开max文件\r\n可收藏常用目录" border:false
 		button btnCutFrameDisplay "◐ 帧预览" pos:[80,128] width:60 height:25 \
@@ -441,13 +444,13 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnImportOut "◮ 导入导出" width:75 height:32 visible:false border:false \
 		toolTip:"功能待添加"
 	
-	groupbox gbxMyScripts "" pos:[5,230] width:335 height:45
+	-- groupbox gbxMyScripts "" pos:[5,230] width:335 height:45
 
-		button btnMyScripts1 "< ＋＋＋ >" pos:[12,242] width:60 height:25 border:false
-		button btnMyScripts2 "< ＋＋＋ >" pos:[77,242] width:60 height:25 border:false
-		button btnMyScripts3 "< ＋＋＋ >" pos:[142,242] width:60 height:25 border:false
-		button btnMyScripts4 "< ＋＋＋ >" pos:[207,242] width:60 height:25 border:false
-		button btnMyScripts5 "< ＋＋＋ >" pos:[272,242] width:60 height:25 border:false
+		button btnMyScripts1 "< ＋＋＋ >" pos:[5,232] width:60 height:20 border:false
+		button btnMyScripts2 "< ＋＋＋ >" pos:[74,232] width:60 height:20 border:false
+		button btnMyScripts3 "< ＋＋＋ >" pos:[143,232] width:60 height:20 border:false
+		button btnMyScripts4 "< ＋＋＋ >" pos:[212,232] width:60 height:20 border:false
+		button btnMyScripts5 "< ＋＋＋ >" pos:[280,232] width:60 height:20 border:false
 
 	groupbox gbxTips "" pos:[5,180] width:190 height:50
 	
@@ -469,7 +472,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		else
 		(
 			rolloutBulletKeyTools.width               = 345
-			rolloutBulletKeyTools.height              = 280
+			rolloutBulletKeyTools.height              = 255
 			rolloutBulletKeyTools.gbxMinTools.visible = true
 			btnMagicBtn.text                          = "( = `▽`)"
 		)
@@ -488,7 +491,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		else
 		(
 			rolloutBulletKeyTools.width               = 345
-			rolloutBulletKeyTools.height              = 280
+			rolloutBulletKeyTools.height              = 255
 			rolloutBulletKeyTools.gbxMinTools.visible = true
 			btnMagicBtn.text                          = "( = `▽`)"
 			switchToolPanel                           = 1
@@ -609,6 +612,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 						for i in tempObj.controller[i].keys do 
 						(
 							appendIfUnique arrLinkKeys i  ---------添加link帧到数组
+							appendIfUnique arrKeysTime i.time
 							if i.selected == true then appendIfUnique arrKeysSelected i.time
 						)
 					)
@@ -926,8 +930,9 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 	)
 	
-	mapped fn fnMoveKeysAndLinkKeys obj offset symbol =  ----https://forums.cgsociety.org/t/moving-keys-from-link-constraint-keys-access/1575053
+	mapped fn fnMoveKeysAndLinkKeys obj offset =  ----https://forums.cgsociety.org/t/moving-keys-from-link-constraint-keys-access/1575053
 	(
+		local arrTargetID  = #()
 		moveKeys obj offset #selection  ---先移动非link帧
 		if rolloutBulletKeyTools.btnJudgeLinkKey.checked == true then 
 		(
@@ -937,33 +942,28 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	
 				if nTargets > 0 do
 				(
-					--SORT THE LINK CONSTRAINT TARGETS
-					obj.controller.setFrameNo 1 (obj.controller.getFrameNo 1)
-								
+					for i = nTargets to 1 by -1 do  ------如果大于0则从最后link帧开始移
+					(
+						fNumber = obj.controller.getFrameNo i
+						if ((fNumber >= keySelFirst) and (fNumber <= keySelEnd)) then
+						(
+							appendIfUnique arrTargetID i
+						)
+					)
 					if offset > 0 then  --------判断向前还是向后移动帧
 					(
-						for i = nTargets to 1 by -1 do  ------如果大于0则从第一个link帧开始移
+						for i = arrTargetID.count to 1 by -1 do  ------如果大于0则从最后link帧开始移
 						(
-							fNumber = obj.controller.getFrameNo i
-							case of  -------------判断link帧位置,数字是随便取的方便判断情况
-							(
-								(symbol == 0):(if fNumber <= sliderTime then (obj.controller.setFrameNo i (fNumber + offset)))
-								(symbol == 1):(if fNumber >= sliderTime then (obj.controller.setFrameNo i (fNumber + offset)))
-								(symbol == 2):((obj.controller.setFrameNo i (fNumber + offset)))
-							)
+							fNumber = obj.controller.getFrameNo arrTargetID[i]
+							obj.controller.setFrameNo i (fNumber + offset)
 						)
 					)
 					else
 					(
-						for i = 1 to nTargets do  ---如果移动帧小于0,从最后link帧开始移
+						for i = 1 to arrTargetID.count do  ---如果移动帧小于0,从第一个link帧开始移
 						(
-							fNumber = obj.controller.getFrameNo i
-							case of  -------------判断link帧位置,数字是随便取的方便判断情况
-							(
-								(symbol == 0):(if fNumber <= sliderTime then (obj.controller.setFrameNo i (fNumber + offset)))
-								(symbol == 1):(if fNumber >= sliderTime then (obj.controller.setFrameNo i (fNumber + offset)))
-								(symbol == 2):((obj.controller.setFrameNo i (fNumber + offset)))
-							)			
+							fNumber = obj.controller.getFrameNo arrTargetID[i]
+							obj.controller.setFrameNo i (fNumber + offset)
 						)
 					)
 				)
@@ -1028,7 +1028,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 	)
 
-	fn fnMoveAllKeys keyMovedOffset =
+	fn fnMoveAllKeys keyMovedOffset fnRange:off =
 	(
 		local rangEnd = animationrange.end
 		local rangeStart = animationrange.start
@@ -1042,7 +1042,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 				(
 					if classof i != Biped_Object then
 					(
-						fnMoveKeysAndLinkKeys i keyMovedOffset symbol
+						fnMoveKeysAndLinkKeys i keyMovedOffset
 					)
 					else 
 					(
@@ -1061,22 +1061,27 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 				(
 					if classof i != Biped_Object then
 					(
-						fnMoveKeysAndLinkKeys i keyMovedOffset symbol
+						fnMoveKeysAndLinkKeys i keyMovedOffset
 					)
 					else fnMoveBipedScaleKeys i keyMovedOffset
 				)
 				fnMoveBipedKeys keyMovedOffset
 			)
-			if keyMovedOffset > 0 then 
+			if fnRange == on then
 			(
-				rangEnd = animationrange.end + keyMovedOffset
-				animationrange = interval animationrange.start rangEnd
+				if keyMovedOffset > 0 then 
+				(
+					rangEnd = animationrange.end + keyMovedOffset
+					animationrange = interval animationrange.start rangEnd
+				)
+				else if keyMovedOffset < 0 then 
+				(
+					rangeStart = animationrange.start + keyMovedOffset
+					animationrange = interval rangeStart animationrange.end
+				)
 			)
-			else if keyMovedOffset < 0 then 
-			(
-				rangeStart = animationrange.start + keyMovedOffset
-				animationrange = interval rangeStart animationrange.end
-			)
+			keySelFirst += keyMovedOffset
+			keySelEnd  += keyMovedOffset
 		)
 	)
 
@@ -1417,45 +1422,11 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	)
 	on btnMoveKeys pressed do with undo on   ------移动选定帧
 	(
-		fnMoveAllKeys keyMovedOffset
+		fnMoveAllKeys keyMovedOffset fnRange:off
 	)
 	on btnMoveKeys rightclick do with undo on
 	(
-		local n = 0
-		if keyMovedOffset != undefined then  ---跟前面一样,只是不改变帧栏范围
-		(
-			if selection.count != 0 then
-			(
-				for i in selection where (i.ishidden == false) do
-				(
-					if classof i != Biped_Object then
-					(
-						fnMoveKeysAndLinkKeys i keyMovedOffset symbol
-					)
-					else 
-					(
-						fnMoveBipedScaleKeys i keyMovedOffset
-						n += 1
-					)
-				)
-				if n != 0 then
-				(
-					fnMoveBipedKeys keyMovedOffset
-				)
-			)
-			else 
-			(
-				for i in objects where (i.ishidden == false) do
-				(
-					if classof i != Biped_Object then
-					(
-						fnMoveKeysAndLinkKeys i keyMovedOffset symbol
-					)
-					else fnMoveBipedScaleKeys i keyMovedOffset
-				)
-				fnMoveBipedKeys keyMovedOffset
-			)
-		)
+		fnMoveAllKeys keyMovedOffset fnRange:on
 	)
 	on btnSelBeforeKeys pressed do  ------------选择滑条之前帧
 	(
