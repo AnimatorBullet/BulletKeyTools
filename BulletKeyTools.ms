@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-29 19:47:38
+ * @LastEditTime: 2019-11-30 06:31:56
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -48,6 +48,7 @@ Global arrToolC4       = #()  ----------工具按钮数组
 Global arrToolC5       = #()  ----------工具按钮数组
 Global iniArrMyScripts = #()
 Global idBtn           = 1
+Global uiClientOffsets = undefined
 ------------------全局变量-------------------------------------------------------------------
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
@@ -375,7 +376,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnSetFpsAndSpeed " " pos:[80,155] width:110 height:20 \
 		toolTip:"左：设置帧率\r\n右：播放速度" border:false
 	
-	groupbox gbxMinTools "小工具" pos:[200,5] width:140 height:225
+	groupbox gbxMinTools "小工具说明" pos:[200,5] width:140 height:225
 	
 		button btnC1 "- 帧 -" width:35 height:35 border:false \
 		pos:[205,24] toolTip:""
@@ -465,7 +466,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		label labmiHoYo "--- TECH OTAKUS SAVE THE WORLD --" \
 		pos:[7,210]
 
-		
+		timer tick_tock interval:400 active:iniHelpBtn
 ----------------------------------UI及作者ID------------------------------------------------
 	fn fnRefreshMagicBtn =
 	(
@@ -1205,6 +1206,20 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 	)
 
+	fn fnRefreshHelpText btn =
+	(
+		local mouseClientPos = mouse.screenPos - (getDialogPos rolloutBulletKeyTools) + uiClientOffsets
+		local btnPos = btn.pos
+		local btnSize = [75,32]
+		local btnBox = (Box2 btnPos.x btnPos.y btnSize.x btnSize.y)
+
+		local dialogPos = getDialogPos rolloutBulletKeyTools
+		local dialogBox = (Box2 dialogPos.x dialogPos.y \
+			rolloutBulletKeyTools.width rolloutBulletKeyTools.height)
+		
+			return (contains btnBox mouseClientPos)
+	)
+
 	on rolloutBulletKeyTools open do  ----打开脚本时操作
 	(------刷新图标, 图标是max自带的,主要是懒得做
 		btnSelBeforeKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,3,3,3,3,true,true) 
@@ -1252,6 +1267,83 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		if switchMouseState == on then
 		(
 			SetDialogPos rolloutBulletKeyTools (mouse.screenpos - posMouMoved)			
+		)
+		if (uiClientOffsets == undefined) then 
+		(
+			uiClientOffsets = pos - (mouse.screenPos - (getDialogPos rolloutBulletKeyTools)) 
+		)
+	)
+
+	on tick_tock tick do
+	(
+		if ((ckbHelpBtn.state) and (uiClientOffsets != undefined)) then 
+		(
+			if fnRefreshHelpText arrToolC1[1] == true then
+			(
+				case of 
+				(
+					(idBtn == 1):(gbxMinTools.caption = "1")
+					(idBtn == 2):(gbxMinTools.caption = "2")
+					(idBtn == 3):(gbxMinTools.caption = "3")
+					(idBtn == 4):(gbxMinTools.caption = "4")
+					(idBtn == 5):(gbxMinTools.caption = "5")
+				)
+			)
+			if fnRefreshHelpText arrToolC1[2] == true then
+			(
+				case of 
+				(
+					(idBtn == 1):(gbxMinTools.caption = "11")
+					(idBtn == 2):(gbxMinTools.caption = "22")
+					(idBtn == 3):(gbxMinTools.caption = "33")
+					(idBtn == 4):(gbxMinTools.caption = "44")
+					(idBtn == 5):(gbxMinTools.caption = "55")
+				)
+			)
+			if fnRefreshHelpText arrToolC1[3] == true then
+			(
+				case of 
+				(
+					(idBtn == 1):(gbxMinTools.caption = "111")
+					(idBtn == 2):(gbxMinTools.caption = "222")
+					(idBtn == 3):(gbxMinTools.caption = "333")
+					(idBtn == 4):(gbxMinTools.caption = "444")
+					(idBtn == 5):(gbxMinTools.caption = "555")
+				)
+			)
+			if fnRefreshHelpText arrToolC1[4] == true then
+			(
+				case of 
+				(
+					(idBtn == 1):(gbxMinTools.caption = "1")
+					(idBtn == 2):(gbxMinTools.caption = "2")
+					(idBtn == 3):(gbxMinTools.caption = "3")
+					(idBtn == 4):(gbxMinTools.caption = "4")
+					(idBtn == 5):(gbxMinTools.caption = "5")
+				)
+			)
+			if fnRefreshHelpText arrToolC1[5] == true then
+			(
+				case of 
+				(
+					(idBtn == 1):(gbxMinTools.caption = "1")
+					(idBtn == 2):(gbxMinTools.caption = "2")
+					(idBtn == 3):(gbxMinTools.caption = "3")
+					(idBtn == 4):(gbxMinTools.caption = "4")
+					(idBtn == 5):(gbxMinTools.caption = "5")
+				)
+			)
+			if fnRefreshHelpText arrToolC1[6] == true then
+			(
+				case of 
+				(
+					(idBtn == 1):(gbxMinTools.caption = "1")
+					(idBtn == 2):(gbxMinTools.caption = "2")
+					(idBtn == 3):(gbxMinTools.caption = "3")
+					(idBtn == 4):(gbxMinTools.caption = "4")
+					(idBtn == 5):(gbxMinTools.caption = "5")
+				)
+			)
 		)
 	)
 	---------------------上面设置拖动脚本窗口,去掉标题栏后默认无法拖动---------------------
