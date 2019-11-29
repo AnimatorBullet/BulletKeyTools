@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-29 19:46:20
+ * @LastEditTime: 2019-11-29 19:47:38
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -348,7 +348,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		checkbutton ckbHelpBtn "？帮助" pos:[135,23] width:55 height:20 border:false \
 		tooltip:"打开帮助模式！"
 		button btnMagicBtn "✧(≖ ◡ ≖" pos:[135,45] width:55 height:25 border:false \
-		tooltip:"点我点我点我~\r\n左点小工具,\r\n右点帮助."
+		tooltip:"点我点我点我~良心小工具"
 		edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
 		pos:[10,78] labelOnTop:false text:"5f" bold:true readOnly:false 
 		button btnSet5 "5f" width:35 pos:[90,75]
