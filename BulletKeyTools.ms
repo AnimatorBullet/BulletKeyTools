@@ -3,12 +3,14 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-01 00:38:58
+ * @LastEditTime: 2019-12-01 02:22:36
 * @Email: animator.bullet@foxmail.com
 */
 
 try(destroydialog rolloutBulletKeyTools)catch()
 try(destroydialog rolFnKeys)catch()
+
+struct myScript (id,dir)
 
 Global posMouX           = mouse.screenpos.x
 Global posMouY           = mouse.screenpos.y  --获取鼠标位置
