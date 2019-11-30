@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-28 23:22:59
+ * @LastEditTime: 2019-11-30 23:17:56
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -159,14 +159,14 @@ rollout rolBsOpenTools "" width:300 height:390
 	width:290 height:385 pos:[5,0]
 	editText edtBrowseFolder "" text:"" labelOnTop:true align:#right \
 	height:20 fieldWidth:220 pos:[70,20] readOnly:true 
-	button btnOpenAddress "..." align:#right tooltip:"选择打开目录" \
+	button btnOpenAddress "..." align:#right tooltip:"左：选择打开目录\r\n右：打开右侧目录文件夹" \
 	height:20 width:30 pos:[37,20] 
 	-- button btnRemoveFolder "━" align:#left \
 	-- height:20 width:25 pos:[10,20] tooltip:"删除选中的收藏目录"
 	-- button btnAddFolder "✚" align:#left border:false \
 	-- height:20 width:20 pos:[35,20] tooltip:"新增常用目录"
 	button btnRefreshFolder "R" align:#left \
-	height:20 width:25 pos:[10,20] tooltip:"左：刷新当前文件目录\r\n右：打开右侧目录文件夹"
+	height:20 width:25 pos:[10,20] tooltip:"左：刷新当前文件目录\r\n右：重置场景"
 	button btnLikedFolder "↓ 添加常用 ↓" border:false \
 	height:23 width:70 pos:[10,43] tooltip:"新增常用目录，右击选中条目删除"
 	dropdownlist ddlLikedFolder "" align:#left selection:1 \
@@ -492,6 +492,13 @@ rollout rolBsOpenTools "" width:300 height:390
 	)
 
 	on btnRefreshFolder rightclick do 
+	(
+		CheckForSave ()
+		resetMaxFile #noPrompt
+		max tool maximize
+	)
+
+	on btnOpenAddress rightclick do 
 	(
 		if (doesDirectoryExist edtBrowseFolder.text) then
 		(
