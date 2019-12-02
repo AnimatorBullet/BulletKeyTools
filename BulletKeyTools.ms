@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-01 02:22:36
+ * @LastEditTime: 2019-12-02 17:07:42
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -19,6 +19,7 @@ Global posToolBtn        = [245,26]
 Global switchMouseState  = false
 Global switchSelKeyRange = 0
 Global switchHideBones   = 0
+Global switchHideBiped   = 0
 Global switchToolPanel   = 0
 Global arrLastSelRange   = #()
 Global switchAllKeyRange = 0
@@ -45,7 +46,8 @@ Global keyMovedOffset = 5
 Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
 Global arrTraj         = #()  ---轨迹存放数组, 方便删除
-Global arrTempBones    = #()  ---隐藏骨骼临时存放数组
+Global arrHideBones    = #()  ---隐藏骨骼临时存放数组
+Global arrHideBiped    = #()  ---隐藏骨骼临时存放数组
 Global arrToolC1       = #()  ----------工具按钮数组
 Global arrToolC2       = #()  ----------工具按钮数组
 Global arrToolC3       = #()  ----------工具按钮数组
@@ -398,7 +400,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnBoneTraj "◆ Bone轨迹" width:90 height:32   visible:false border:false \
 		toolTip:"左：切换显示Bone轨迹,\r\n右：清除所有Bone轨迹"
 		button btnBipedTraj "◇ Biped轨迹" width:90 height:32   visible:false border:false \
-		toolTip:"左：切换显示单个Biped轨迹,\r\n右：切换显示所有Biped轨迹~"
+		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除所有单独Biped轨迹~"
 		button btnFnFrame "● 整小数帧" width:90 height:32   visible:false border:false \
 		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿"
 		button btnSelByColor "◪ 同色选择" width:90 height:32   visible:false border:false \
@@ -420,7 +422,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		checkbutton ckbFreezeMesh "✲ 冻结模型" width:90 height:32   visible:false border:false \
 		toolTip:"冻结解冻模型"
 		button btnHideBones "☁ 隐藏骨骼" width:90 height:32   visible:false border:false \
-		toolTip:"左：隐藏bone\r\n右：隐藏biped和bone"
+		toolTip:"左：隐藏bone\r\n右：隐藏biped"
 		button btnSelBoneBiped "☑ 选择骨骼" width:90 height:32   visible:false border:false \
 		toolTip:"左：选择所有biped\r\n右：选择所有bone"
 		button btnEndBone "✚ 末端操作" width:90 height:32   visible:false border:false \
@@ -1256,7 +1258,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 					case of 
 					(
 						(idBtn == 1):(gbxMinTools.caption = " 删选择帧  ||  删轴外帧 ")
-						(idBtn == 2):(gbxMinTools.caption = " 切显单个  ||  切显所有 ")
+						(idBtn == 2):(gbxMinTools.caption = " 切显单个  ||  清除所有 ")
 						(idBtn == 3):(gbxMinTools.caption = " 根据颜色选择同色物体 ")
 						(idBtn == 4):(gbxMinTools.caption = " Bone过滤欧拉曲线 ")
 						(idBtn == 5):(gbxMinTools.caption = " Mopher表情选择滑条 ")
@@ -1315,28 +1317,30 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 	)
 
-	fn fnHidebyCategory cate:BoneGeometry =
+	fn fnHidebyCategory arr cate fnSwitch =
 	(
-		if switchHideBones == 0 then
+		if fnSwitch == 0 then
 		(
 			for o in objects where ((classof o == cate) and (o.isHidden == false)) do
 			(
-				append arrTempBones o
+				append arr o
 			)
-			for b in arrTempBones do
+			for b in arr do
 			(
 				b.isHidden = true
 			)
-			switchHideBones = 1
+			if cate == BoneGeometry then switchHideBones  = 1
+			if cate == Biped_Object then switchHideBiped  = 1
 		)
 		else
 		(
-			for b in arrTempBones do
+			for b in arr do
 			(
 				b.isHidden = false
 			)
-			arrTempBones = #()
-			switchHideBones = 0
+			arr = #()
+			if cate == BoneGeometry then switchHideBones  = 0
+			if cate == Biped_Object then switchHideBiped  = 0
 		)
 	)
 
@@ -1526,36 +1530,23 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		else if selection.count == 1 then
 		(
 			if classof $ == Biped_Object then
+			(
+				if (getNodeByName ("Traj_" + $.name)) != undefined then 
 				(
-					if (getNodeByName ("Traj_" + $.name)) != undefined then 
-					(
-						fnDeleteTraj $
-					)
-					else fnAddBipedTraj $
+					fnDeleteTraj $
 				)
+				else fnAddBipedTraj $
+			)
 		)
 	)
 
 	on btnBipedTraj rightclick do
 	(
-		-- bipedRoot = #()   -------判断选择了几个biped骨架
-		if (selection.count > 0) then
+		arrDel = for i in objects where (matchpattern i.name pattern:"Traj_*") collect i
+		delete arrDel
+		if (LayerManager.getLayerFromName "Biped_Trajectories") != undefined then
 		(
-			-- for i in (selection as array) where classof i == Biped_Object do  
-			-- (
-			-- 	appendIfUnique bipedRoot i.controller.rootNode  --添加到骨架数组
-			-- )
-			for i in (selection as array) do 
-			(
-				if (classof i == Biped_Object) then
-				(
-					nodeTemp = i.controller.rootNode
-					trajDisFn = nodeTemp.controller.displayTrajectories
-					if trajDisFn == true then nodeTemp.controller.displayTrajectories = false
-					else nodeTemp.controller.displayTrajectories = true
-					exit
-				)
-			)
+			LayerManager.deleteLayerByName  "Biped_Trajectories"
 		)
 	)
 
@@ -1775,12 +1766,12 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 -- 		redrawviews()
 -- 		slidertime -= 1
 -- 		slidertime += 1
-		fnHidebyCategory cate:BoneGeometry
+		fnHidebyCategory arrHideBones BoneGeometry switchHideBones
 	)
 	
 	on btnHideBones rightclick do
 	(
-		fnHidebyCategory cate:Biped_Object
+		fnHidebyCategory arrHideBiped Biped_Object switchHideBiped
 	)
 
 	on ckbFreezeMesh changed state do 
