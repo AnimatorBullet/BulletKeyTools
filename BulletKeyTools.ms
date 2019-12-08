@@ -3,11 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
-<<<<<<< HEAD
- * @LastEditTime: 2019-12-08 16:20:24
-=======
- * @LastEditTime: 2019-12-02 17:07:42
->>>>>>> da683c04ee33529f9fe98f7ff3e0b74b684af250
+ * @LastEditTime: 2019-12-08 16:39:57
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -23,7 +19,6 @@ Global posToolBtn        = [205,45]
 Global switchMouseState  = false
 Global switchSelKeyRange = 0
 Global switchHideBones   = 0
-Global switchHideBiped   = 0
 Global switchToolPanel   = 0
 Global arrLastSelRange   = #()
 Global switchAllKeyRange = 0
@@ -50,8 +45,7 @@ Global keyMovedOffset = 5
 Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
 Global arrTraj         = #()  ---轨迹存放数组, 方便删除
-Global arrHideBones    = #()  ---隐藏骨骼临时存放数组
-Global arrHideBiped    = #()  ---隐藏骨骼临时存放数组
+Global arrTempBones    = #()  ---隐藏骨骼临时存放数组
 Global arrToolC1       = #()  ----------工具按钮数组
 Global arrToolC2       = #()  ----------工具按钮数组
 Global arrToolC3       = #()  ----------工具按钮数组
@@ -403,15 +397,9 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 
 		button btnBoneTraj "◆ Bone轨迹" width:150 height:30   visible:false \
 		toolTip:"左：切换显示Bone轨迹,\r\n右：清除所有Bone轨迹"
-<<<<<<< HEAD
 		button btnBipedTraj "◇ Biped轨迹" width:150 height:30   visible:false \
 		toolTip:"左：切换显示单个Biped轨迹,\r\n右：切换显示所有Biped轨迹~"
 		button btnFnFrame "● 整小数帧" width:150 height:30   visible:false \
-=======
-		button btnBipedTraj "◇ Biped轨迹" width:90 height:32   visible:false border:false \
-		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除所有单独Biped轨迹~"
-		button btnFnFrame "● 整小数帧" width:90 height:32   visible:false border:false \
->>>>>>> da683c04ee33529f9fe98f7ff3e0b74b684af250
 		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿"
 		button btnSelByColor "◪ 同色选择" width:150 height:30   visible:false \
 		tooltip:"选择同颜色物体"
@@ -431,15 +419,9 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		toolTip:"左：清除选择或所有帧\r\nLink帧请手动删~\r\n右：清范围外帧(无限帧)"
 		checkbutton ckbFreezeMesh "✲ 冻结模型" width:150 height:30   visible:false \
 		toolTip:"冻结解冻模型"
-<<<<<<< HEAD
 		button btnHideBones "☁ 隐藏骨骼" width:150 height:30   visible:false \
 		toolTip:"左：隐藏bone\r\n右：隐藏biped和bone"
 		button btnSelBoneBiped "☑ 选择骨骼" width:150 height:30   visible:false \
-=======
-		button btnHideBones "☁ 隐藏骨骼" width:90 height:32   visible:false border:false \
-		toolTip:"左：隐藏bone\r\n右：隐藏biped"
-		button btnSelBoneBiped "☑ 选择骨骼" width:90 height:32   visible:false border:false \
->>>>>>> da683c04ee33529f9fe98f7ff3e0b74b684af250
 		toolTip:"左：选择所有biped\r\n右：选择所有bone"
 		button btnEndBone "✚ 末端操作" width:150 height:30   visible:false \
 		toolTip:"清除添加Bone末端"
@@ -1245,7 +1227,6 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		return (contains btnBox mouseClientPos)
 	)
 
-<<<<<<< HEAD
 	-- fn fnRefreshHelpText = 
 	-- (
 	-- 	if ((ckbHelpBtn.state) and (uiClientOffsets != undefined)) then 
@@ -1333,120 +1314,29 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	-- 		)
 	-- 	)
 	-- )
-=======
-	fn fnRefreshHelpText = 
-	(
-		if ((ckbHelpBtn.state) and (uiClientOffsets != undefined)) then 
-		(
-			posToolBtn1 = posToolBtn
-			posToolBtn2 = posToolBtn + [0,32]
-			posToolBtn3 = posToolBtn + [0,2 * 32]
-			posToolBtn4 = posToolBtn + [0,3 * 32]
-			posToolBtn5 = posToolBtn + [0,4 * 32]
-			posToolBtn6 = posToolBtn + [0,5 * 32]
 
-			if (fnHelpPosRange [245,26] btnSize:[90,192]) == true then 
-			(
-				if fnHelpPosRange posToolBtn1 == true then
-				(
-					case of 
-					(
-						(idBtn == 1):(gbxMinTools.caption = " 取消关键帧选择 ")
-						(idBtn == 2):(gbxMinTools.caption = " 显示轨迹  ||  清除所有 ")
-						(idBtn == 3):(gbxMinTools.caption = " 冻结显示模型 ")
-						(idBtn == 4):(gbxMinTools.caption = " TCB和欧拉属性互转 ")
-						(idBtn == 5):(gbxMinTools.caption = " Pose库，要鸽 ")
-					)
-				)
-				if fnHelpPosRange posToolBtn2 == true then
-				(
-					case of 
-					(
-						(idBtn == 1):(gbxMinTools.caption = " 删选择帧  ||  删轴外帧 ")
-						(idBtn == 2):(gbxMinTools.caption = " 切显单个  ||  清除所有 ")
-						(idBtn == 3):(gbxMinTools.caption = " 根据颜色选择同色物体 ")
-						(idBtn == 4):(gbxMinTools.caption = " Bone过滤欧拉曲线 ")
-						(idBtn == 5):(gbxMinTools.caption = " Mopher表情选择滑条 ")
-					)
-				)
-				if fnHelpPosRange posToolBtn3 == true then
-				(
-					case of 
-					(
-						(idBtn == 1):(gbxMinTools.caption = " 功能待添加 ")
-						(idBtn == 2):(gbxMinTools.caption = " 方便拖帧平滑预览 ")
-						(idBtn == 3):(gbxMinTools.caption = " Biped骨骼 ||  Bone骨骼 ")
-						(idBtn == 4):(gbxMinTools.caption = " 清除末端  ||  添加末端 ")
-						(idBtn == 5):(gbxMinTools.caption = " 动画片断标签，要鸽 ")
-					)
-				)
-				if fnHelpPosRange posToolBtn4 == true then
-				(
-					case of 
-					(
-						(idBtn == 1):(gbxMinTools.caption = " 功能待添加 ")
-						(idBtn == 2):(gbxMinTools.caption = " Bone骨骼 ||  Biped骨骼 ")
-						(idBtn == 3):(gbxMinTools.caption = " 功能待添加 ")
-						(idBtn == 4):(gbxMinTools.caption = " 功能待添加 ")
-						(idBtn == 5):(gbxMinTools.caption = " 批量导入导出，要鸽 ")
-					)
-				)
-				if fnHelpPosRange posToolBtn5 == true then
-				(
-					case of 
-					(
-						(idBtn == 1):(gbxMinTools.caption = " 功能待添加 ")
-						(idBtn == 2):(gbxMinTools.caption = " Box显示   ||  Clay显示 ")
-						(idBtn == 3):(gbxMinTools.caption = " 功能待添加 ")
-						(idBtn == 4):(gbxMinTools.caption = " 功能待添加 ")
-						(idBtn == 5):(gbxMinTools.caption = " 功能待添加  ")
-					)
-				)
-				if fnHelpPosRange posToolBtn6 == true then
-				(
-					case of 
-					(
-						(idBtn == 1):(gbxMinTools.caption = " 批量转换滑动帧 ")
-						(idBtn == 2):(gbxMinTools.caption = " 隐藏贴图，预览动画 ")
-						(idBtn == 3):(gbxMinTools.caption = " 选择CS骨骼工具 ")
-						(idBtn == 4):(gbxMinTools.caption = " 打开BoneTools面板 ")
-						(idBtn == 5):(gbxMinTools.caption = " 快捷键，备份设置 ")
-					)
-				)
-			)
-			else 
-			(
-				gbxMinTools.caption = " < 小工具说明 > "
-				myTimer.stop()
-			)
-		)
-	)
->>>>>>> da683c04ee33529f9fe98f7ff3e0b74b684af250
-
-	fn fnHidebyCategory arr cate fnSwitch =
+	fn fnHidebyCategory cate:BoneGeometry =
 	(
-		if fnSwitch == 0 then
+		if switchHideBones == 0 then
 		(
 			for o in objects where ((classof o == cate) and (o.isHidden == false)) do
 			(
-				append arr o
+				append arrTempBones o
 			)
-			for b in arr do
+			for b in arrTempBones do
 			(
 				b.isHidden = true
 			)
-			if cate == BoneGeometry then switchHideBones  = 1
-			if cate == Biped_Object then switchHideBiped  = 1
+			switchHideBones = 1
 		)
 		else
 		(
-			for b in arr do
+			for b in arrTempBones do
 			(
 				b.isHidden = false
 			)
-			arr = #()
-			if cate == BoneGeometry then switchHideBones  = 0
-			if cate == Biped_Object then switchHideBiped  = 0
+			arrTempBones = #()
+			switchHideBones = 0
 		)
 	)
 
@@ -1636,23 +1526,36 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		else if selection.count == 1 then
 		(
 			if classof $ == Biped_Object then
-			(
-				if (getNodeByName ("Traj_" + $.name)) != undefined then 
 				(
-					fnDeleteTraj $
+					if (getNodeByName ("Traj_" + $.name)) != undefined then 
+					(
+						fnDeleteTraj $
+					)
+					else fnAddBipedTraj $
 				)
-				else fnAddBipedTraj $
-			)
 		)
 	)
 
 	on btnBipedTraj rightclick do
 	(
-		arrDel = for i in objects where (matchpattern i.name pattern:"Traj_*") collect i
-		delete arrDel
-		if (LayerManager.getLayerFromName "Biped_Trajectories") != undefined then
+		-- bipedRoot = #()   -------判断选择了几个biped骨架
+		if (selection.count > 0) then
 		(
-			LayerManager.deleteLayerByName  "Biped_Trajectories"
+			-- for i in (selection as array) where classof i == Biped_Object do  
+			-- (
+			-- 	appendIfUnique bipedRoot i.controller.rootNode  --添加到骨架数组
+			-- )
+			for i in (selection as array) do 
+			(
+				if (classof i == Biped_Object) then
+				(
+					nodeTemp = i.controller.rootNode
+					trajDisFn = nodeTemp.controller.displayTrajectories
+					if trajDisFn == true then nodeTemp.controller.displayTrajectories = false
+					else nodeTemp.controller.displayTrajectories = true
+					exit
+				)
+			)
 		)
 	)
 
@@ -1872,12 +1775,12 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 -- 		redrawviews()
 -- 		slidertime -= 1
 -- 		slidertime += 1
-		fnHidebyCategory arrHideBones BoneGeometry switchHideBones
+		fnHidebyCategory cate:BoneGeometry
 	)
 	
 	on btnHideBones rightclick do
 	(
-		fnHidebyCategory arrHideBiped Biped_Object switchHideBiped
+		fnHidebyCategory cate:Biped_Object
 	)
 
 	on ckbFreezeMesh changed state do 

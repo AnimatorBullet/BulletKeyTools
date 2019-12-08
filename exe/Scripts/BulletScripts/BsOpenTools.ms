@@ -1,11 +1,11 @@
 /*
- * @Description: 快速打开max文件，并保存常用目录
- * @Author: Bullet.S
- * @Date: 2019-11-23 01:41:13
+* @Description: 快速打开max文件，并保存常用目录
+* @Author: Bullet.S
+* @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-11-30 23:17:56
- * @Email: animator.bullet@foxmail.com
- */
+ * @LastEditTime: 2019-12-08 16:39:41
+* @Email: animator.bullet@foxmail.com
+*/
 
 
 try(destroydialog rolBsOpenTools)catch()
@@ -153,10 +153,10 @@ rollout rolAddItem "添加" width:320 height:130
 	)
 )
 
-rollout rolBsOpenTools "" width:300 height:390
+rollout rolBsOpenTools "" width:300 height:370
 (
 	groupbox grpMain " 时光机_v0.1 --- 此处拖动,中键关闭,右击上层目录 " \
-	width:290 height:385 pos:[5,0]
+	width:290 height:365 pos:[5,0]
 	editText edtBrowseFolder "" text:"" labelOnTop:true align:#right \
 	height:20 fieldWidth:220 pos:[70,20] readOnly:true 
 	button btnOpenAddress "..." align:#right tooltip:"左：选择打开目录\r\n右：打开右侧目录文件夹" \
@@ -180,7 +180,7 @@ rollout rolBsOpenTools "" width:300 height:390
 	radioButtons rdoFileType "" columns:4 offsets:#([7,0],[7,0],[7,0],[7,0]) \
 	pos:[82,48] labels:#(".max",".fbx",".bip",".ms") 
 	button btnCountTips "" border:false enabled:false \
-	height:20 width:70 pos:[10,342]
+	height:20 width:70 pos:[10,339]
 
 	button btnRecentFileDir "~念念不忘~" border:false \
 	height:25 width:70 pos:[10,206] tooltip:"最近打开文件"
@@ -195,11 +195,11 @@ rollout rolBsOpenTools "" width:300 height:390
 	HyperLink lnkLink ""
 	color:(color 255 20 100) hovercolor:(color 255 0 255) visitedcolor:(color 255 20 100) \
 	pos:[390,343] address:"https://space.bilibili.com/2031113"
-	checkbutton ckbLockWidth "" pos:[88,343] width:16 height:20 border:false \
+	checkbutton ckbLockWidth "" pos:[88,339] width:16 height:20 border:false \
 	toolTip:"是否解锁宽度调节\r\n右：重置宽度" checked:false
-	slider sldSetWidth pos:[111,340] range:[300,500,iniWidthOpenTools] ticks:0 \
+	slider sldSetWidth pos:[111,337] range:[300,500,iniWidthOpenTools] ticks:0 \
 	width:184 type:#integer toolTip:"调节面板宽度,以显示更多字" enabled:false
-	label labLogo "-------------------------  TECH OTAKUS SAVE THE WORLD -" pos:[12,365]
+	-- label labLogo "-------------------------  TECH OTAKUS SAVE THE WORLD -" pos:[12,365]
 	------------------------------------------------- ↑ UI -------------------------------------
 	
 	-- global charClass = dotNetClass "System.Char" --dotnet charclass used for isDigit comparisment
@@ -276,7 +276,7 @@ rollout rolBsOpenTools "" width:300 height:390
 	)
 	\
 	fn fnRefreshList strFilesDir type:".max" =
-    (
+	(
 		arrFolders = #()
 		arrFiles = #()
 		arrFoldersName = #()
@@ -337,7 +337,7 @@ rollout rolBsOpenTools "" width:300 height:390
 			)
 		)
 		btnCountTips.text = "文件：" + arrFiles.count as string
-    )
+	)
 	
 	fn fnRefreshAddress =
 	(
@@ -448,7 +448,7 @@ rollout rolBsOpenTools "" width:300 height:390
 		grpMain.width         = rolBsOpenTools.width - 10
 		edtBrowseFolder.width = rolBsOpenTools.width - 80
 		ltbFilesList.width    = rolBsOpenTools.width - 95
-		if rolBsOpenTools.width == 500 then \
+		if ((rolBsOpenTools.width >= 490) and (rolBsOpenTools.width <= 500)) then \
 		lnkLink.caption = "---  | 2019.11  miHoYo_Bullet.S |  ---"
 		else lnkLink.caption = ""
 	)
@@ -529,13 +529,13 @@ rollout rolBsOpenTools "" width:300 height:390
 	)
 
 	on btnOpenAddress pressed do 
-    (
-        dirOpened = getSavePath caption:"请选择Max文件路径:" initialDir:(maxFilePath)
-        if (dirOpened != undefined) then
-        (
-            edtBrowseFolder.text = dirOpened
-            fnRefreshList dirOpened type:arrFileType[rdoFileType.state]
-        )
+	(
+		dirOpened = getSavePath caption:"请选择Max文件路径:" initialDir:(maxFilePath)
+		if (dirOpened != undefined) then
+		(
+			edtBrowseFolder.text = dirOpened
+			fnRefreshList dirOpened type:arrFileType[rdoFileType.state]
+		)
 	)
 	
 	on btnLikedFolder pressed do 
@@ -662,11 +662,11 @@ rollout rolBsOpenTools "" width:300 height:390
 	on btnDesktopDir rightclick do 
 	(
 		dirOpened = getSavePath caption:"请设置桌面路径:" initialDir:(maxFilePath)
-        if (dirOpened != undefined) then
-        (
-            iniDesktop.dir = dirOpened
-            fnRefreshList iniDesktop.dir type:arrFileType[rdoFileType.state]
-        )
+		if (dirOpened != undefined) then
+		(
+			iniDesktop.dir = dirOpened
+			fnRefreshList iniDesktop.dir type:arrFileType[rdoFileType.state]
+		)
 	)
 
 	on btnAutobackDir pressed do 
