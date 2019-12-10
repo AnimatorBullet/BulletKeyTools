@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-08 16:39:41
+ * @LastEditTime: 2019-12-10 12:26:02
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -13,6 +13,7 @@ try(destroydialog rolAddItem)catch()
 
 struct itemsFolder (name,dir)
 
+Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPosOpenTools
 Global iniWidthOpenTools  = 300
 Global iniDesktop         = (itemsFolder name:"Desktop" dir:"")
