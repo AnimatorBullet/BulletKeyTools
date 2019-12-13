@@ -1,4 +1,0 @@
-安装完成，请重启 3ds Max 软件！！！
-Customize - Customize user interface 
-- Toolbars - _[BulletTools]（最上）
-也可找到,并拖到工具栏打开~Enjoy it~

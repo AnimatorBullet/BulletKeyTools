@@ -1,9 +1,9 @@
 --转自CGJOY:https://www.cgjoy.com/forum.php?mod=viewthread&tid=150585
 --原作者未知,Bullet.S精简修改,版权归原作者,请勿商用!后果自负!
 
-if doesFileExist ((getdir #UI_ln) + "\\cstool.ini") == false then
+if doesFileExist ((getDir #maxData) + "\\cstool.ini") == false then
 	(
-		f = createFile ((getdir #UI_ln) + "\\cstool.ini");close f
+		f = createFile ((getdir #maxData) + "\\cstool.ini");close f
 	)
 	
 	if ottool!=undefind then CloseRolloutfloater ottool
@@ -717,7 +717,7 @@ if doesFileExist ((getdir #UI_ln) + "\\cstool.ini") == false then
 	
 	function savedate  =
 		(
-		   f=createFile("$UI_ln\\cstool.ini")
+		   f=createFile("$maxData\\cstool.ini")
 			format "%\t%\n" dialog_x dialog_y to:f
 			format "%\t%\t%\t%\t%\n" mystarttime myendtime myrangetime mymovetime myaddtime to:f
 		   format "%\n" bspeed to:f
@@ -739,7 +739,7 @@ if doesFileExist ((getdir #UI_ln) + "\\cstool.ini") == false then
 		
 	function loaddate  =
 	   (
-		f = openfile ("$UI_ln\\cstool.ini")
+		f = openfile ("$maxData\\cstool.ini")
 	
 		if f != undefined then 
 		   try
@@ -761,7 +761,7 @@ if doesFileExist ((getdir #UI_ln) + "\\cstool.ini") == false then
 		  else 
 		  try( 
 	
-		   f=createFile("$UI_ln\\cstool.ini")
+		   f=createFile("$maxData\\cstool.ini")
 			format "%\t%\t%\n" dialog_x dialog_y to:f
 			format "%\t%\t%\t%\t%\n" mystarttime myendtime myrangetime mymovetime myaddtime to:f
 		   format "%\n" bspeed to:f

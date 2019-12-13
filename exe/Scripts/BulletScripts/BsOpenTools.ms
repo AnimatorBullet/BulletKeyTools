@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-10 12:26:02
+ * @LastEditTime: 2019-12-12 13:14:05
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -227,9 +227,9 @@ rollout rolBsOpenTools "" width:300 height:370
 		b = bBase + bDigits
 	
 		case of (
-			(a == b): 0
-			(a < b): -1
-			(a > b): 1
+		(a == b): 0
+		(a < b): -1
+		(a > b): 1
 		)
 	)
 -------------------------------------↑ 文件排序方法 --------------------------------------------------
@@ -257,7 +257,7 @@ rollout rolBsOpenTools "" width:300 height:370
 		(
 			for c in arrRecentFiles do  --获取文件夹名字,后面切换脚本类别和列表会用到
 			(
-				append arrRecentFilesName ("○ " + (getFilenameFile (substring c 1 (c.count-1))))
+				append arrRecentFilesName ("📄 " + (getFilenameFile (substring c 1 (c.count-1))))
 			)
 		)
 	)
@@ -307,14 +307,14 @@ rollout rolBsOpenTools "" width:300 height:370
 			(
 				for c in arrFolders do  --获取文件夹名字,后面切换脚本类别和列表会用到
 				(
-					append arrFoldersName ("○ " + (getFilenameFile c))
+					append arrFoldersName ("📂 " + (getFilenameFile c))
 				)
 			)
 			if arrFiles[1] != undefined then
 			(
 				for c in arrFiles do  --获取文件名字,后面切换脚本类别和列表会用到
 				(
-					append arrFilesName ("● " + (getFilenameFile c) + type)
+					append arrFilesName ("📄 " + (getFilenameFile c) + type)
 				)
 			)
 			rolBsOpenTools.ltbFilesList.items = arrFoldersName + arrFilesName
@@ -503,7 +503,7 @@ rollout rolBsOpenTools "" width:300 height:370
 	(
 		if (doesDirectoryExist edtBrowseFolder.text) then
 		(
-			shellLaunch "explorer.exe" edtBrowseFolder.text
+			shellLaunch edtBrowseFolder.text ""
 		)
 	)
 
@@ -709,9 +709,9 @@ rollout rolBsOpenTools "" width:300 height:370
 		(
 			if doesFileExist i then
 			(
-				append arrRecentFilesName ("● " + (getFilenameFile i) + ".max")
+				append arrRecentFilesName ("📄 " + (getFilenameFile i) + ".max")
 			)
-			else append arrRecentFilesName ("● (疑丢失) " + (getFilenameFile i) + ".max")
+			else append arrRecentFilesName ("📄 (疑丢失) " + (getFilenameFile i) + ".max")
 		)
 		rdoFileType.state  = 1
 		ltbFilesList.items = arrRecentFilesName
