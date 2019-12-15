@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-14 21:27:51
+ * @LastEditTime: 2019-12-15 14:05:05
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -533,8 +533,8 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		toolTip:"左：选择所有biped\r\n右：选择所有bone"
 		button btnEndBone "➕  清除 | 添加  末端" width:150 height:30   visible:false \
 		toolTip:"清除添加Bone末端"
-		button btnNull6 " < 未定义 > " width:150 height:30   visible:false \
-		toolTip:"功能待添加"
+		button btnQuickPrev "🎥 快速拍屏 | 打开目录 " width:150 height:30   visible:false \
+		toolTip:"左：快速拍屏预览\r\n右：打开预览文件夹"
 		button btnFastAlign "🌏 快速对齐工具  " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
 		button btnFnKeyType "📍  批量改滑动帧  " width:150 height:30   visible:false \
@@ -639,7 +639,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		arrToolC2 = #(rolloutBulletKeyTools.btnBoneTraj,\
 						rolloutBulletKeyTools.btnBipedTraj,\
 						rolloutBulletKeyTools.btnHideUnSel,\
-						rolloutBulletKeyTools.btnNull6,\
+						rolloutBulletKeyTools.btnQuickPrev,\
 						rolloutBulletKeyTools.btnFnFrame,\
 						rolloutBulletKeyTools.ckbFnMtlDisplay)
 		arrToolC3 = #(rolloutBulletKeyTools.btnSelByColor,\
@@ -2292,6 +2292,20 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		(
 			for i in arrTempUnSelection do i.isHidden = false
 		)
+	)
+
+	on btnQuickPrev pressed do 
+	(
+		createPreview percentSize:100 \
+		dspGeometry:true dspShapes:false dspLights:false \
+		dspCameras:false dspHelpers:false dspParticles:true dspBones:false \
+		dspGrid:true dspSafeFrame:false dspFrameNums:false dspBkg:true \
+		rndLevel:#smoothhighlights
+	)
+
+	on btnQuickPrev rightclick do 
+	(
+		shellLaunch (getdir #preview) ""
 	)
 )
 Createdialog rolloutBulletKeyTools fgcolor:(color 255 20 100) pos:iniPos style:#()
