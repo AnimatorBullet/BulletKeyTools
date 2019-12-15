@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-13 16:11:35
+ * @LastEditTime: 2019-12-14 21:27:51
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -475,19 +475,19 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		pos:[130,93] width:30 height:30 toolTip:"选择滑条后面关键帧" border:false
 		button btnMoveKeys " " width:30 height:30 \
 		pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~" border:false
-		checkbutton ckbFnBoxDisplay "㊣ BOX" width:42 height:23 border:false \
+		checkbutton ckbFnBoxDisplay "📦 BOX" width:42 height:23 border:false \
 		toolTip:"左:骨骼切换Box显示\r\n右:Clay显示开关" pos:[10,125]
-		checkbutton ckbFreezeMesh "✲ 冻结模型" width:68 height:23 border:false \
+		checkbutton ckbFreezeMesh "❄️ 冻结模型" width:68 height:23 border:false \
 		toolTip:"冻结解冻模型" pos:[52,125]
-		button btnHideBones "☁ 隐藏骨骼" width:70 height:23 border:false \
+		button btnHideBones "⛅️ 隐藏骨骼" width:70 height:23 border:false \
 		toolTip:"左：隐藏 bone\r\n右：隐藏 biped" pos:[120,125]
-		button btnFileOpen "★  美好时光" pos:[10,149] width:70 height:23 \
+		button btnFileOpen "🎞 美好时光 " pos:[10,149] width:70 height:23 \
 		tooltip:"快速打开max文件\r\n可收藏常用目录" border:false
-		button btnCutFrameDisplay "◐ 帧预览" pos:[80,149] width:60 height:23 \
+		button btnCutFrameDisplay "🎹 帧预览" pos:[80,149] width:60 height:23 \
 		tooltip:"左：预览选择帧范围\r\n右：预览全部帧范围\r\n再点回到上次帧范围\r\n别晃晕了。╮(￣▽￣)╭" border:false
-		button btnSpringMagic "✿ 飘带" pos:[140,149] width:50 height:23 \
+		button btnSpringMagic "💎 飘带" pos:[140,149] width:50 height:23 \
 		tooltip:"左点新版,右点旧版\r\n不久可能会有强化版~" border:false
-		button btnQuickSave "✪ 备份|另存" pos:[10,173] width:70 height:23 \
+		button btnQuickSave "💣 备份|另存" pos:[10,173] width:70 height:23 \
 		toolTip:"左：快速备份\r\n右：另存文件" border:false
 		button btnSetFpsAndSpeed " " pos:[80,173] width:110 height:23 \
 		toolTip:"左：设置帧率\r\n右：播放速度" border:false
@@ -505,55 +505,55 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		-- checkbutton ckbC5 "乱" width:30 height:25 \
 		-- pos:[325,15] toolTip:""
 
-		button btnBoneTraj "◆ 显示 | 清除 Bone轨迹" width:150 height:30   visible:false \
+		button btnBoneTraj "〽️ 显示 | 清除 Bone轨迹" width:150 height:30   visible:false \
 		toolTip:"左：切换显示Bone轨迹,\r\n右：清除所有Bone轨迹"
-		button btnBipedTraj "◇ 单加 | 清除 Biped轨迹" width:150 height:30   visible:false \
+		button btnBipedTraj "〰️ 单加 | 清除 Biped轨迹" width:150 height:30   visible:false \
 		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除添加的所有Biped轨迹~"
-		button btnFnFrame "●  整数小数帧切换        " width:150 height:30   visible:false \
+		button btnFnFrame "💬  整数小数帧切换        " width:150 height:30   visible:false \
 		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿"
-		button btnSelByColor "◪  以同颜色选择     " width:150 height:30   visible:false \
+		button btnSelByColor "💊  以同颜色选择     " width:150 height:30   visible:false \
 		tooltip:"选择同颜色物体"
-		button btnFnTCB "☯   Euler  |  TCB 互转" width:150 height:30   visible:false \
+		button btnFnTCB "🔄   Euler  |  TCB 互转" width:150 height:30   visible:false \
 		tooltip:"欧拉和TCB互转"
-		button btnEulerFilter "✈   欧拉曲线过滤    " width:150 height:30   visible:false \
+		button btnEulerFilter "💢   欧拉曲线过滤    " width:150 height:30   visible:false \
 		tooltip:"Bone骨骼过滤欧拉旋转"
-		button btnBoneTool " ❁  BoneOn 开关切换" width:150 height:30   visible:false \
+		button btnBoneTool " 🗝  BoneOn 开关切换" width:150 height:30   visible:false \
 		tooltip:"骨骼BoneOn切换"
-		button btnNiceSet "✎  系统易用设置     " width:150 height:30   visible:false \
+		button btnNiceSet "⚙️  系统易用设置     " width:150 height:30   visible:false \
 		tooltip:"改K帧键，自动备份等设置"
 		-- button btnClearSelKeys "▲ 取消选择帧" width:150 height:30   visible:false \
 		-- tooltip:"取消关键帧选择 (非删除帧)"
-		button btnDelOutKeys " ✖ 删选中 | 所有帧" width:150 height:30   visible:false \
+		button btnDelOutKeys " ✖️ 删选中 | 所有帧" width:150 height:30   visible:false \
 		toolTip:"左：清除选择\r\n右：清除所有帧\r\nLink帧请手动删~"
-		button btnCleanOutKeys "※  清范围外关键帧 " width:150 height:30   visible:false \
+		button btnCleanOutKeys "🚫  清范围外关键帧 " width:150 height:30   visible:false \
 		toolTip:"清范围外帧(无限帧)"
-		button btnHideUnSel "☒  隐藏当前未选中物体" width:150 height:30   visible:false \
+		button btnHideUnSel "✳️  隐藏当前未选中物体" width:150 height:30   visible:false \
 		toolTip:"隐藏当前显示的未选中物体，可再重新显示"
-		button btnSelBoneBiped "☑  Biped | Bone 选择" width:150 height:30   visible:false \
+		button btnSelBoneBiped "☑️  Biped | Bone 选择" width:150 height:30   visible:false \
 		toolTip:"左：选择所有biped\r\n右：选择所有bone"
-		button btnEndBone "✚  清除 | 添加  末端" width:150 height:30   visible:false \
+		button btnEndBone "➕  清除 | 添加  末端" width:150 height:30   visible:false \
 		toolTip:"清除添加Bone末端"
 		button btnNull6 " < 未定义 > " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
-		button btnFastAlign "▌ 快速对齐工具  " width:150 height:30   visible:false \
+		button btnFastAlign "🌏 快速对齐工具  " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
-		button btnFnKeyType "♣  批量改滑动帧  " width:150 height:30   visible:false \
+		button btnFnKeyType "📍  批量改滑动帧  " width:150 height:30   visible:false \
 		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置"
-		button btnCopyKeyTools "✔ 暴力粘贴工具  " width:150 height:30   visible:false \
+		button btnCopyKeyTools "⚡️ 暴力粘贴工具  " width:150 height:30   visible:false \
 		toolTip:"目前引用吇鱼大佬的插件\r\n后面随缘新写或优化"
-		button btnAnimMirror "〼 动画镜像工具  " width:150 height:30   visible:false \
+		button btnAnimMirror "🔰 动画镜像工具  " width:150 height:30   visible:false \
 		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化"
-		checkbutton ckbFnMtlDisplay "▣  白模材质切换            " width:150 height:30   visible:false \
+		checkbutton ckbFnMtlDisplay "💡  白模材质切换            " width:150 height:30   visible:false \
 		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:\r\n注意：暂不支持子材质和Vray材质..."
-		button btnCSTools "❤  CS 选择工具       " width:150 height:30   visible:false \
+		button btnCSTools "🚹  CS 选择工具       " width:150 height:30   visible:false \
 		toolTip:"快速选择CS骨骼\r\n右键添加或解除自启"
-		button btnCutSequence "✄  动画片断记录    " width:150 height:30   visible:false \
+		button btnCutSequence "✂️  动画片断记录    " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
-		button btnPoseTool "♚  Pose 库存取     " width:150 height:30   visible:false \
+		button btnPoseTool "🚻  Pose 库存取    " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
-		button btnMopherSlider "☺  表情滑条             " width:150 height:30   visible:false \
+		button btnMopherSlider "😍  表情滑条             " width:150 height:30   visible:false \
 		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~"
-		button btnImportOut "◮  批量导入导出     " width:150 height:30   visible:false \
+		button btnImportOut "🔔  批量导入导出     " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
 	
 	-- groupbox gbxMyScripts "" pos:[5,230] width:335 height:45
