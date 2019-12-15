@@ -9,10 +9,8 @@
 # BulletKeyTools
 KeyTools for 3ds Max...
 ## 帮助文档
----
 https://acedocs.tk/
 ## 下载链接
----
 [![BulletKeyTools](https://img.shields.io/badge/BulletKeyTools-Download-success?style=flat-square&logo=github)](https://github.com/AnimatorBullet/BulletKeyTools/releases)
 
 ---
