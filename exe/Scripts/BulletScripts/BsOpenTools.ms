@@ -1,47 +1,69 @@
 /*
-* @Description: 快速打开max文件，并保存常用目录
+* @Description: 关键帧小工具,逐渐丰富中
 * @Author: Bullet.S
-* @Date: 2019-11-23 01:41:13
+* @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-15 14:19:29
+ * @LastEditTime: 2019-12-15 18:22:15
 * @Email: animator.bullet@foxmail.com
 */
 
+try(destroydialog rolloutBulletKeyTools)catch()
+try(destroydialog rolFnKeys)catch()
+try(destroydialog rolAddMyScripts)catch()
 
-try(destroydialog rolBsOpenTools)catch()
-try(destroydialog rolAddItem)catch()
-
-struct itemsFolder (name,dir)
+struct myScript (id,msName,dir)
 
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
-Global iniPosOpenTools
-Global iniWidthOpenTools  = 300
-Global iniDesktop         = (itemsFolder name:"Desktop" dir:"")
-Global posMouScreen       = mouse.screenpos
-Global posMouMove         = [0,0]
-Global switchMouState     = false
-Global iniSelectedID      = 1
-Global arrFolders         = #()
-Global arrFoldersName     = #()
-Global arrFiles           = #()
-Global arrFilesName       = #()
-Global dirLiked           = ""
-Global dirOpened          = ""
-Global arrDirItems        = #()
-Global arrPreItems        = #()
-Global iniLikedFolder     = #()
-Global iniFilterPrefix    = #()
-Global arrRecentFiles     = #()
-Global arrRecentFilesName = #()
-Global arrFileType        = #(".max",".fbx",".bip",".ms*")
-Global rolBsOpenTools
-Global fnRefreshList
-Global tempLastFolder
+Global iniPos  	--位置保存记录
+Global iniHelpBtn        = off--记录是否打开帮助模式
+Global iniArrMyScripts   = #()
+Global idBtn             = 1
+Global posMouX           = mouse.screenpos.x
+Global posMouY           = mouse.screenpos.y  --获取鼠标位置
+Global posMouMoved       = [0,0]
+Global posToolBtn        = [205,45]
+Global switchMouseState  = false
+Global switchSelKeyRange = 0
+Global switchHideBones   = 0
+Global switchHideBiped   = 0
+Global switchToolPanel   = 0
+Global arrLastSelRange   = #()
+Global switchAllKeyRange = 0
+Global arrLastAllRange   = #()
+Global arrKeysTime       = #()  ----------biped和bone的首尾帧
+Global arrLinkKeys       = #()  -----------存link帧
+Global arrKeysSelected   = #()  -----------存选中的帧
+Global keyFirst
+Global keyEnd
+Global keySelFirst
+Global keySelEnd
+Global fnFindFirstEndKey
+Global fnAddKyes
+Global fnSelectKeys
+Global fnSelLinkKeys
+Global fnAddLinkTimesKeys
+Global fnAddLinkParamsKeys
+Global keyMovedOffset = 5
+Global symbol ----选择的范围判断, 0左边,1右边,2全部
+Global layerTraj --轨迹辅助层
+Global arrTraj          = #()  ---轨迹存放数组, 方便删除
+Global arrTempBones     = #()  ---隐藏骨骼临时存放数组
+Global arrTempBiped     = #()  ---隐藏骨骼临时存放数组
+Global arrTempUnSelection = #()  ---隐藏未选中临时存放数组
+Global arrToolC1        = #()  ----------工具按钮数组
+Global arrToolC2        = #()  ----------工具按钮数组
+Global arrToolC3        = #()  ----------工具按钮数组
+Global arrToolC4        = #()  ----------工具按钮数组
+Global arrToolC5        = #()  ----------工具按钮数组
+Global uiClientOffsets = undefined
+Global rolloutBulletKeyTools
+-- Global myTimer = dotnetobject "System.Timers.Timer" 500 autoreset:true
+------------------全局变量-------------------------------------------------------------------
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
 (
 	attr = (GetINISetting BulletConfig nameAttrClass nameAttr) as string  --先提取文件中的记录
-	if ((nameAttr == "LikedFolder") or (nameAttr == "Desktop"))then
+	if (nameAttr == "ArrMyScripts")then
 	(
 		attr = substituteString attr "dir:" "dir:@"
 	)
@@ -49,689 +71,2268 @@ fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方�
 )
 fn fnSaveConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
-	iniPosOpenTools   = fnGetConfig iniPosOpenTools "BsOpenToolsSet" "PosOpenTools" (posMouScreen as string)
-	iniSelectedID     = fnGetConfig iniSelectedID "BsOpenToolsSet" "SelectedID" (iniSelectedID as string)
-	iniLikedFolder    = fnGetConfig iniLikedFolder "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
-	iniFilterPrefix   = fnGetConfig iniFilterPrefix "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)
-	iniWidthOpenTools = fnGetConfig iniWidthOpenTools "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
-	iniDesktop        = fnGetConfig iniDesktop "BsOpenToolsSet"  "Desktop" (iniDesktop as string)
+	iniPos          = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" ([posMouX,posMouY] as string)
+	switchToolPanel = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
+	idBtn           = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
+	iniArrMyScripts = fnGetConfig iniArrMyScripts "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
+	iniHelpBtn      = fnGetConfig iniHelpBtn "BulletKeyToolsSet"  "HelpBtn" (iniHelpBtn as string)
 )
 fnSaveConfig () --初始执行一遍
 fn fnSetConfig =  --保存参数,脚本位置
 (
-	SetINISetting BulletConfig "BsOpenToolsSet"  "PosOpenTools" (iniPosOpenTools as string)
-	SetINISetting BulletConfig "BsOpenToolsSet"  "SelectedID" (iniSelectedID as string)
-	SetINISetting BulletConfig "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
-	SetINISetting BulletConfig "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)
-	SetINISetting BulletConfig "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
-	SetINISetting BulletConfig "BsOpenToolsSet"  "Desktop" (iniDesktop as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "Pos" (iniPos as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "idBtn" (idBtn as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "HelpBtn" (iniHelpBtn as string)
 )
----------------配合BulletTools工具的ini文件保存位置信息----------------------------------
+---------------配合BulletTools工具的ini文件保存位置信息-----------------
 
-rollout rolAddItem "添加" width:320 height:130
+-------------------帧率,播放速度--------------------------------------------------------------
+Global valueFps
+Global valuePlaySpeed = ""
+Global strCurrentFps = framerate as string + " FPS"
+
+rollout rolCustomFps ""
 (
-	groupbox gbxAddDir "添加常用目录 ---- Tips：右击选中条目删除" width:310 height:70 pos:[5,5]
-	
-	edittext edtAddDir "命名" pos:[10,25] fieldWidth:200 height:20 labelOnTop:false text:""
-	button btnOpenDir "选择目录"  pos:[240,25] width:70 height:20 tooltip:"选择添加目录，默认打开当前文件目录"
-	edittext edtDirStr "" pos:[5,50] fieldWidth:302 readOnly:true
-	
-	groupbox gbxAddPre "添加过滤前缀  ---------- Tips：右击框内条目删除 "  width:310 height:70 pos:[5,5]
-	edittext edtPrefix ""  text:"" fieldWidth:302 height:25 pos:[5,35]
+	edittext edtFpsValue "FPS: "  pos:[10,10] width:60 usePercentageWidth:true \
+	percentageWidth:44.0 labelOnTop:false text:"60" bold:true readOnly:false --帧率数值
+	button btnSetFps "Set" pos:[80,8]
+	label labTips strCurrentFps
 
-	groupbox gbxAddBtn ""  width:310 height:50 pos:[5,75]
-	button btnAddItems "> > > > > > > >     ✚  添加  ✚     < < < < < < < <" width:300 height:35 pos:[10,85]
-
-	on btnOpenDir pressed do 
+	on rolCustomFps open do 
 	(
-		local dir = getSavePath caption:"请选择目录:" initialDir:(maxFilePath)
-		if (dir != undefined) then
+		edtFpsValue.text = framerate as string
+		labTips.text = "当前帧率: " + framerate as string + " FPS"
+		valueFps = framerate as integer
+	)
+
+	on edtFpsValue entered val do 
+	(
+		if ((val != ".") and (val as integer != undefined) and (val != "") and (val as integer >= 0)) then
 		(
-			edtDirStr.text = dir
+			valueFps = (val as integer)
 		)
+		else messagebox "---------------------------\r\n请输入正确帧率数值\r\n"
+	)
+	on btnSetFps pressed do 
+	(
+		framerate = valueFps
+		labTips.text = "当前帧率: " + framerate as string + " FPS"
+		slidertime -= 1
+		slidertime += 1
+	)
+)
+
+fn fnSetFps numFps =
+(
+	framerate = numFps
+	valueFps = numFps
+	strCurrentFps = numFps as string + " FPS"
+	rolloutBulletKeyTools.btnSetFpsAndSpeed.text = " |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
+	slidertime -= 1
+	slidertime += 1
+)
+
+fn judgePlaySpeedValue =
+(
+	case of
+	(
+		(timeConfiguration.playbackSpeed == 1):(valuePlaySpeed = "--1/4x--")
+		(timeConfiguration.playbackSpeed == 2):(valuePlaySpeed = "--1/2x--")
+		(timeConfiguration.playbackSpeed == 3):(valuePlaySpeed = "-- 1x --")
+		(timeConfiguration.playbackSpeed == 4):(valuePlaySpeed = "-- 2x --")
+		(timeConfiguration.playbackSpeed == 5):(valuePlaySpeed = "-- 4x --")
+	)
+)
+
+fn fnSetSpeed numSpeed =
+(
+	timeConfiguration.playbackSpeed = numSpeed
+	judgePlaySpeedValue ()
+	rolloutBulletKeyTools.btnSetFpsAndSpeed.text = " |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
+)
+
+rcmenu menuSetFps
+(
+	menuItem menuCurrentFps "" enabled:false
+	menuItem menuSet60Fps "-- 60 Fps --"
+	menuItem menuSet30Fps "-- 30 Fps --"
+	menuItem menuSet24Fps "-- 24 Fps --"
+	separator menuSepCustom
+	menuItem menuCustomFps "自定义帧率"
+
+	on menuSetFps open do 
+	(
+		menuSetFps.menuCurrentFps.text = "当前帧率: " + framerate as string + " FPS"
 	)
 
-	on edtAddDir changed txt do 
+	on menuSet60Fps picked do 
 	(
-		tempText = substituteString txt "\n" ""
-		edtAddDir.text = tempText
-		-- print edtAddDir.text
+		fnSetFps 60
+	)
+	on menuSet30Fps picked do
+	(
+		fnSetFps 30
+	)
+	on menuSet24Fps picked do 
+	(
+		fnSetFps 24
 	)
 
-	on edtPrefix changed txt do 
+	on menuCustomFps picked do
 	(
-		tempText = substituteString txt "\n" ""
-		edtPrefix.text = tempText
-		-- print edtPrefix.text
+		try (destroyDialog rolCustomFps) catch()
+		createdialog rolCustomFps 120 55 fgcolor:(color 255 20 100) \
+		pos:[mouse.screenpos.x,mouse.screenpos.y]
+	)
+)
+
+rcmenu menuSetSpeed
+(
+	menuItem menuCurrentSpeed "" enabled:false
+	menuItem menuSet14Speed "-- 1/4x --"
+	menuItem menuSet12Speed "-- 1/2x --"
+	separator menuSepSpeedLow
+	menuItem menuSet1Speed "--  1x  --"
+	separator menuSepSpeedHigh
+	menuItem menuSet2Speed "--  2x  --"
+	menuItem menuSet4Speed "--  4x  --"
+
+	on menuSetSpeed open do 
+	(
+		judgePlaySpeedValue ()
+		menuSetSpeed.menuCurrentSpeed.text = "当前播速: " + valuePlaySpeed
 	)
 
-	on btnAddItems pressed do 
+	on menuSet14Speed picked do 
 	(
-		if ((edtDirStr.text != "") and (edtAddDir.text != "") and (edtDirStr.visible == true)) then
+		fnSetSpeed 1
+	)
+	on menuSet12Speed picked do
+	(
+		fnSetSpeed 2
+	)
+	on menuSet1Speed picked do 
+	(
+		fnSetSpeed 3
+	)
+	on menuSet2Speed picked do 
+	(
+		fnSetSpeed 4
+	)
+	on menuSet4Speed picked do 
+	(
+		fnSetSpeed 5
+	)
+)
+------------------帧率,播放速度------------------------------------------------------------
+rollout rolAddMyScripts "我的脚本" width:250 height:155
+(
+	label lblRename "↓请输入重命名↓" pos:[20,5]
+	label lblReDir "↓指定路径↓" pos:[125,5]
+	label lblTips "↓注意↓" pos:[205,5]
+	edittext edtRenameMs1 " 1 "  pos:[5,25] width:100 height:20 text:""
+	button btnReAddMs1 "..."  pos:[115,25] width:80 height:20 border:true
+	edittext edtRenameMs2 " 2 "  pos:[5,60] width:100 height:20 text:""
+	button btnReAddMs2 "..."  pos:[115,60] width:80 height:20 border:true
+	edittext edtRenameMs3 " 3 "  pos:[5,95] width:100 height:20 text:""
+	button btnReAddMs3 "..."  pos:[115,95] width:80 height:20 border:true
+	edittext edtRenameMs4 " 4 "  pos:[5,130] width:100 height:20 text:""
+	button btnReAddMs4 "..."  pos:[115,130] width:80 height:20 border:true
+	button btnDoit "确认" pos:[205,25] width:35 height:125 border:true
+
+	fn fnRefreshBtnReAddMs btnMsName btnMsDir id =
+	(
+		dirScript = getOpenFileName caption:"请选择添加的Max脚本:" historyCategory:"myScripts" \
+		types:"ms(*.ms)|*.ms|mse(*.mse)|*.mse|All(*.*)|*.*" filename:(getDir #scripts + @"\") 
+		if (dirScript != undefined) then
 		(
-			local fnExist = 0
-			for i = 1 to iniLikedFolder.count do 
-			(
-				if matchPattern iniLikedFolder[i].dir pattern:edtDirStr.text then 
-				(
-					fnExist = 1
-				)
-			)
-			if fnExist == 0 then
-			(
-				append iniLikedFolder (itemsFolder edtAddDir.text edtDirStr.text)
-				arrDirItems = #()
-				for i = iniLikedFolder.count to 1 by -1 do
-				(
-					append arrDirItems iniLikedFolder[i].name
-				)
-				rolBsOpenTools.ddlLikedFolder.items = arrDirItems
-				rolBsOpenTools.ddlLikedFolder.selection = 1
-				rolBsOpenTools.ddlLikedFolder.tooltip = iniLikedFolder[iniLikedFolder.count].dir
-				-- fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[rolBsOpenTools.rdoFileType.state]
-			)
-			else (messagebox "----------------------------------------\r\n可能常用目录中已存在此目录~")
-		)
-		if ((edtPrefix.text != "") and (edtPrefix.visible == true)) then
-		(
-			if (findItem iniFilterPrefix edtPrefix.text) != 0 then 
-			(
-				messagebox "-------------------------------------\r\n可能过滤词缀中已存在~"
-			)
+			nameMyScript = getFilenameFile dirScript
+			btnMsName.text = nameMyScript
+			btnMsDir.text = "已修改"
+			if iniArrMyScripts[id] != undefiend then iniArrMyScripts[id].dir = dirScript
 			else
 			(
-				append iniFilterPrefix edtPrefix.text
-				arrPreItems = #()
-				for i = iniFilterPrefix.count to 1 by -1 do
-				(
-					append arrPreItems iniFilterPrefix[i]
-				)
-				rolBsOpenTools.ltbFilterPrefix.items = arrPreItems
-				rolBsOpenTools.ltbFilterPrefix.selection = 1
-				-- fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[rolBsOpenTools.rdoFileType.state]
+				append iniArrMyScripts (myScript id edtRenameMs1.text dirScript)
+			)
+		)
+		-- print dirScript
+	)
+
+	on rolAddMyScripts open do 
+	(
+		edtRenameMs1.text = if iniArrMyScripts[1] != undefined then iniArrMyScripts[1].msName else ""
+		edtRenameMs2.text = if iniArrMyScripts[2] != undefined then iniArrMyScripts[2].msName else ""
+		edtRenameMs3.text = if iniArrMyScripts[3] != undefined then iniArrMyScripts[3].msName else ""
+		edtRenameMs4.text = if iniArrMyScripts[4] != undefined then iniArrMyScripts[4].msName else ""
+	)
+
+	on btnReAddMs1 pressed do 
+	(
+		fnRefreshBtnReAddMs edtRenameMs1 btnReAddMs1 1
+	)
+
+	on btnReAddMs2 pressed do 
+	(
+		fnRefreshBtnReAddMs edtRenameMs2 btnReAddMs2 2
+	)
+
+	on btnReAddMs3 pressed do 
+	(
+		fnRefreshBtnReAddMs edtRenameMs3 btnReAddMs3 3
+	)
+
+	on btnReAddMs4 pressed do 
+	(
+		fnRefreshBtnReAddMs edtRenameMs4 btnReAddMs4 4
+	)
+
+	on edtRenameMs1 changed txt do 
+	(
+		tempText = substituteString txt "\n" ""
+		edtRenameMs1.text = tempText
+	)
+
+	on edtRenameMs2 changed txt do 
+	(
+		tempText = substituteString txt "\n" ""
+		edtRenameMs2.text = tempText
+	)
+
+	on edtRenameMs3 changed txt do 
+	(
+		tempText = substituteString txt "\n" ""
+		edtRenameMs3.text = tempText
+	)
+
+	on edtRenameMs4 changed txt do 
+	(
+		tempText = substituteString txt "\n" ""
+		edtRenameMs4.text = tempText
+	)
+
+	on btnDoit pressed do
+	(
+		fn fnAddMsName id edtRenameMs =
+		(
+			if iniArrMyScripts[id] != undefined then
+			(
+				iniArrMyScripts[id].msName = if edtRenameMs.text != "" then edtRenameMs.text
+			)
+		)
+		fnAddMsName 1 edtRenameMs1
+		fnAddMsName 2 edtRenameMs2
+		fnAddMsName 3 edtRenameMs3
+		fnAddMsName 4 edtRenameMs4
+
+		arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1,rolloutBulletKeyTools.btnMyScripts2,rolloutBulletKeyTools.btnMyScripts3,rolloutBulletKeyTools.btnMyScripts4)
+		for b = 1 to 4 do 
+		(
+			if ((iniArrMyScripts[b] != undefined) and (doesfileexist iniArrMyScripts[b].dir)) then 
+			(
+				arrMyScriptTemp[b].text = iniArrMyScripts[b].msName
 			)
 		)
 	)
 )
-
-rollout rolBsOpenTools "" width:300 height:345
+---------------------滑动帧切换rollout---------------------------------
+rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 (
-	groupbox grpMain " 时光机_v0.1 --- 此处拖动,中键关闭,右击上层目录 " \
-	width:290 height:340 pos:[5,0]
-	editText edtBrowseFolder "" text:"" labelOnTop:true align:#right \
-	height:20 fieldWidth:220 pos:[70,20] readOnly:true 
-	button btnOpenAddress "..." align:#right tooltip:"左：选择打开目录\r\n右：打开右侧目录文件夹" \
-	height:20 width:30 pos:[37,20] 
-	-- button btnRemoveFolder "━" align:#left \
-	-- height:20 width:25 pos:[10,20] tooltip:"删除选中的收藏目录"
-	-- button btnAddFolder "✚" align:#left border:false \
-	-- height:20 width:20 pos:[35,20] tooltip:"新增常用目录"
-	button btnRefreshFolder "R" align:#left \
-	height:20 width:25 pos:[10,20] tooltip:"左：刷新当前文件目录\r\n右：重置场景"
-	button btnLikedFolder "↓ 添加常用 ↓" border:false \
-	height:23 width:70 pos:[10,43] tooltip:"新增常用目录，右击选中条目删除"
-	dropdownlist ddlLikedFolder "" align:#left selection:1 \
-	height:15 width:70 pos:[10,70]
-	listBox ltbFilesList "" align:#right selection:0 \
-	height:18 width:205 pos:[85,70]
-	button btnFilterPrefix "✚过滤词缀✚" border:false \
-	height:23 width:70 pos:[10,95] tooltip:"左：添加过滤\r\n右：取消过滤\r\n选中过滤列表\r\n右击删除条目"
-	listBox ltbFilterPrefix "" align:#left selection:0 \
-	height:6 width:70 pos:[10,120]
-	radioButtons rdoFileType "" columns:4 offsets:#([7,0],[7,0],[7,0],[7,0]) \
-	pos:[82,48] labels:#(".max",".fbx",".bip",".ms") 
-
-	button btnRecentFileDir "~念念不忘~" border:false \
-	height:25 width:70 pos:[10,208] tooltip:"最近打开文件"
-	button btnDesktopDir "• 希望之地 •" border:false \
-	height:25 width:70 pos:[10,234] tooltip:"自定文件夹，默认桌面，右键可设"
-	button btnAutobackDir "×崩坏神域×" border:false \
-	height:25 width:70 pos:[10,260] tooltip:"自动保存目录"
-	button btnScriptsDir "★逆商科技★" border:false \
-	height:25 width:70 pos:[10,286] tooltip:"脚本文件夹\r\n左：根目录\r\n右：自启目录"
-	-- button btnPreviewDir "<轮回梦境>" border:false \
-	-- height:25 width:70 pos:[10,310] tooltip:"左：预览视频默认文件夹\r\n右：快速拍屏渲染预览动画"
-	button btnCountTips "" border:false enabled:false \
-	height:20 width:70 pos:[10,312]
-	HyperLink lnkLink ""
-	color:(color 255 20 100) hovercolor:(color 255 0 255) visitedcolor:(color 255 20 100) \
-	pos:[390,314] address:"https://space.bilibili.com/2031113"
-	checkbutton ckbLockWidth "🔒" pos:[86,312] width:20 height:20 border:false \
-	toolTip:"是否解锁宽度调节\r\n右：重置宽度" checked:false
-	slider sldSetWidth "" pos:[113,312] range:[300,500,iniWidthOpenTools] ticks:0 \
-	width:182 type:#integer toolTip:"调节面板宽度,以显示更多字" enabled:false
-	-- label labLogo "-------------------------  TECH OTAKUS SAVE THE WORLD -" pos:[12,365]
-	------------------------------------------------- ↑ UI -------------------------------------
-	
-	-- global charClass = dotNetClass "System.Char" --dotnet charclass used for isDigit comparisment
-	-- dotNetClass:System.Char
-
-	fn getFilesequenceFile f &base &digits = 
+	group ""
 	(
-		f = getFilenameFile f
-		base = trimRight f "0123456789"
-		digits = subString f (base.count + 1) -1
-	)
-
-	fn fnPseudoNaturalSort a b =  --文件名排序新方法--https://forums.cgsociety.org/t/sorting-filenames/1219205/4
-	(
-		a = a as string
-		b = b as string
-		getFilesequenceFile a &aBase &aDigits
-		-- hackhackhack.  This pads a number with zeros to 6 digits without using a loop.
-		-- things will fail if there's more digits.. 6 'seems' safe.
-		aDigits = subString ((1000000 + (aDigits as integer)) as string) 2 -1
-		getFilesequenceFile b &bBase &bDigits
-		bDigits = subString ((1000000 + (bDigits as integer)) as string) 2 -1
-		a = aBase + aDigits
-		b = bBase + bDigits
-	
-		case of (
-		(a == b): 0
-		(a < b): -1
-		(a > b): 1
-		)
-	)
--------------------------------------↑ 文件排序方法 --------------------------------------------------
-	Fn fnLoadRecentFileList = -------获取最近打开文件列表
-	(
-		local recentfiles = (getdir #maxData) + "RecentDocuments.xml"
-		if doesfileexist recentfiles then
-		(
-			arrRecentFiles     = #()
-			arrRecentFilesName = #()
-			xDoc = dotnetobject "system.xml.xmldocument"	
-			xDoc.Load recentfiles
-			Rootelement = xDoc.documentelement
-
-			arrRecentFiles = for i = 0 to rootelement.childnodes.item[4].childnodes.itemof[0].childnodes.count-1 collect 
-			(
-				rootelement.childnodes.item[4].childnodes.itemof[0].childnodes.itemof[i].childnodes.itemof[3].innertext	
-			)
-			Return arrRecentFiles
-			LRXML = Undefined
-			XDoc = Undefined
-			XDoc = nothing	
-		)
-		if arrRecentFiles[1] != undefined then
-		(
-			for c in arrRecentFiles do  --获取文件夹名字,后面切换脚本类别和列表会用到
-			(
-				append arrRecentFilesName ("📄 " + (getFilenameFile (substring c 1 (c.count-1))))
-			)
-		)
-	)
-
-	fn fnGetLastFolder strFolder =
-	(
-		if ((strFolder != "") and (doesDirectoryExist strFolder)) then
-		(
-			local arrFilterStr = filterstring strFolder @"\"
-			local strLastFolder = ""
-			for i = 1 to (arrFilterStr.count - 1) do 
-			(
-				strLastFolder = strLastFolder  + arrFilterStr[i] + "\\"
-			)
-		)
-		return strLastFolder
-	)
-	\
-	fn fnRefreshList strFilesDir type:".max" =
-	(
-		arrFolders = #()
-		arrFiles = #()
-		arrFoldersName = #()
-		arrFilesName = #()
-		if ((strFilesDir != "") and (doesDirectoryExist strFilesDir)) then
-		(
-			local tempDir = GetDirectories (strFilesDir + "/*")
-			for i in tempDir do 
-			(
-				append arrFolders (substring i 1 (i.count-1))
-			)
-			qsort arrFolders fnPseudoNaturalSort
-			arrFilesBeforeFilter = getFiles (strFilesDir + "\\*" + type)
-			qsort arrFilesBeforeFilter fnPseudoNaturalSort
-			if (rolBsOpenTools.ltbFilterPrefix.selected != undefined) then
-			(
-				for i in arrFilesBeforeFilter do 
-				(
-					if (matchpattern (getfilenamefile i) \
-					pattern:("*" + rolBsOpenTools.ltbFilterPrefix.selected + "*")) then 
-					(append arrFiles i)
-				)
-			)
-			else arrFiles = arrFilesBeforeFilter
-			
-			if arrFolders[1] != undefined then
-			(
-				for c in arrFolders do  --获取文件夹名字,后面切换脚本类别和列表会用到
-				(
-					append arrFoldersName ("📂 " + (getFilenameFile c))
-				)
-			)
-			if arrFiles[1] != undefined then
-			(
-				for c in arrFiles do  --获取文件名字,后面切换脚本类别和列表会用到
-				(
-					append arrFilesName ("📄 " + (getFilenameFile c) + type)
-				)
-			)
-			rolBsOpenTools.ltbFilesList.items = arrFoldersName + arrFilesName
-			rolBsOpenTools.edtBrowseFolder.text = strFilesDir
-			for i = 1 to iniLikedFolder.count do 
-			(
-				if matchPattern iniLikedFolder[i].dir pattern:strFilesDir then 
-				(
-					rolBsOpenTools.ddlLikedFolder.selection = iniLikedFolder.count + 1 - i
-					rolBsOpenTools.ddlLikedFolder.tooltip = iniLikedFolder[i].dir
-				)
-			)
-		)
-		else 
-		(
-			if ((iniSelectedID != 0) and (iniLikedFolder.count > 0)) then
-			(
-				rolBsOpenTools.ddlLikedFolder.selection = iniSelectedID
-				fnRefreshList iniLikedFolder[iniLikedFolder.count + 1 - iniSelectedID].dir
-				rolBsOpenTools.ddlLikedFolder.tooltip = iniLikedFolder[iniLikedFolder.count + 1 - iniSelectedID].dir
-			)
-		)
-		btnCountTips.text = "文件：" + arrFiles.count as string
+		checkbox chkLHand "左手" pos:[24,20] width:50 height:20 color:Blue
+		checkbox chkRHand "右手" pos:[96,20] width:50 height:20 color:Green
+		checkbox chkLFoot "左脚" pos:[24,55] width:50 height:20 color:Blue checked:true
+		checkbox chkRFoot "右脚" pos:[96,55] width:50 height:20 color:Green checked:true
+		button btnPlanted "固定关键帧" pos:[184,20] width:80 height:25 toolTip:"Set Planted Key"
+		button btnSliding "滑动关键帧" pos:[184,50] width:80 height:25 toolTip:"Set Sliding Key"
+		button btnFree "自由关键帧" pos:[184,80] width:80 height:25 toolTip:"Set Free Key"
+		label lblMe "[2019.05.28]  Bullet.S" pos:[24,92] width:120 height:16 color:Green
 	)
 	
-	fn fnRefreshAddress =
+	Fn fnSetKeyType keyType = 
 	(
-		if (maxFilePath != "") then 
+		sliderTime = animationRange.start
+		for obj in selection where ((classof obj.baseObject == Biped_Object) \
+		and (biped.getCurrentLayer obj.controller == 0)) do
 		(
-			local tempMaxFilePath = (substring maxFilePath 1 (maxFilePath.count-1))
-			fnRefreshList tempMaxFilePath type:arrFileType[rdoFileType.state]
-		)
-		else 
-		(
-			if rolBsOpenTools.ddlLikedFolder.selection != 0 then 
+			bipCtrl = obj.controller
+			if chkLHand.checked then 
 			(
-				local tempSelectionID = rolBsOpenTools.ddlLikedFolder.selection
-				edtBrowseFolder.text = iniLikedFolder[iniLikedFolder.count + 1 - tempSelectionID].dir
-			)
-			else 
-			(
-				edtBrowseFolder.text = " ( 打开目录 )"
-			)
-		)
-	)
-
-	fn fnRefLikedFolderItems =
-	(
-		arrDirItems = #()
-		if iniLikedFolder.count != 0 then
-		(
-			for i = iniLikedFolder.count to 1 by -1 do
-			(
-				append arrDirItems iniLikedFolder[i].name
-			)
-		)
-		else 
-		(
-			ddlLikedFolder.tooltip = "请添加常用目录"
-		)
-		rolBsOpenTools.ddlLikedFolder.items = arrDirItems
-	)
-
-	fn fnRefreshFilterItems =
-	(
-		local arrPreItems = #()
-		for i = iniFilterPrefix.count to 1 by -1 do
-		(
-			append arrPreItems iniFilterPrefix[i]
-		)
-		rolBsOpenTools.ltbFilterPrefix.items = arrPreItems
-	)
-
-	fn fnLoadBip fBip =
-	(
-		-- biped.loadBipFile <biped_ctrl> <file_name> \
-		-- [#matchFileStruct] [#zeroHgt] [#noRedraw] \
-		-- [#loadMaxObjects][#promptForDuplicates] [#retargetHeight] \
-		-- [#retargetLimbSizes] [#scaleIKObjectSize] [#loadSubAnimControllers] \
-		-- [#loadSelectedMaxObjects nodename_array] \
-		-- [#loadSelectedSubAnimControllers bipednodename_array int_array]
-
-		local numSelbiped = #()   -------判断选择了几个biped骨架
-		if selection.count != 0 then
-		(
-			for i in (selection as array) where ((classof i == Biped_Object) and (i.ishidden == false)) do  
-			(
-				appendIfUnique numSelbiped i.controller.rootNode  --添加到骨架数组
-			)
-			for b in numSelbiped do 
-			(
-				biped.loadBipFile b.controller fBip #noRedraw
-			)
-		)
-	)
-
-	----------------------------------------------------------------------------------------------------
-	
-	on rolBsOpenTools open do 
-	(
-		sldSetWidth.value         = iniWidthOpenTools
-		rolBsOpenTools.width      = iniWidthOpenTools
-		btnRefreshFolder.images   = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,3,3,3,3,true,false)
-		ckbLockWidth.images       = #("LockButtonExt_i.bmp","LockButtonExt_i.bmp",2,1,1,2,2,true,false)
-		fnRefreshAddress ()
-		fnRefreshList maxFilePath type: arrFileType[rdoFileType.state]
-		btnCountTips.text = "文件：" + arrFiles.count as string
-		fnSaveConfig ()  ---------------脚本位置等赋值
-		fnSetConfig ()  ----------------保存位置信息到ini文件
-		fnRefLikedFolderItems ()
-		ltbFilterPrefix.selection = 0
-		fnRefreshFilterItems ()
-		ddlLikedFolder.selection = iniSelectedID
-	)
-
-	on rolBsOpenTools close do -- 关闭记忆浮动窗口位置
-	(
-		iniPosOpenTools   = (GetDialogPos rolBsOpenTools)
-		iniSelectedID     = rolBsOpenTools.ddlLikedFolder.selection
-		iniWidthOpenTools = sldSetWidth.value
-		fnSetConfig ()
-	)
-
-	on sldSetWidth changed ticks do
-	(
-		rolBsOpenTools.width = ticks
-	)
-	------------------------------------------------------------------------------
-
-	on rolBsOpenTools resized pos do
-	(
-		grpMain.width         = rolBsOpenTools.width - 10
-		edtBrowseFolder.width = rolBsOpenTools.width - 80
-		ltbFilesList.width    = rolBsOpenTools.width - 95
-		if ((rolBsOpenTools.width >= 490) and (rolBsOpenTools.width <= 500)) then \
-		lnkLink.caption = "---  | 2019.11  miHoYo_Bullet.S |  ---"
-		else lnkLink.caption = ""
-	)
-
-	on rolBsOpenTools mbuttondown pos do 
-	(
-		try (destroydialog rolBsOpenTools) catch ()
-		try(destroydialog rolAddItem)catch()
-	)
-
-	on rolBsOpenTools lbuttondown posMou do
-	(
-		posMouMove = posMou
-		switchMouState = on
-	)
-
-	on rolBsOpenTools lbuttonup posMou do
-	(
-		switchMouState = off
-	)
-
-	on rolBsOpenTools rbuttondown pos do 
-	(
-		tempLastFolder = fnGetLastFolder edtBrowseFolder.text
-		fnRefreshList tempLastFolder type:arrFileType[rdoFileType.state]
-	)
-
-	on rolBsOpenTools mouseMove pos do
-	(
-		if switchMouState == on then
-		(
-			SetDialogPos rolBsOpenTools (mouse.screenpos - posMouMove)			
-		)
-	)
-	------------------------------------------------------------------------------
-
-	on btnRefreshFolder pressed do 
-	(
-		fnRefreshAddress ()
-		fnRefreshList edtBrowseFolder.text type:arrFileType[rdoFileType.state]
-	)
-
-	on btnRefreshFolder rightclick do 
-	(
-		CheckForSave ()
-		resetMaxFile #noPrompt
-		max tool maximize
-	)
-
-	on btnOpenAddress rightclick do 
-	(
-		if (doesDirectoryExist edtBrowseFolder.text) then
-		(
-			shellLaunch edtBrowseFolder.text ""
-		)
-	)
-
-	on edtBrowseFolder changed txt do
-	(
-		fnRefreshList txt type:arrFileType[rdoFileType.state]
-	)
-
-	on rdoFileType changed state do
-	(
-		fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[state]
-	)
-
-	on ckbLockWidth changed state do 
-	(
-		if state == on then sldSetWidth.enabled = true 
-		else sldSetWidth.enabled = false
-	)
-
-	on ckbLockWidth rightclick do
-	(
-		rolBsOpenTools.width = 300
-		sldSetWidth.value    = 300
-	)
-
-	on btnOpenAddress pressed do 
-	(
-		dirOpened = getSavePath caption:"请选择Max文件路径:" initialDir:(maxFilePath)
-		if (dirOpened != undefined) then
-		(
-			edtBrowseFolder.text = dirOpened
-			fnRefreshList dirOpened type:arrFileType[rdoFileType.state]
-		)
-	)
-	
-	on btnLikedFolder pressed do 
-	(
-		try(destroydialog rolAddItem)catch()
-		createdialog rolAddItem fgcolor:(color 255 20 100) pos:mouse.screenpos
-		rolAddItem.gbxAddDir.visible  = true
-		rolAddItem.edtAddDir.visible  = true
-		rolAddItem.btnOpenDir.visible = true
-		rolAddItem.edtDirStr.visible  = true
-		rolAddItem.gbxAddPre.visible  = false
-		rolAddItem.edtPrefix.visible  = false
-	)
-
-	on btnFilterPrefix pressed do 
-	(
-		try(destroydialog rolAddItem)catch()
-		createdialog rolAddItem fgcolor:(color 255 20 100) pos:mouse.screenpos
-		rolAddItem.gbxAddPre.visible  = true
-		rolAddItem.edtPrefix.visible  = true
-		rolAddItem.gbxAddDir.visible  = false
-		rolAddItem.edtAddDir.visible  = false
-		rolAddItem.btnOpenDir.visible = false
-		rolAddItem.edtDirStr.visible  = false
-	)
-
-	on btnFilterPrefix rightclick do 
-	(
-		ltbFilterPrefix.selection = 0
-		fnRefreshList edtBrowseFolder.text type:arrFileType[rdoFileType.state]
-	)
-
-	on ddlLikedFolder selected id do
-	(
-		if iniLikedFolder[id] != undefined then
-		(
-			ddlLikedFolder.tooltip = iniLikedFolder[iniLikedFolder.count + 1 - id].dir
-			fnRefreshList ddlLikedFolder.tooltip type:arrFileType[rdoFileType.state]
-		)
-		else ddlLikedFolder.tooltip = "请添加常用目录"
-		iniSelectedID = id
-	)
-
-	on ddlLikedFolder rightclick do
-	(
-		idDel = iniLikedFolder.count + 1 - ddlLikedFolder.selection
-		deleteItem iniLikedFolder idDel
-		fnRefLikedFolderItems ()
-	)
-
-	on ltbFilterPrefix selected id do
-	(
-		fnRefreshList edtBrowseFolder.text type:arrFileType[rdoFileType.state]
-	)
-	
-	on ltbFilterPrefix rightclick id do
-	(
-		idDel = iniFilterPrefix.count + 1 - id
-		deleteItem iniFilterPrefix idDel
-		fnRefreshFilterItems ()
-	)
-
-	on ltbFilesList rightclick id do
-	(
-		tempLastFolder = fnGetLastFolder edtBrowseFolder.text
-		fnRefreshList tempLastFolder type:arrFileType[rdoFileType.state]
-	)
-
-	on ltbFilesList doubleClicked id do
-	(
-		if (doesDirectoryExist edtBrowseFolder.text) then
-		(
-			if edtBrowseFolder.text == (getdir #preview) then ramplayer arrFiles[id] ""
-			else 
-			(
-				case of
-				(
-					(id <= arrFolders.count):
+				sel_obj1 = (biped.getNode bipCtrl #larm)
+				k = numKeys sel_obj1.controller
+					for i=1 to k do
 					(
-						edtBrowseFolder.text = arrFolders[id]
-						fnRefreshList edtBrowseFolder.text type:arrFileType[rdoFileType.state]
-					)
-					(id > arrFolders.count):
-					(
-						local idFile = id - arrFolders.count
-						case of 
+					t = (biped.getkey sel_obj1.controller i).time
+						slidertime = t
+						with animate on --at time t		
 						(
-							(rdoFileType.state == 1):
+							case of
 							(
-								CheckForSave ()
-								loadMaxFile (arrFiles[idFile]) useFileUnits:true quiet:true
+								(keyType == 1):(biped.SetPlantedKey sel_obj1)
+								(keyType == 2):(biped.SetSlidingKey sel_obj1)
+								(keyType == 3):(biped.SetFreeKey sel_obj1)
 							)
-							(rdoFileType.state == 2):(importFile arrFiles[idFile] #noPrompt using:FBXIMP)
-							(rdoFileType.state == 3):(fnLoadBip arrFiles[idFile])
-							(rdoFileType.state == 4):(fileIn arrFiles[idFile])
+						)
+					)
+			)
+			if chkRHand.checked then 
+			(
+				sel_obj2 = (biped.getNode bipCtrl #rarm)
+				k = numKeys sel_obj2.controller
+					for i=1 to k do
+					(
+					t = (biped.getkey sel_obj2.controller i).time
+						slidertime = t
+						with animate on --at time t		
+						(
+							case of
+							(
+								(keyType == 1):(biped.SetPlantedKey sel_obj2)
+								(keyType == 2):(biped.SetSlidingKey sel_obj2)
+								(keyType == 3):(biped.SetFreeKey sel_obj2)
+							)
+						)
+					)
+			)
+			if chkLFoot.checked then 
+			(
+				sel_obj3 = (biped.getNode bipCtrl #lleg)
+				k = numKeys sel_obj3.controller
+					for i=1 to k do
+					(
+					t = (biped.getkey sel_obj3.controller i).time
+						slidertime = t
+						with animate on --at time t		
+						(
+							case of
+							(
+								(keyType == 1):(biped.SetPlantedKey sel_obj3)
+								(keyType == 2):(biped.SetSlidingKey sel_obj3)
+								(keyType == 3):(biped.SetFreeKey sel_obj3)
+							)
+						)
+					)
+			)
+			if chkRFoot.checked then 
+			(
+				sel_obj4 = (biped.getNode bipCtrl #rleg)
+				k = numKeys sel_obj4.controller
+					for i=1 to k do
+					(
+					t = (biped.getkey sel_obj4.controller i).time
+						slidertime = t
+						with animate on --at time t		
+						(
+							case of
+							(
+								(keyType == 1):(biped.SetPlantedKey sel_obj4)
+								(keyType == 2):(biped.SetSlidingKey sel_obj4)
+								(keyType == 3):(biped.SetFreeKey sel_obj4)
+							)
+						)
+					)
+			)
+		)
+	)
+	
+	on btnPlanted pressed  do
+	(
+		fnSetKeyType 1
+	)
+	
+	on btnSliding pressed  do
+	(
+		fnSetKeyType 2
+	)
+	
+	on btnFree pressed  do
+	(
+		fnSetKeyType 3
+	)
+)
+-----------------------------------------------------------------
+
+-------------主UI-----------------------------------------------------------------
+rollout rolloutBulletKeyTools "" width:200 height:235
+(
+	---------------------------------UI--------------------------------------
+	groupbox gbxMainUI "[ AnimBullet _ v0.7 ] ---- 中键关闭" pos:[5,5] width:190 height:195
+	
+		label lblRangeTimeText "| 起始帧 |      | 结束帧 |" pos:[10,25] width:180 \
+		spinner spiStartTime "" pos:[10,45] width:50 type:#integer \
+		range:[-999999999,999999999,animationrange.start] scale:1
+		label lblTo "▃"  pos:[65,41] tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" \
+		width:20 height:20
+		spinner spiEndTime "" pos:[80,45] width:50 type:#integer \
+		range:[-999999999,999999999,animationrange.end] scale:1
+		-- checkbutton ckbHelpBtn "？觉醒" pos:[135,23] width:55 height:20 border:false \
+		-- tooltip:"打开帮助模式！"
+		button btnMagicBtn "✧(≖ ◡ ≖" pos:[135,26] width:55 height:35 border:false \
+		tooltip:"点我点我点我~良心小工具"
+		edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
+		pos:[10,70] labelOnTop:false text:"5f" bold:true readOnly:false 
+		button btnSet5 "5f" width:35 pos:[90,67]
+		button btnSetAdd "+5f" width:35 pos:[125,67]
+		button btnSetOpposite "负" width:30 pos:[160,67]
+		checkBox btnJudgeLinkKey "Link?" \
+		pos:[18,102] tooltip:"是否存在Link帧?" checked:false 
+		button btnSelBeforeKeys " " \
+		pos:[70,93] width:30 height:30 toolTip:"选择滑条前面关键帧" border:false
+		button btnSelAllKeys " " \
+		pos:[100,93] width:30 height:30 toolTip:"选择所有关键帧" border:false
+		button btnSelAfterKeys " " \
+		pos:[130,93] width:30 height:30 toolTip:"选择滑条后面关键帧" border:false
+		button btnMoveKeys " " width:30 height:30 \
+		pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~" border:false
+		checkbutton ckbFnBoxDisplay "📦 BOX" width:42 height:23 border:false \
+		toolTip:"左:骨骼切换Box显示\r\n右:Clay显示开关" pos:[10,125]
+		checkbutton ckbFreezeMesh "❄️ 冻结模型" width:68 height:23 border:false \
+		toolTip:"冻结解冻模型" pos:[52,125]
+		button btnHideBones "⛅️ 隐藏骨骼" width:70 height:23 border:false \
+		toolTip:"左：隐藏 bone\r\n右：隐藏 biped" pos:[120,125]
+		button btnFileOpen "🎞 美好时光 " pos:[10,149] width:70 height:23 \
+		tooltip:"快速打开max文件\r\n可收藏常用目录" border:false
+		button btnCutFrameDisplay "🎹 帧预览" pos:[80,149] width:60 height:23 \
+		tooltip:"左：预览选择帧范围\r\n右：预览全部帧范围\r\n再点回到上次帧范围\r\n别晃晕了。╮(￣▽￣)╭" border:false
+		button btnSpringMagic "💎 飘带" pos:[140,149] width:50 height:23 \
+		tooltip:"左点新版,右点旧版\r\n不久可能会有强化版~" border:false
+		button btnQuickSave "💣 备份|另存" pos:[10,173] width:70 height:23 \
+		toolTip:"左：快速备份\r\n右：另存文件" border:false
+		button btnSetFpsAndSpeed " " pos:[80,173] width:110 height:23 \
+		toolTip:"左：设置帧率\r\n右：播放速度" border:false
+	
+	groupbox gbxMinTools "" pos:[200,5] width:160 height:225
+	
+		checkbutton ckbC1 "帧" width:38 height:26 \
+		pos:[205,15] toolTip:""
+		checkbutton ckbC2 "显" width:37 height:26 \
+		pos:[243,15] toolTip:""
+		checkbutton ckbC3 "选" width:37 height:26 \
+		pos:[280,15] toolTip:""
+		checkbutton ckbC4 "骨" width:38 height:26 \
+		pos:[317,15] toolTip:""
+		-- checkbutton ckbC5 "乱" width:30 height:25 \
+		-- pos:[325,15] toolTip:""
+
+		button btnBoneTraj "〽️ 显示 | 清除 Bone轨迹" width:150 height:30   visible:false \
+		toolTip:"左：切换显示Bone轨迹,\r\n右：清除所有Bone轨迹"
+		button btnBipedTraj "〰️ 单加 | 清除 Biped轨迹" width:150 height:30   visible:false \
+		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除添加的所有Biped轨迹~"
+		button btnFnFrame "💬  整数小数帧切换        " width:150 height:30   visible:false \
+		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿"
+		button btnSelByColor "💊  以同颜色选择     " width:150 height:30   visible:false \
+		tooltip:"选择同颜色物体"
+		button btnFnTCB "🔄   Euler  |  TCB 互转" width:150 height:30   visible:false \
+		tooltip:"欧拉和TCB互转"
+		button btnEulerFilter "💢   欧拉曲线过滤    " width:150 height:30   visible:false \
+		tooltip:"Bone骨骼过滤欧拉旋转"
+		button btnBoneTool " 🗝  BoneOn 开关切换" width:150 height:30   visible:false \
+		tooltip:"骨骼BoneOn切换"
+		button btnNiceSet "⚙️  系统易用设置     " width:150 height:30   visible:false \
+		tooltip:"改K帧键，自动备份等设置"
+		-- button btnClearSelKeys "▲ 取消选择帧" width:150 height:30   visible:false \
+		-- tooltip:"取消关键帧选择 (非删除帧)"
+		button btnDelOutKeys " ✖️ 删选中 | 所有帧" width:150 height:30   visible:false \
+		toolTip:"左：清除选择\r\n右：清除所有帧\r\nLink帧请手动删~"
+		button btnCleanOutKeys "🚫  清范围外关键帧 " width:150 height:30   visible:false \
+		toolTip:"清范围外帧(无限帧)"
+		button btnHideUnSel "✳️  隐藏当前未选中物体" width:150 height:30   visible:false \
+		toolTip:"隐藏当前显示的未选中物体，可再重新显示"
+		button btnSelBoneBiped "☑️  Biped | Bone 选择" width:150 height:30   visible:false \
+		toolTip:"左：选择所有biped\r\n右：选择所有bone"
+		button btnEndBone "➕  清除 | 添加  末端" width:150 height:30   visible:false \
+		toolTip:"清除添加Bone末端"
+		button btnQuickPrev "🎥 快速拍屏 | 打开目录 " width:150 height:30   visible:false \
+		toolTip:"左：快速拍屏预览\r\n右：打开预览文件夹"
+		button btnFastAlign "🌏 快速对齐工具  " width:150 height:30   visible:false \
+		toolTip:"功能待添加"
+		button btnFnKeyType "📍  批量改滑动帧  " width:150 height:30   visible:false \
+		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置"
+		button btnCopyKeyTools "⚡️ 暴力粘贴工具  " width:150 height:30   visible:false \
+		toolTip:"目前引用吇鱼大佬的插件\r\n后面随缘新写或优化"
+		button btnAnimMirror "🔰 动画镜像工具  " width:150 height:30   visible:false \
+		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化"
+		checkbutton ckbFnMtlDisplay "💡  白模材质切换            " width:150 height:30   visible:false \
+		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:\r\n注意：暂不支持子材质和Vray材质..."
+		button btnCSTools "🚹  CS 选择工具       " width:150 height:30   visible:false \
+		toolTip:"快速选择CS骨骼\r\n右键添加或解除自启"
+		button btnCutSequence "✂️  动画片断记录    " width:150 height:30   visible:false \
+		toolTip:"功能待添加"
+		button btnPoseTool "🚻  Pose 库存取    " width:150 height:30   visible:false \
+		toolTip:"功能待添加"
+		button btnMopherSlider "😍  表情滑条             " width:150 height:30   visible:false \
+		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~"
+		button btnImportOut "🔔  批量导入导出     " width:150 height:30   visible:false \
+		toolTip:"功能待添加"
+	
+	-- groupbox gbxMyScripts "" pos:[5,230] width:335 height:45
+
+		button btnMyScripts1 "< ＋＋＋ >" pos:[5,232] width:85 height:20 border:true
+		button btnMyScripts2 "< ＋＋＋ >" pos:[95,232] width:85 height:20 border:true
+		button btnMyScripts3 "< ＋＋＋ >" pos:[185,232] width:85 height:20 border:true
+		button btnMyScripts4 "< ＋＋＋ >" pos:[275,232] width:85 height:20 border:true
+		-- button btnMyScripts5 "< ＋＋＋ >" pos:[290,232] width:70 height:20 border:true
+
+	groupbox gbxTips "" pos:[5,200] width:190 height:30
+	
+		HyperLink lnkLink "---  | 2019.9  miHoYo_Bullet.S |  - ？ --"
+		color:(color 255 20 100) hovercolor:(color 255 0 255) visitedcolor:(color 255 20 100) \
+		pos:[7,210] address:"https://acedocs.tk/"
+		-- label labmiHoYo "--- TECH OTAKUS SAVE THE WORLD --" \
+		-- pos:[7,210]
+
+		-- timer tick_tock interval:666 active:iniHelpBtn
+----------------------------------UI及作者ID------------------------------------------------
+	fn fnRefreshMagicBtn =
+	(
+		if switchToolPanel == 0 then
+		(
+			rolloutBulletKeyTools.width               = 200
+			rolloutBulletKeyTools.height              = 235
+			rolloutBulletKeyTools.gbxMinTools.visible = false
+			btnMagicBtn.text                          = "✧(≖ ◡ ≖"
+			btnMyScripts1.visible                     = false
+			btnMyScripts2.visible                     = false
+			btnMyScripts3.visible                     = false
+			btnMyScripts4.visible                     = false
+		)
+		else
+		(
+			rolloutBulletKeyTools.width               = 365
+			rolloutBulletKeyTools.height              = 255
+			rolloutBulletKeyTools.gbxMinTools.visible = true
+			btnMagicBtn.text                          = "( = `▽`)"
+			btnMyScripts1.visible                     = true
+			btnMyScripts2.visible                     = true
+			btnMyScripts3.visible                     = true
+			btnMyScripts4.visible                     = true
+		)
+	)
+
+	fn fnSwitchMagicBtn =
+	(
+		if switchToolPanel == 1 then
+		(
+			rolloutBulletKeyTools.width               = 200
+			rolloutBulletKeyTools.height              = 235
+			rolloutBulletKeyTools.gbxMinTools.visible = false
+			btnMagicBtn.text                          = "✧(≖ ◡ ≖"
+			switchToolPanel                           = 0
+			btnMyScripts1.visible                     = false
+			btnMyScripts2.visible                     = false
+			btnMyScripts3.visible                     = false
+			btnMyScripts4.visible                     = false
+		)
+		else
+		(
+			rolloutBulletKeyTools.width               = 365
+			rolloutBulletKeyTools.height              = 255
+			rolloutBulletKeyTools.gbxMinTools.visible = true
+			btnMagicBtn.text                          = "( = `▽`)"
+			switchToolPanel                           = 1
+			btnMyScripts1.visible                     = true
+			btnMyScripts2.visible                     = true
+			btnMyScripts3.visible                     = true
+			btnMyScripts4.visible                     = true
+		)
+	)
+
+	fn fnSwitchToolsBtn idBtn =
+	(
+		arrToolC1 = #(rolloutBulletKeyTools.btnDelOutKeys,\
+						rolloutBulletKeyTools.btnFastAlign,\
+						rolloutBulletKeyTools.btnCopyKeyTools,\
+						rolloutBulletKeyTools.btnAnimMirror,\
+						rolloutBulletKeyTools.btnFnKeyType,\
+						rolloutBulletKeyTools.btnPoseTool)
+		arrToolC2 = #(rolloutBulletKeyTools.btnBoneTraj,\
+						rolloutBulletKeyTools.btnBipedTraj,\
+						rolloutBulletKeyTools.btnHideUnSel,\
+						rolloutBulletKeyTools.btnQuickPrev,\
+						rolloutBulletKeyTools.btnFnFrame,\
+						rolloutBulletKeyTools.ckbFnMtlDisplay)
+		arrToolC3 = #(rolloutBulletKeyTools.btnSelByColor,\
+						rolloutBulletKeyTools.btnSelBoneBiped,\
+						rolloutBulletKeyTools.btnCutSequence,\
+						rolloutBulletKeyTools.btnMopherSlider,\
+						rolloutBulletKeyTools.btnCSTools,\
+						rolloutBulletKeyTools.btnNiceSet)
+		arrToolC4 = #(rolloutBulletKeyTools.btnFnTCB,\
+						rolloutBulletKeyTools.btnEulerFilter,\
+						rolloutBulletKeyTools.btnEndBone,\
+						rolloutBulletKeyTools.btnCleanOutKeys,\
+						rolloutBulletKeyTools.btnImportOut,\
+						rolloutBulletKeyTools.btnBoneTool)
+		-- arrToolC5 = #(rolloutBulletKeyTools.btnPoseTool,\
+		-- 				rolloutBulletKeyTools.btnMopherSlider,\
+		-- 				rolloutBulletKeyTools.btnCutSequence,\
+		-- 				rolloutBulletKeyTools.btnImportOut,\
+		-- 				rolloutBulletKeyTools.btnNull13,\
+		-- 				rolloutBulletKeyTools.btnNiceSet)
+
+		local arrBtnAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4
+		
+		for b in arrBtnAll do
+		(
+			b.visible = false
+			-- b.width = 75
+			-- b.height = 32
+		)
+
+		str  = "for b = 1 to arrToolC" + idBtn as string + ".count do" + "\r\n"
+		str += "(" + "\r\n"
+		str += "	arrToolC" + idBtn as string + "[b].visible = true" + "\r\n"
+		str += "	arrToolC" + idBtn as string + "[b].pos = " + posToolBtn as string + " + [0,(b - 1) * 30]" + "\r\n"
+		str += ")"
+		
+		execute str
+	)
+
+	fn fnSwitchToolBtnChecked Btn =
+	(
+		arrBtnTemp = #(ckbC1,ckbC2,ckbC3,ckbC4)
+		for i = 1 to 4 do
+		(
+			if i != Btn then 
+			(
+				arrBtnTemp[i].checked = false
+			)
+			else 
+			(
+				idBtn = Btn
+				arrBtnTemp[idBtn].checked = true
+			)
+		)
+	)
+
+	Fn fnCleanOutRangeKeys inputObject =  ---清理无限帧,以前收集的,找不到来源了,大概是遍历子动画
+	(
+		startTime = AnimationRange.Start
+		endTime = AnimationRange.End
+		for i = 1 to inputObject.numSubs do
+		(
+			tempSubAnim = GetSubAnim inputObject i
+			tempController = tempSubAnim.Controller
+			
+			if tempController != undefined do
+			(
+				tempKeyList = tempController.Keys
+				
+				outEndKeysIndex = for i = 1 to tempKeyList.Count where tempKeyList[i].Time > endTime collect i
+				if outEndKeysIndex.Count > 0 do for i = 1 to outEndKeysIndex.Count do DeleteKey tempKeyList tempKeyList.count
+				
+				outStartKeysIndex = for i = 1 to tempKeyList.Count where  tempKeyList[i].Time < startTime collect i
+				for i = 1 to outStartKeysIndex.Count do DeleteKey tempKeyList 1
+			)
+			if tempSubAnim.numSubs > 0 do fnCleanOutRangeKeys tempSubAnim
+		)
+	)
+
+	fn fnDelSelKeys =
+	(
+		for o in selection where (o.ishidden == false) do 
+		(
+			if (classof o == Biped_Object) then
+			(
+				if classof o.controller == Vertical_Horizontal_Turn then  --清理质心帧
+				(
+					biped.deleteKeys o.controller.vertical #selection
+					biped.deleteKeys o.controller.horizontal #selection
+					if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
+						(biped.deleteKeys o.controller.flip #selection)
+						else(biped.deleteKeys o.controller.turning #selection)
+				)
+				else if classof o.controller == BipSlave_Control then  --清理biped正常帧
+				(
+					biped.deleteKeys o.controller #selection
+					subanimBipedScale = GetSubAnim o.controller[1] 1
+					if ((subanimBipedScale != undefined) and \
+					(GetSubAnimName subanimBipedScale 1 == #ScaleXYZ)) then  --清理biped的缩放针
+					(
+						deleteKeys subanimBipedScale.controller #selection
+					)
+				)
+			)
+			else deleteKeys o #selection   ---清理非biped帧
+		)
+	)
+
+	-- fn fnAddLinkKeys tempObj =
+	-- (
+		fn fnAddLinkTimesKeys tempObj i=     --添加linkTimes关键帧
+		(
+			-- for i = 1 to tempObj.controller.numsubs do 
+			-- (
+				if ((GetSubAnimName tempObj.controller i) == #Link_Times) then
+				(
+					if tempObj.controller[i].keys[1] != undefined then
+					(
+						for i in tempObj.controller[i].keys do 
+						(
+							appendIfUnique arrLinkKeys i  ---------添加link帧到数组
+							appendIfUnique arrKeysTime i.time
+							if i.selected == true then appendIfUnique arrKeysSelected i.time
+						)
+					)
+				)
+			-- )
+		)
+		fn fnAddLinkParamsKeys tempObj i=   ----添加LinkParams下面的Transform帧
+		(
+			local tempLinkController
+			local keyTimeStartTemp
+			local keyTimeEndTemp
+			
+			-- for i = 1 to tempObj.controller.numsubs do 
+			-- (
+				if ((GetSubAnimName tempObj.controller i) == #Link_Params) then
+				(
+					tempLinkController = tempObj.controller[i]
+					if tempLinkController[1] != undefined then
+					(
+						for i = 1 to tempLinkController.numsubs do -----link属性的bone下面的prs帧------
+						(
+							if (((tempLinkController[i]).name == "Position") or \
+							((tempLinkController[i]).name == "Rotation") or \
+							((tempLinkController[i]).name == "Scale")) then
+							(
+								if tempLinkController[i].keys[1] != undefined then
+								(
+									keyTimeStartTemp = tempLinkController[i].keys[1].time
+									keyTimeEndTemp = tempLinkController[i].keys[tempLinkController[i].keys.count].time
+									appendIfUnique arrKeysTime keyTimeStartTemp
+									appendIfUnique arrKeysTime keyTimeEndTemp
+									for i in tempLinkController[i].keys do 
+									(
+										if i.selected == true then appendIfUnique arrKeysSelected i.time
+									)
+								)
+							)
+						)
+					)
+				)
+			-- )
+		)
+		-- fnAddLinkTimesKeys tempObj
+		-- fnAddLinkParamsKeys tempObj
+	-- )
+
+	fn fnAddPrsKeys tempObj i=  ---------添加正常非biped的prs帧(没加link),i是子动画ID,后面用到,提前传入减少遍历
+	(
+		local keyTimeStartTemp
+		local keyTimeEndTemp
+		
+		-- for i = 1 to tempObj.controller.numsubs do 
+		-- (
+			if (((tempObj.controller[i]).name == "Position") or \
+			((tempObj.controller[i]).name == "Rotation") or \
+			((tempObj.controller[i]).name == "Scale")) then
+			(
+				if tempObj.controller[i].keys[1] != undefined then
+				(
+					keyTimeStartTemp = tempObj.controller[i].keys[1].time
+					keyTimeEndTemp = tempObj.controller[i].keys[tempObj.controller[i].keys.count].time
+					appendIfUnique arrKeysTime keyTimeStartTemp
+					appendIfUnique arrKeysTime keyTimeEndTemp
+					for i in tempObj.controller[i].keys do 
+					(
+						if i.selected == true then appendIfUnique arrKeysSelected i.time
+					)
+				)
+			)
+		-- )
+	)
+
+	fn fnAddBipedKeys tempObj =------收集Biped帧
+	(
+		local keyTimeStartTemp
+		local keyTimeEndTemp
+		local subanimBipedScale
+
+		if classof tempObj.controller != Footsteps then
+		(
+			if classof tempObj.controller != Vertical_Horizontal_Turn then --筛选出非质心的biped帧
+			(
+				if (tempObj.controller.keys[1] != undefined) then
+				(
+					for i in tempObj.controller.keys do 
+					(
+						appendIfUnique arrKeysTime i.time   ---添加到数组
+						if i.selected == true then appendIfUnique arrKeysSelected i.time
+					)
+				)
+				subanimBipedScale = GetSubAnim tempObj.controller[1] 1
+				if ((subanimBipedScale != undefined) and \
+				(GetSubAnimName subanimBipedScale 1 == #ScaleXYZ)) then  ----筛选出biped的缩放帧
+				(
+					if subanimBipedScale[1].keys[1] != undefined then
+					(
+						keyTimeStartTemp = subanimBipedScale[1].keys[1].time
+						keyTimeEndTemp = subanimBipedScale[1].keys[subanimBipedScale[1].keys.count].time
+						appendIfUnique arrKeysTime keyTimeStartTemp
+						appendIfUnique arrKeysTime keyTimeEndTemp
+						for i in subanimBipedScale[1].keys do 
+						(
+							if i.selected == true then appendIfUnique arrKeysSelected i.time
+						)
+					)
+				)
+			)
+			else
+			(-------------------下面是收集质心的关键帧,坑在于中英文turning名字还不一样...
+				if classof tempObj.controller == Vertical_Horizontal_Turn then
+				(
+					bipCtrl = tempObj.controller
+					vertCtrl = bipCtrl.vertical.controller
+					horzCtrl = bipCtrl.horizontal.controller
+					if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
+						(turnCtrl = bipCtrl.flip.controller)
+						else(turnCtrl = bipCtrl.turning.controller)
+					bipCtrlTemp = #(vertCtrl,horzCtrl,turnCtrl)
+					for c in bipCtrlTemp do
+					(
+						if c.keys[1] != undefined then
+						(
+							keyTimeStartTemp = c.keys[1].time
+							keyTimeEndTemp = c.keys[c.keys.count].time
+							appendIfUnique arrKeysTime keyTimeStartTemp
+							appendIfUnique arrKeysTime keyTimeEndTemp
+							for i in c.keys do 
+							(
+								if i.selected == true then appendIfUnique arrKeysSelected i.time
+							)
 						)
 					)
 				)
 			)
 		)
-		else 
+	)
+
+	fn fnAddKyes tempObj fnLink =   ---添加帧(主要是首尾帧),加个判断是否勾选link
+	(	
+		if fnLink == 1 then ------1代表勾选了link
 		(
-			if edtBrowseFolder.text == "( 最近打开 Max 文件列表 )" then
+			if (classof tempObj != Biped_Object) then
 			(
-				if doesFileExist arrRecentFiles[id] then 
+				if tempObj.controller != undefined then
 				(
-					loadMaxFile (arrRecentFiles[id])
-					local tempDir = getfilenamepath arrRecentFiles[id]
-					fnRefreshList tempDir type:arrFileType[rdoFileType.state]
+					if (classof tempObj.controller) == prs then
+					(
+						for i = 1 to tempObj.controller.numsubs do 
+						(
+							fnAddPrsKeys tempObj i        ---非biped物体的位移旋转缩放帧
+						)
+					)
+					if (classof tempObj.controller) == Link_Constraint then
+					(
+						for i = 1 to tempObj.controller.numsubs do 
+						(
+							fnAddLinkTimesKeys tempObj i         ---------link属性的物体link帧和非link帧
+							fnAddLinkParamsKeys tempObj i
+						)
+					)
+				)
+			)
+			else
+			(
+				fnAddBipedKeys tempObj   ---------biped帧
+			)
+		)
+		if fnLink == 0 then  --------跟上面一样,区别在于没有(link属性物体的link帧)
+		(
+			if (classof tempObj != Biped_Object) then
+			(
+				if tempObj.controller != undefined then
+				(
+					if (classof tempObj.controller) == prs then
+					(
+						for i = 1 to tempObj.controller.numsubs do 
+						(
+							fnAddPrsKeys tempObj i
+						)
+					)
+					if (classof tempObj.controller) == Link_Constraint then
+					(
+						for i = 1 to tempObj.controller.numsubs do 
+						(
+							fnAddLinkParamsKeys tempObj i
+						)
+					)
+				)
+			)
+			else
+			(
+				fnAddBipedKeys tempObj   ---------biped帧
+			)
+		)----------------收集各种帧
+		-- arrKeysTime = makeUniqueArray arrKeysTime  ---去除重复帧数
+		sort arrKeysTime  ----帧数排序
+		sort arrKeysSelected
+		if (arrKeysTime.count != 0) then
+		(
+			case of 
+			(
+				(arrKeysTime.count > 1):
+				(
+					keyFirst = arrKeysTime[1]            ------找到首帧
+					keyEnd = arrKeysTime[arrKeysTime.count]   -----------找到尾帧
+				)
+				(arrKeysTime.count == 1):   --防止首尾同帧的保险
+				(
+					keyFirst = arrKeysTime[1]
+					keyEnd = keyFirst + 1
+				)
+			)
+		)
+		if (arrKeysSelected.count != 0) then
+		(
+			case of 
+			(
+				(arrKeysSelected.count > 1):
+				(
+					keySelFirst = arrKeysSelected[1]            ------找到首帧
+					keySelEnd = arrKeysSelected[arrKeysSelected.count]   -----------找到尾帧
+				)
+				(arrKeysSelected.count == 1):   --防止首尾同帧的保险
+				(
+					keySelFirst = arrKeysSelected[1]
+					keySelEnd = keySelFirst + 1
 				)
 			)
 		)
 	)
 
-	on btnDesktopDir pressed do 
+	fn fnCollectKeys = ---------收集关键帧
 	(
-		if iniDesktop.dir == "" then 
+		arrKeysTime     = #()
+		arrKeysSelected = #() ----------------先清空数组
+		arrLinkKeys     = #()
+		case of  -----------处理选中,未选中则处理全部
 		(
-			iniDesktop.dir = (@"C:\Users\" + (filterString  (getdir #userscripts) @"\")[3] + @"\Desktop\")
-		)
-		fnRefreshList iniDesktop.dir type:arrFileType[rdoFileType.state]
-	)
-
-	on btnDesktopDir rightclick do 
-	(
-		dirOpened = getSavePath caption:"请设置桌面路径:" initialDir:(maxFilePath)
-		if (dirOpened != undefined) then
-		(
-			iniDesktop.dir = dirOpened
-			fnRefreshList iniDesktop.dir type:arrFileType[rdoFileType.state]
-		)
-	)
-
-	on btnAutobackDir pressed do 
-	(
-		rdoFileType.state  = 1
-		fnRefreshList (getdir #autoback) type:".max"
-	)
-
-	on btnScriptsDir pressed do
-	(
-		rdoFileType.state  = 4
-		fnRefreshList (getdir #scripts) type:".ms*"
-	)
-
-	on btnScriptsDir rightclick do
-	(
-		rdoFileType.state  = 4
-		fnRefreshList (getdir #startupScripts) type:".ms*"
-	)
-
-	-- on btnPreviewDir pressed do 
-	-- (
-	-- 	fnRefreshList (getdir #preview) type:".avi"
-	-- )
-
-	-- on btnPreviewDir rightclick do 
-	-- (
-	-- 	createPreview percentSize:100 \
-	-- 	dspGeometry:true dspShapes:false dspLights:false \
-	-- 	dspCameras:false dspHelpers:false dspParticles:true dspBones:false \
-	-- 	dspGrid:true dspSafeFrame:false dspFrameNums:false dspBkg:true \
-	-- 	rndLevel:#smoothhighlights
-	-- )
-
-	on btnRecentFileDir pressed do 
-	(
-		fnLoadRecentFileList ()
-		for i in arrRecentFiles do 
-		(
-			if doesFileExist i then
+			(selection.count == 0):
 			(
-				append arrRecentFilesName ("📄 " + (getFilenameFile i) + ".max")
+				for i in (objects as array) where (i.ishidden == false) do 
+				(
+					if rolloutBulletKeyTools.btnJudgeLinkKey.checked == false then fnAddKyes i 0
+					else 
+					fnAddKyes i 1  -----------根据是否勾选link处理收集帧
+				)
 			)
-			else append arrRecentFilesName ("📄 (疑丢失) " + (getFilenameFile i) + ".max")
+			default:
+			(
+				for i in (selection as array) where (i.ishidden == false) do 
+				(
+					if rolloutBulletKeyTools.btnJudgeLinkKey.checked == false then fnAddKyes i 0
+					else 
+					fnAddKyes i 1  -----------根据是否勾选link处理收集帧
+				)
+			)
 		)
-		rdoFileType.state  = 1
-		ltbFilesList.items = arrRecentFilesName
-		edtBrowseFolder.text = "( 最近打开 Max 文件列表 )"
-		btnCountTips.text = "文件：" + arrRecentFiles.count as string
+	)
+	
+	fn fnChangetRangeTime =   ------------关键帧数字随滑条改变
+	(
+		rolloutBulletKeyTools.spiStartTime.value = animationrange.start
+		rolloutBulletKeyTools.spiEndTime.value = animationrange.end
+	)
+
+	fn fnSelLinkKeys keyFirst KeyEnd symbol =  ---------------选择link帧方法
+	(
+		if arrLinkKeys.count != 0 then
+		(
+			for i in arrLinkKeys do   -------link帧选中
+			(
+				i.selected = false ---先取消之前link帧选中状态
+				case of  -------------判断link帧位置,数字是随便取的方便判断情况
+				(
+					(symbol == 0):(if i.time <= KeyEnd then i.selected = true)
+					(symbol == 1):(if i.time >= keyFirst then i.selected = true)
+					(symbol == 2):(i.selected = true)
+				)
+			)
+		)
+	)
+
+	fn fnSelKeys keyFirst KeyEnd symbol =  ---------------选择帧的方法
+	(
+		fn fnSelectKeys keyFirst KeyEnd symbol =  -------因为有选中和没选择状态, 所以加一个方法精简下
+		(
+			for i in objects where (i.ishidden == false) do deselectKeys i          --清除之前选中的关键帧
+			if arrKeysTime.count != 0 then
+			(
+				selectkeys $ keyFirst KeyEnd  -------------选中正常帧
+				if rolloutBulletKeyTools.btnJudgeLinkKey.checked == true then
+				(
+					fnSelLinkKeys keyFirst KeyEnd symbol --------------选中link帧
+				)
+			)
+			else
+			(
+				if rolloutBulletKeyTools.btnJudgeLinkKey.checked == true then
+				(
+					fnSelLinkKeys keyFirst KeyEnd symbol
+				)
+			)
+		)
+		case of 
+		(
+			(selection.count == 0):  ----------判断是否有选中物体
+			(
+				actionMan.executeAction 0 "40021"    ---没有选择物体则选择所有物体
+				fnSelectKeys keyFirst KeyEnd symbol
+			)
+			default:  ----------------
+			(
+				fnSelectKeys keyFirst KeyEnd symbol
+			)
+		)
+	)
+	
+	mapped fn fnMoveKeysAndLinkKeys obj offset =  ----https://forums.cgsociety.org/t/moving-keys-from-link-constraint-keys-access/1575053
+	(
+		local arrTargetID  = #()
+		moveKeys obj offset #selection  ---先移动非link帧
+		if rolloutBulletKeyTools.btnJudgeLinkKey.checked == true then 
+		(
+			if classof obj.controller == Link_Constraint do
+			(
+				nTargets = obj.controller.getNumTargets()  ---得到link的帧数量
+	
+				if nTargets > 0 do
+				(
+					for i = nTargets to 1 by -1 do  ------如果大于0则从最后link帧开始移
+					(
+						fNumber = obj.controller.getFrameNo i
+						if ((fNumber >= keySelFirst) and (fNumber <= keySelEnd)) then
+						(
+							appendIfUnique arrTargetID i
+						)
+					)
+					if offset > 0 then  --------判断向前还是向后移动帧
+					(
+						for i = arrTargetID.count to 1 by -1 do  ------如果大于0则从最后link帧开始移
+						(
+							fNumber = obj.controller.getFrameNo arrTargetID[i]
+							obj.controller.setFrameNo i (fNumber + offset)
+						)
+					)
+					else
+					(
+						for i = 1 to arrTargetID.count do  ---如果移动帧小于0,从第一个link帧开始移
+						(
+							fNumber = obj.controller.getFrameNo arrTargetID[i]
+							obj.controller.setFrameNo i (fNumber + offset)
+						)
+					)
+				)
+			)
+		)
+	)
+
+	-- fn fnSplitSelBiped = --分开选择四肢和身体,例如同一条手臂只选择最父级的(方便移动帧)
+	-- (
+	-- 	arrSelBiped = for i in selection where classof i.controller == BipSlave_Control collect i 
+
+	-- )
+
+	fn fnMoveBipedKeys offsetFrame =  -------移动Biped帧
+	(
+		bipedRoot = #()   -------判断选择了几个biped骨架
+		for i in selection where ((classof i == Biped_Object) and (i.ishidden == false)) do  
+		(
+			appendIfUnique bipedRoot i.controller.rootNode  --添加到骨架数组
+		)
+		for c in bipedRoot do  ---按每个骨架处理
+		(
+			ctrlBiped = c.controller
+			bipedAll = #(biped.getNode ctrlBiped #pelvis, -----四肢同帧处理,只处理他首节biped
+						biped.getNode ctrlBiped #spine,
+						biped.getNode ctrlBiped #neck,
+						biped.getNode ctrlBiped #larm,
+						biped.getNode ctrlBiped #rarm,
+						biped.getNode ctrlBiped #lleg,
+						biped.getNode ctrlBiped #rleg,
+						biped.getNode ctrlBiped #prop1,
+						biped.getNode ctrlBiped #prop2,
+						biped.getNode ctrlBiped #prop3,
+						biped.getNode ctrlBiped #tail)
+
+			vertCtrl = ctrlBiped.vertical.controller  -----质心ctrl关键帧
+			horzCtrl = ctrlBiped.horizontal.controller
+			if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
+			(turnCtrl = ctrlBiped.flip.controller)
+			else(turnCtrl = ctrlBiped.turning.controller)
+			bipCtrlTemp = #(vertCtrl,horzCtrl,turnCtrl)
+			for c in bipCtrlTemp do
+			(
+				biped.moveKeys c offsetFrame #selection  -----移动选定的质心帧
+			)
+			for nodeBiped in bipedAll where nodeBiped != undefined do  -----移动其他biped的选定帧
+			(
+				biped.moveKeys nodeBiped.controller offsetFrame #selection
+			)
+		)
+	)		
+
+	mapped fn fnMoveBipedScaleKeys tempObj offsetFrame =  -------移动biped的缩放帧
+	(
+		ctrlBiped = tempObj.controller
+		if classof ctrlBiped == BipSlave_Control then  --------下面判定子动画是否为scaleXYZ
+		(
+			if ((ctrlBiped[1][1] != undefined) and ((getSubAnimName ctrlBiped[1][1] 1) == #ScaleXYZ)) then
+			(
+				movekeys ctrlBiped[1][1][1] offsetFrame #selection
+			)
+		)
+	)
+
+	fn fnMoveAllKeys keyMovedOffset fnRange:off =
+	(
+		local rangEnd = animationrange.end
+		local rangeStart = animationrange.start
+		local n = 0  --n来判定是否有选中biped
+
+		if keyMovedOffset != undefined then
+		(
+			if selection.count != 0 then
+			(
+				for i in selection where (i.ishidden == false) do
+				(
+					if classof i != Biped_Object then
+					(
+						fnMoveKeysAndLinkKeys i keyMovedOffset
+					)
+					else 
+					(
+						fnMoveBipedScaleKeys i keyMovedOffset
+						n += 1
+					)
+				)
+				if n != 0 then  ----------分开解决biped多移动的问题,傻瓜式方法
+				(
+					fnMoveBipedKeys keyMovedOffset
+				)
+			)
+			else  ---跟上面一样,只是对所有物体
+			(
+				for i in objects where (i.ishidden == false) do
+				(
+					if classof i != Biped_Object then
+					(
+						fnMoveKeysAndLinkKeys i keyMovedOffset
+					)
+					else fnMoveBipedScaleKeys i keyMovedOffset
+				)
+				fnMoveBipedKeys keyMovedOffset
+			)
+			if fnRange == on then
+			(
+				if keyMovedOffset > 0 then 
+				(
+					rangEnd = animationrange.end + keyMovedOffset
+					animationrange = interval animationrange.start rangEnd
+				)
+				else if keyMovedOffset < 0 then 
+				(
+					rangeStart = animationrange.start + keyMovedOffset
+					animationrange = interval rangeStart animationrange.end
+				)
+			)
+			keySelFirst += keyMovedOffset
+			keySelEnd  += keyMovedOffset
+		)
+	)
+
+	fn fnAddTrajLayer =
+	(
+		if (LayerManager.getLayerFromName "Biped_Trajectories") != undefined then
+		(
+			layerTraj = LayerManager.getLayerFromName "Biped_Trajectories"
+		)
+		else layerTraj = LayerManager.newLayerFromName "Biped_Trajectories"
+		layerTraj.lock = on
+	)
+
+	fn fnAddBipedTraj tempBiped =
+	(
+		pointTraj = point name:("Traj_" + tempBiped.name) size:0 cross:true 
+		appendIfUnique arrTraj pointTraj
+		freeze pointTraj
+		arrBipedSonTemp = tempBiped.children
+		bipedTarget = arrBipedSonTemp[(arrBipedSonTemp.count + 1)/2]
+		pointTraj.transform = bipedTarget.transform
+		pointTraj.parent = tempBiped
+		layerTraj.addNode pointTraj
+		deleteKeys pointTraj #allKeys
+		pointTraj.showTrajectory = true
+		-- ResetXForm pointTraj
+	)
+
+	fn fnDeleteTraj tempBiped =
+	(
+		local deleteTraj
+		local deleteTrajName = ("Traj_" + tempBiped.name)
+		local deleteTraArrID = findItem arrTraj deleteTrajName
+		if deleteTraArrID != 0 then
+		(
+			deleteTraj = arrTraj[deleteTraArrID]
+			deleteItem arrTraj deleteTraArrID
+		)
+		if (getNodeByName deleteTrajName) != undefined then (delete (getNodeByName deleteTrajName))
+	)
+
+	fn fnQuickSave =
+	(
+		local nameCurrentFile = getFilenameFile maxFileName
+		local strNameSplit = "_Backup"
+		local suffixFile = 1
+		local fileSave = ""
+		local arrFiles = #()
+		local arrFilesNum = #()
+		
+		fn fnGetVerNum nameCurrentFile = 
+		(
+			numTempName = findstring nameCurrentFile "_Backup"
+			numTempVer = substring nameCurrentFile (numTempName + 7) nameCurrentFile.count
+			return numTempVer
+		)
+
+		if (matchPattern nameCurrentFile pattern:"*_Backup*" ignorCase:false) then
+		(
+			fnGetVerNum nameCurrentFile
+			numTempName = findstring nameCurrentFile "_Backup"
+			nameCurrentFile = substring nameCurrentFile 1 (numTempName - 1)
+		)
+		arrFiles = getfiles (maxFilePath + nameCurrentFile + "_Backup*.max")
+		if arrFiles.count > 0 then
+		(
+			for i in arrFiles where (i != undefined) do
+			(
+				tempNum = ((fnGetVerNum (getFilenameFile i)) as integer)
+				if tempNum != undefined then append arrFilesNum tempNum
+				sort arrFilesNum
+			)
+			suffixFile = arrFilesNum[arrFilesNum.count] + 1
+		)
+		else suffixFile = 1
+		fileSave = maxFilePath + nameCurrentFile + strNameSplit + (suffixFile as string) + ".max"
+		saveMaxFile fileSave
+	)
+
+	fn fnCutDisplayKeyRange keyFirst keyEnd =  ---显示首尾帧范围
+	(
+		if (arrKeysTime.count != 0) then
+		(
+			if (arrLinkKeys.count != 0) then
+			(
+				case of  ------万恶的link帧导致更多判定
+				(
+					((arrLinkKeys[1].time >= keyFirst) and (arrLinkKeys[arrLinkKeys.count].time <= keyEnd)):
+					(animationrange = (interval keyFirst keyEnd))
+					((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time <= keyEnd)):
+					(animationrange = (interval arrLinkKeys[1].time keyEnd))
+					((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time >= keyEnd)):
+					(animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time))
+					((arrLinkKeys[1].time >= keyFirst) and (arrLinkKeys[arrLinkKeys.count].time > keyEnd)):
+					(animationrange = (interval keyFirst arrLinkKeys[arrLinkKeys.count].time))
+					((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time > keyEnd)):
+					(animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time))
+				)
+			)
+			else
+			(
+				animationrange = interval keyFirst keyEnd
+			)
+		)
+		else 
+		(
+			if ((arrLinkKeys.count != 0) and (arrLinkKeys.count > 1)) then 
+			(
+				animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time)
+			)
+			else 
+			(
+				if (arrLinkKeys.count == 1) then
+				(
+					animationrange = (interval arrLinkKeys[1].time (arrLinkKeys[1].time + 1))
+				)
+			)
+		)
+	)
+
+	fn fnHelpPosRange btnPos btnSize:[75,32] =
+	(
+		local mouseClientPos = mouse.screenPos - (getDialogPos rolloutBulletKeyTools) + uiClientOffsets
+		-- local btnPos = pos
+		-- local btnSize = [75,32]
+		local btnBox = (Box2 btnPos.x btnPos.y btnSize.x btnSize.y)
+
+		local dialogPos = getDialogPos rolloutBulletKeyTools
+		local dialogBox = (Box2 dialogPos.x dialogPos.y \
+			rolloutBulletKeyTools.width rolloutBulletKeyTools.height)
+		return (contains btnBox mouseClientPos)
+	)
+
+	-- fn fnRefreshHelpText = 
+	-- (
+	-- 	if ((ckbHelpBtn.state) and (uiClientOffsets != undefined)) then 
+	-- 	(
+	-- 		posToolBtn1 = posToolBtn
+	-- 		posToolBtn2 = posToolBtn + [0,32]
+	-- 		posToolBtn3 = posToolBtn + [0,2 * 32]
+	-- 		posToolBtn4 = posToolBtn + [0,3 * 32]
+	-- 		posToolBtn5 = posToolBtn + [0,4 * 32]
+	-- 		posToolBtn6 = posToolBtn + [0,5 * 32]
+
+	-- 		if (fnHelpPosRange [245,26] btnSize:[90,192]) == true then 
+	-- 		(
+	-- 			if fnHelpPosRange posToolBtn1 == true then
+	-- 			(
+	-- 				case of 
+	-- 				(
+	-- 					(idBtn == 1):(gbxMinTools.caption = " 取消关键帧选择 ")
+	-- 					(idBtn == 2):(gbxMinTools.caption = " 显示轨迹  ||  清除所有 ")
+	-- 					(idBtn == 3):(gbxMinTools.caption = " 冻结显示模型 ")
+	-- 					(idBtn == 4):(gbxMinTools.caption = " TCB和欧拉属性互转 ")
+	-- 					(idBtn == 5):(gbxMinTools.caption = " Pose库，要鸽 ")
+	-- 				)
+	-- 			)
+	-- 			if fnHelpPosRange posToolBtn2 == true then
+	-- 			(
+	-- 				case of 
+	-- 				(
+	-- 					(idBtn == 1):(gbxMinTools.caption = " 删选择帧  ||  删轴外帧 ")
+	-- 					(idBtn == 2):(gbxMinTools.caption = " 切显单个  ||  切显所有 ")
+	-- 					(idBtn == 3):(gbxMinTools.caption = " 根据颜色选择同色物体 ")
+	-- 					(idBtn == 4):(gbxMinTools.caption = " Bone过滤欧拉曲线 ")
+	-- 					(idBtn == 5):(gbxMinTools.caption = " Mopher表情选择滑条 ")
+	-- 				)
+	-- 			)
+	-- 			if fnHelpPosRange posToolBtn3 == true then
+	-- 			(
+	-- 				case of 
+	-- 				(
+	-- 					(idBtn == 1):(gbxMinTools.caption = " 功能待添加 ")
+	-- 					(idBtn == 2):(gbxMinTools.caption = " 方便拖帧平滑预览 ")
+	-- 					(idBtn == 3):(gbxMinTools.caption = " Biped骨骼 ||  Bone骨骼 ")
+	-- 					(idBtn == 4):(gbxMinTools.caption = " 清除末端  ||  添加末端 ")
+	-- 					(idBtn == 5):(gbxMinTools.caption = " 动画片断标签，要鸽 ")
+	-- 				)
+	-- 			)
+	-- 			if fnHelpPosRange posToolBtn4 == true then
+	-- 			(
+	-- 				case of 
+	-- 				(
+	-- 					(idBtn == 1):(gbxMinTools.caption = " 功能待添加 ")
+	-- 					(idBtn == 2):(gbxMinTools.caption = " Bone骨骼 ||  Biped骨骼 ")
+	-- 					(idBtn == 3):(gbxMinTools.caption = " 功能待添加 ")
+	-- 					(idBtn == 4):(gbxMinTools.caption = " 功能待添加 ")
+	-- 					(idBtn == 5):(gbxMinTools.caption = " 批量导入导出，要鸽 ")
+	-- 				)
+	-- 			)
+	-- 			if fnHelpPosRange posToolBtn5 == true then
+	-- 			(
+	-- 				case of 
+	-- 				(
+	-- 					(idBtn == 1):(gbxMinTools.caption = " 功能待添加 ")
+	-- 					(idBtn == 2):(gbxMinTools.caption = " Box显示   ||  Clay显示 ")
+	-- 					(idBtn == 3):(gbxMinTools.caption = " 功能待添加 ")
+	-- 					(idBtn == 4):(gbxMinTools.caption = " 功能待添加 ")
+	-- 					(idBtn == 5):(gbxMinTools.caption = " 功能待添加  ")
+	-- 				)
+	-- 			)
+	-- 			if fnHelpPosRange posToolBtn6 == true then
+	-- 			(
+	-- 				case of 
+	-- 				(
+	-- 					(idBtn == 1):(gbxMinTools.caption = " 批量转换滑动帧 ")
+	-- 					(idBtn == 2):(gbxMinTools.caption = " 隐藏贴图，预览动画 ")
+	-- 					(idBtn == 3):(gbxMinTools.caption = " 选择CS骨骼工具 ")
+	-- 					(idBtn == 4):(gbxMinTools.caption = " 打开BoneTools面板 ")
+	-- 					(idBtn == 5):(gbxMinTools.caption = " 快捷键，备份设置 ")
+	-- 				)
+	-- 			)
+	-- 		)
+	-- 		else 
+	-- 		(
+	-- 			gbxMinTools.caption = " < 小工具说明 > "
+	-- 			myTimer.stop()
+	-- 		)
+	-- 	)
+	-- )
+
+	fn fnHidebyCategory cate:BoneGeometry =
+	(
+		if cate == BoneGeometry then
+		(
+			if switchHideBones == 0 then
+			(
+				for o in objects where ((classof o == BoneGeometry) and (o.isHidden == false)) do
+				(
+					append arrTempBones o
+				)
+				for b in arrTempBones do
+				(
+					b.isHidden = true
+				)
+				switchHideBones = 1
+			)
+			else if switchHideBones == 1 then
+			(
+				for b in arrTempBones do
+				(
+					b.isHidden = false
+				)
+				arrTempBones = #()
+				switchHideBones = 0
+			)
+		)
+		else
+		(
+			if switchHideBiped == 0 then 
+			(
+				for o in objects where ((classof o == Biped_Object) and (o.isHidden == false)) do
+				(
+					append arrTempBiped o
+				)
+				for b in arrTempBiped do
+				(
+					b.isHidden = true
+				)
+				switchHideBiped = 1
+			)
+			else if switchHideBiped == 1 then 
+			(
+				for b in arrTempBiped do
+				(
+					b.isHidden = false
+				)
+				arrTempBiped = #()
+				switchHideBiped = 0
+			)
+		)
+	)
+
+	fn fnAddMyScript btnMyScript idMyScript =
+	(
+		dirScript = getOpenFileName caption:"请选择添加的Max脚本:" historyCategory:"myScripts" \
+		types:"ms(*.ms)|*.ms|mse(*.mse)|*.mse|All(*.*)|*.*" filename:(getDir #scripts + @"\") 
+		if (dirScript != undefined) then
+		(
+			nameMyScript = getFilenameFile dirScript
+			btnMyScript.text = nameMyScript
+			for i = 1 to iniArrMyScripts.count where iniArrMyScripts[i] != undefined do
+			(
+				if iniArrMyScripts[i].id == idMyScript then
+				(
+					deleteItem iniArrMyScripts i
+				)
+			)
+			insertItem (myScript idMyScript nameMyScript dirScript) iniArrMyScripts idMyScript
+		)
+	)
+
+	fn fnRefreshMyScripts =
+	(
+		arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1,rolloutBulletKeyTools.btnMyScripts2,rolloutBulletKeyTools.btnMyScripts3,rolloutBulletKeyTools.btnMyScripts4)
+		for b = 1 to 4 do 
+		(
+			if ((iniArrMyScripts[b] != undefined) and (doesfileexist iniArrMyScripts[b].dir)) then 
+			(
+				arrMyScriptTemp[b].text = iniArrMyScripts[b].msName
+			)
+		)
+	)
+
+	on rolloutBulletKeyTools open do  ----打开脚本时操作
+	(------刷新图标, 图标是max自带的,主要是懒得做
+		btnSelBeforeKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,3,3,3,3,true,true) 
+		btnSelAfterKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,11,11,11,11,true,true) 
+		btnSelAllKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,26,26,26,26,true,true)
+		btnMoveKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,21,21,21,21,true,true)
+-- 		btnMoveAfterKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,13,13,13,13,true,true)
+		-- dotnet.AddEventHandler myTimer #elapsed fnRefreshHelpText
+		-- myTimer.Start()
+		-- ckbHelpBtn.checked = iniHelpBtn
+		timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
+		-- iniPos = (GetDialogPos rolloutBulletKeyTools) 
+		fnSaveConfig ()  ---------------脚本位置赋值
+		fnSetConfig ()  ----------------保存位置信息到ini文件
+		registerTimeCallback fnChangetRangeTime  -------------帧范围改变添加回调
+		rolloutBulletKeyTools.gbxMinTools.visible  = false
+		judgePlaySpeedValue ()  -----判断播放速度
+		rolloutBulletKeyTools.btnSetFpsAndSpeed.text = " |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
+		fnRefreshMagicBtn ()
+		fnSwitchToolsBtn idBtn
+		fnSwitchToolBtnChecked idBtn
+		fnRefreshMyScripts ()
+	)
+	
+	on rolloutBulletKeyTools close do -- 关闭记忆浮动窗口位置
+	(
+		iniPos = (GetDialogPos rolloutBulletKeyTools)
+		fnSetConfig ()
+	)
+	-----------------------------------------------------------------------------------------
+	on rolloutBulletKeyTools mbuttondown pos do 
+	(
+		try (destroydialog rolloutBulletKeyTools) catch ()
+	)
+	
+	on rolloutBulletKeyTools lbuttondown posMou do
+	(
+		posMouMoved = posMou
+		switchMouseState = on
+	)
+	
+	on rolloutBulletKeyTools lbuttonup posMou do
+	(
+		switchMouseState = off
+	)
+	
+	on rolloutBulletKeyTools mouseMove pos do
+	(
+		-- myTimer.Start()
+		if switchMouseState == on then
+		(
+			SetDialogPos rolloutBulletKeyTools (mouse.screenpos - posMouMoved)			
+		)
+		if (uiClientOffsets == undefined) then 
+		(
+			uiClientOffsets = pos - (mouse.screenPos - (getDialogPos rolloutBulletKeyTools)) 
+		)
+	)
+
+	-- on tick_tock tick do
+	-- (
+	-- 	fnRefreshHelpText ()
+	-- )
+	---------------------上面设置拖动脚本窗口,去掉标题栏后默认无法拖动---------------------
+	on btnSelBoneBiped pressed do ----选择bone或者biped
+	(
+		clearselection ()
+		for o in objects where (o.ishidden == false) do 
+		(
+			if classof o == Biped_Object then selectmore o
+		)
+	)
+
+	on btnSelBoneBiped rightclick do ----选择bone或者biped
+	(
+		clearselection ()
+		for o in objects where (o.ishidden == false) do 
+		(
+			if classof o == BoneGeometry then selectmore o
+		)
+	)
+
+	on spiStartTime changed valTime do  --------初始帧定位到输入的帧数
+	(		
+		local rangeStart = valTime as time
+		if ((valTime != ".") and (valTime as time != undefined) and \
+		(valTime != "") and (rangeStart < animationrange.end)) then
+		(
+			animationrange = (interval rangeStart animationrange.end)
+		)
+		else messageBox "----------------------\r\n请输入正确帧数!"
+	)
+
+	on spiEndTime changed valTime do  --------初始帧定位到输入的帧数
+	(		
+		local rangEnd = valTime as time
+		if ((valTime != ".") and (valTime as time != undefined) and \ 
+		(valTime != "") and (rangEnd > animationrange.start)) then
+		(
+			animationrange = (interval animationrange.start rangEnd)
+		)
+		else messageBox "----------------------\r\n请输入正确帧数!"
+	)
+	
+	on btnFnFrame pressed do  -------------切换整数帧小数帧,方便拖动滑条平滑预览
+	(
+		if timeDisplayMode != #frameTicks then 
+		(
+			timeDisplayMode = #frameTicks
+		)
+		else 
+		(
+			timeDisplayMode = #frames
+		)
+		slidertime -= 1
+		slidertime += 1  ----------默认改了要划一下滑条才生效,脚本直接操作了~~没找到refresh的
+	)
+	
+	on btnMagicBtn pressed do  -------------切换整数帧小数帧,方便拖动滑条平滑预览
+	(
+		fnSwitchMagicBtn ()
+	)
+
+	-- on ckbHelpBtn changed state do 
+	-- (
+	-- 	iniHelpBtn = state
+	-- 	if state == off then 
+	-- 	(
+	-- 		gbxMinTools.caption = " < 小工具说明 > "
+	-- 		-- tick_tock.active = false
+	-- 	)
+	-- 	-- else tick_tock.active = true
+	-- )
+
+	on btnCSTools pressed do 
+	(
+		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\cstools.ms")
+	)
+	on btnSpringMagic pressed do 
+	(
+		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_New.mse")
+	)
+	on btnSpringMagic rightclick do 
+	(
+		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_Old.mse")
+	)
+
+	on btnFileOpen pressed do 
+	(
+		FileIn ((getDir #scripts) + "\\BulletScripts" + "\\BsOpenTools.ms")
+	)
+
+	on btnBoneTraj pressed do ------显示bone的轨迹
+	(
+		for i in (selection as array) where (classof i != Biped_Object) do
+		(
+			if i.showtrajectory == true then i.showtrajectory = false
+			else i.showtrajectory = true
+		)
+	)
+
+	on btnBoneTraj rightclick do   ----右键取消bone的轨迹显示
+	(
+		for i in (objects as array) where (classof i != Biped_Object) do
+		(
+			if i.showtrajectory == true then i.showtrajectory = false
+		)
+	)
+
+	on btnBipedTraj pressed do 
+	(
+		fnAddTrajLayer () ----是否创建轨迹层
+		if (selection.count > 1) then
+		(
+			for i in (selection as array) do
+			(
+				if classof i == Biped_Object then
+				(
+					if (getNodeByName ("Traj_" + i.name)) != undefined then 
+					(
+						fnDeleteTraj i
+					)
+				)
+			)
+		)
+		else if selection.count == 1 then
+		(
+			if classof $ == Biped_Object then
+				(
+					if (getNodeByName ("Traj_" + $.name)) != undefined then 
+					(
+						fnDeleteTraj $
+					)
+					else fnAddBipedTraj $
+				)
+		)
+	)
+
+	on btnBipedTraj rightclick do
+	(
+		delLayer = LayerManager.getLayerFromName "Biped_Trajectories"
+		delLayer.lock = off
+		delete (LayerManager.getLayerObject "Biped_Trajectories")
+		LayerManager.deleteLayerByName "Biped_Trajectories"
+	)
+
+	-- on btnBipedTraj rightclick do
+	-- (
+	-- 	-- bipedRoot = #()   -------判断选择了几个biped骨架
+	-- 	if (selection.count > 0) then
+	-- 	(
+	-- 		-- for i in (selection as array) where classof i == Biped_Object do  
+	-- 		-- (
+	-- 		-- 	appendIfUnique bipedRoot i.controller.rootNode  --添加到骨架数组
+	-- 		-- )
+	-- 		for i in (selection as array) do 
+	-- 		(
+	-- 			if (classof i == Biped_Object) then
+	-- 			(
+	-- 				nodeTemp = i.controller.rootNode
+	-- 				trajDisFn = nodeTemp.controller.displayTrajectories
+	-- 				if trajDisFn == true then nodeTemp.controller.displayTrajectories = false
+	-- 				else nodeTemp.controller.displayTrajectories = true
+	-- 				exit
+	-- 			)
+	-- 		)
+	-- 	)
+	-- )
+
+	on edtMoveKey entered val do   -----移动帧数自定义,输入即可
+	(
+		if ((val != ".") and (val as time != undefined) and (val != "")) then
+		(------"."他也认为是数字...
+			keyMovedOffset = val as integer
+			rolloutBulletKeyTools.edtMoveKey.text = keyMovedOffset as string + "f"
+		)
+		else messageBox "----------------------\r\n请输入正确帧数!"
+	)
+
+	on btnSet5 pressed do 
+	(
+		edtMoveKey.text = "5f"
+		keyMovedOffset = 5
+	)
+	on btnSetAdd pressed do 
+	(
+		edtMoveKey.text = "+5f"
+		keyMovedOffset += 5
+		edtMoveKey.text = keyMovedOffset as string + "f"
+	)
+	on btnSetOpposite pressed do
+	(
+		keyMovedOffset = - keyMovedOffset
+		edtMoveKey.text = keyMovedOffset as string + "f"
+	)
+	on btnMoveKeys pressed do with undo on   ------移动选定帧
+	(
+		fnMoveAllKeys keyMovedOffset fnRange:off
+	)
+	on btnMoveKeys rightclick do with undo on
+	(
+		fnMoveAllKeys keyMovedOffset fnRange:on
+	)
+	on btnSelBeforeKeys pressed do  ------------选择滑条之前帧
+	(
+		symbol = 0
+		fnCollectKeys ()
+		if arrLinkKeys.count != 0 then
+		(
+			for i in arrLinkKeys do i.selected = false
+		)
+		if arrKeysTime.count != 0 then
+		(
+			if keyFirst <= sliderTime then 
+			(
+				fnSelKeys keyFirst sliderTime symbol
+			)
+			else 
+			(
+				fnSelKeys sliderTime sliderTime symbol
+			)
+		)
+		else
+		(
+			if arrLinkKeys.count != 0 then
+			(
+				if arrLinkKeys[1].time <= sliderTime then 
+				(
+					fnSelLinkKeys arrLinkKeys[1].time sliderTime symbol
+				)
+				else 
+				(
+					fnSelLinkKeys sliderTime sliderTime symbol
+				)
+			)
+		)
+	)
+	
+	on btnSelAfterKeys pressed do  -------------选择滑条之后帧
+	(
+		symbol = 1
+		fnCollectKeys ()
+		if arrKeysTime.count != 0 then
+		(
+			if arrLinkKeys.count != 0 then
+			(
+				for i in arrLinkKeys do i.selected = false
+			)
+			if keyEnd >= sliderTime then 
+			(
+				fnSelKeys sliderTime keyEnd symbol
+			)
+			else 
+			(
+				fnSelKeys sliderTime sliderTime symbol
+			)
+		)
+		else
+		(
+			if arrLinkKeys.count != 0 then
+			(
+				if arrLinkKeys[1].time >= sliderTime then 
+				(
+					fnSelLinkKeys sliderTime arrLinkKeys[1].time symbol
+				)
+				else 
+				(
+					fnSelLinkKeys sliderTime sliderTime symbol
+				)
+			)
+		)
+	)
+	
+	on btnSelAllKeys pressed do     ------------------选择所有帧
+	(
+		symbol = 2
+		fnCollectKeys ()
+		if arrKeysTime.count != 0 then
+		(
+			fnSelKeys keyFirst keyEnd symbol
+		)
+		else
+		(
+			if arrLinkKeys.count != 0 then
+			(
+				fnSelLinkKeys arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time symbol
+			)
+		)
+	)
+	
+	on btnSetFpsAndSpeed pressed do popupMenu menuSetFps
+		
+	on btnSetFpsAndSpeed rightclick do popupMenu menuSetSpeed
+
+	-- on btnClearSelKeys pressed do  ---------------------清除帧选择
+	-- (
+	-- 	fnCollectKeys ()
+	-- 	if arrKeysTime.count != 0 then  ----清除非link帧
+	-- 	(
+	-- 		for i in objects where (i.ishidden == false) do 
+	-- 		(
+	-- 			deselectKeys i
+	-- 			if classof i == Biped_Object then
+	-- 			(
+	-- 				ctrlBiped      = i.controller
+	-- 				numLayers      = biped.numLayers ctrlBiped
+	-- 				idCurrentLayer = biped.getCurrentLayer ctrlBiped
+	-- 				while numLayers >= 0 do
+	-- 				(
+	-- 					biped.setCurrentLayer ctrlBiped numLayers
+	-- 					deselectKeys i
+	-- 					numLayers -= 1
+	-- 				)
+	-- 				biped.setCurrentLayer ctrlBiped idCurrentLayer
+	-- 			)
+	-- 		)
+	-- 		if arrLinkKeys.count != 0 then
+	-- 		(
+	-- 			for i in arrLinkKeys do i.selected = false
+	-- 		)
+	-- 	)
+	-- 	else
+	-- 	(
+	-- 		if arrLinkKeys.count != 0 then  ---清除link帧
+	-- 		(
+	-- 			for i in arrLinkKeys do i.selected = false
+	-- 		)
+	-- 	)
+	-- )
+	
+	on btnJudgeLinkKey changed state do   --切换是否勾选link
+	(
+		if btnJudgeLinkKey.state == false then
+		(
+			if arrLinkKeys.count != 0 then
+			(
+				for i in arrLinkKeys do i.selected = false
+			)
+		)
+		else fnCollectKeys ()
+	)
+
+	on btnCleanOutKeys pressed do with undo on-----------清理范围外帧(无限帧)
+	(
+		if (selection as array).count == 0 then 
+		(
+			for tempObject in (objects as Array) do fnCleanOutRangeKeys tempObject
+		)
+		else
+		(
+			for tempObject in (selection as Array) do fnCleanOutRangeKeys tempObject
+		)
+	)
+
+	on btnDelOutKeys pressed do with undo on-----------清理选择帧
+	(
+		fnDelSelKeys ()
+	)
+
+	on btnDelOutKeys rightclick do with undo on-----------清理选择帧
+	(
+		actionMan.executeAction 0 "40021"  -- Selection: Select All
+		fnCollectKeys ()
+		fnSelKeys keyFirst keyEnd 2
+		fnDelSelKeys ()
+		if arrLinkKeys.count != 0 then
+		(
+			fnSelLinkKeys arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time 2
+		)
+	)
+
+	on btnHideBones pressed do
+	(
+-- 		if hideByCategory.bones == false then 
+-- 		(
+-- 			hideByCategory.bones = true
+-- 			btnHideBones.text = "☀ 显示骨骼"
+-- 		)
+-- 		else 
+-- 		(
+-- 			hideByCategory.bones = false
+-- 			btnHideBones.text = "☁ 隐藏骨骼"
+-- 		)
+-- 		redrawviews()
+-- 		slidertime -= 1
+-- 		slidertime += 1
+		fnHidebyCategory cate:BoneGeometry
+	)
+	
+	on btnHideBones rightclick do
+	(
+		fnHidebyCategory cate:Biped_Object
+	)
+
+	on ckbFreezeMesh changed state do 
+	(
+		if state == on then
+		(
+			for o in objects where (((classof o == Editable_mesh) \
+			or (classof o == Editable_Poly) or (classof o == PolyMeshObject)) \
+			and (o.isHidden == false)) do
+			(
+				freeze o
+				o.showFrozenInGray = off
+			)
+			ckbFreezeMesh.text = "☀ 解冻模型"
+		)
+		else
+		(
+			for o in objects where (((classof o == Editable_mesh) \
+			or (classof o == Editable_Poly) or (classof o == PolyMeshObject)) \
+			and (o.isHidden == false)) do
+			(
+				unfreeze o
+				o.showFrozenInGray = off
+			)
+			ckbFreezeMesh.text = "✲ 冻结模型"
+		)
+	)
+
+	on btnQuickSave pressed do 
+	(
+		if maxFilePath == "" then 
+		(
+			messagebox "------------------------------------\r\n当前场景未保存过,\r\n请先右键点击保存初始版本~"
+		)
+		else fnQuickSave ()
+	)
+	on btnQuickSave rightclick do 
+	(
+		max file saveas
+	)
+
+	on btnCutFrameDisplay pressed do with undo on  ---------------帧栏显示首尾帧范围
+	(
+		if switchSelKeyRange == 0 then
+		(
+			arrLastSelRange = #(animationrange.start,animationrange.end)
+			fnCollectKeys ()
+			fnCutDisplayKeyRange keySelFirst keySelEnd
+			switchSelKeyRange = 1
+		)
+		else 
+		(
+			animationrange = interval arrLastSelRange[1] arrLastSelRange[2]
+			switchSelKeyRange = 0
+			arrLastSelRange = #()
+		)
+	)
+	on btnCutFrameDisplay rightclick do with undo on  ---------------帧栏显示首尾帧范围
+	(
+		if switchAllKeyRange == 0 then
+		(
+			arrLastAllRange = #(animationrange.start,animationrange.end)
+			fnCollectKeys ()
+			fnCutDisplayKeyRange keyFirst keyEnd
+			switchAllKeyRange = 1
+		)
+		else 
+		(
+			animationrange = interval arrLastAllRange[1] arrLastAllRange[2]
+			switchAllKeyRange = 0
+			arrLastAllRange = #()
+		)
+	)
+
+	------------切换工具栏分类--------------------------------------------
+	on ckbC1 changed state do 
+	(
+		if state == true then 
+		(
+			fnSwitchToolBtnChecked 1
+			fnSwitchToolsBtn 1
+		)
+		else ckbC1.checked = true
+	)
+	on ckbC2 changed state do 
+	(
+		if state == true then 
+		(
+			fnSwitchToolBtnChecked 2
+			fnSwitchToolsBtn 2
+		)
+		else ckbC2.checked = true
+	)
+	on ckbC3 changed state do 
+	(
+		if state == true then 
+		(
+			fnSwitchToolBtnChecked 3
+			fnSwitchToolsBtn 3
+		)
+		else ckbC3.checked = true
+	)
+	on ckbC4 changed state do 
+	(
+		if state == true then 
+		(
+			fnSwitchToolBtnChecked 4
+			fnSwitchToolsBtn 4
+		)
+		else ckbC4.checked = true
+	)
+	-- on ckbC5 changed state do 
+	-- (
+	-- 	if state == true then 
+	-- 	(
+	-- 		fnSwitchToolBtnChecked 5
+	-- 		fnSwitchToolsBtn 5
+	-- 	)
+	-- 	else ckbC5.checked = true
+	-- )
+	--------------------------------------------------------------------
+
+	on btnFnTCB pressed do 
+	(
+		for i in selection where classof i == BoneGeometry do
+		(
+			if classof i.rotation.controller == tcb_rotation then
+				(i.rotation.controller = Euler_XYZ ())
+				else (i.rotation.controller = tcb_rotation ())
+		)
+	)
+
+	-- on btnBoneTool pressed do (macros.run "Animation Tools" "BoneAdjustmentTools")
+
+	on btnBoneTool pressed do 
+	(
+		for i in selection where classof i == BoneGeometry do
+		(
+			if i.boneEnable == false then i.boneEnable = true
+			else i.boneEnable = false
+		)
+	)
+	
+	on btnFnKeyType pressed do 
+	(
+		try(destroydialog rolFnKeys)catch()
+		Createdialog rolFnKeys  fgcolor:(color 255 20 100) \
+		pos:[mouse.screenpos.x,mouse.screenpos.y]
+	)
+
+	on btnEulerFilter pressed do 
+	(
+		for i in selection where classof i == BoneGeometry do
+		(
+			if classof i.rotation.controller == Euler_XYZ then
+			(
+				i.rotation.controller = tcb_rotation ()
+				i.rotation.controller = Euler_XYZ ()
+			)
+		)
+	)
+
+	on ckbFnBoxDisplay changed state do 
+	(
+		for o in Geometry where (o.isHidden == false) do 
+		(
+			if ((classof o == BoneGeometry) or (classof o == Biped_Object)) then
+			(
+				if state == on then o.boxmode = on 
+				else o.boxmode = off
+			)
+		)
+	)
+	on ckbFnBoxDisplay rightclick do 
+	(
+		local disp = NitrousGraphicsManager.GetActiveViewportSetting() 
+		if disp.VisualStyleMode == #clay then disp.VisualStyleMode = #Realistic
+		else disp.VisualStyleMode =  #clay
+	)
+	
+	on ckbFnMtlDisplay changed state do 
+	(
+		if state == off then
+		(
+			-- for mat in (getClassInstances vrayMtl processAllAnimatables:true) do showTextureMap mat on
+			for mat in (getClassInstances standard processAllAnimatables:true) do showTextureMap mat on
+		)
+		else
+		(
+			-- for mat in (getClassInstances vrayMtl processAllAnimatables:true) do showTextureMap mat off
+			for mat in (getClassInstances standard processAllAnimatables:true) do showTextureMap mat off
+		)
+	)
+
+	-- on ckbFnMtlDisplay rightclick do 
+	-- (
+		
+	-- )
+
+	on btnMopherSlider pressed do 
+	(
+		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\MorphSliders_11.ms")
+		macros.run "Tools" "MorphSliders"
+	)
+
+	on btnCopyKeyTools pressed do 
+	(
+		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\暴力帧拷贝粘贴脚本.mse")
+	)
+
+	on btnAnimMirror pressed do 
+	(
+		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\动画镜像工具.mse")
+	)
+
+	on btnMyScripts1 pressed do 
+	(
+		if ((iniArrMyScripts[1] != undefined) and (doesfileexist iniArrMyScripts[1].dir)) then 
+		(
+			fileIn iniArrMyScripts[1].dir
+		)
+		else fnAddMyScript btnMyScripts1 1
+	)
+	on btnMyScripts2 pressed do 
+	(
+		if ((iniArrMyScripts[2] != undefined) and (doesfileexist iniArrMyScripts[2].dir)) then 
+		(
+			fileIn iniArrMyScripts[2].dir
+		)
+		else fnAddMyScript btnMyScripts2 2
+	)
+	on btnMyScripts3 pressed do 
+	(
+		if ((iniArrMyScripts[3] != undefined) and (doesfileexist iniArrMyScripts[3].dir)) then 
+		(
+			fileIn iniArrMyScripts[3].dir
+		)
+		else fnAddMyScript btnMyScripts3 3
+	)
+	on btnMyScripts4 pressed do 
+	(
+		if ((iniArrMyScripts[4] != undefined) and (doesfileexist iniArrMyScripts[4].dir)) then 
+		(
+			fileIn iniArrMyScripts[4].dir
+		)
+		else fnAddMyScript btnMyScripts4 4
+	)
+	on btnMyScripts5 pressed do 
+	(
+		if ((iniArrMyScripts[5] != undefined) and (doesfileexist iniArrMyScripts[5].dir)) then 
+		(
+			fileIn iniArrMyScripts[5].dir
+		)
+		else fnAddMyScript btnMyScripts5 5
+	)
+
+	on btnMyScripts1 rightclick do 
+	(
+		try(destroydialog rolAddMyScripts)catch()
+		createDialog rolAddMyScripts fgcolor:(color 255 20 100) \
+		pos:[mouse.screenpos.x,mouse.screenpos.y]
+	)
+	on btnMyScripts2 rightclick do 
+	(
+		try(destroydialog rolAddMyScripts)catch()
+		createDialog rolAddMyScripts fgcolor:(color 255 20 100) \
+		pos:[mouse.screenpos.x,mouse.screenpos.y]
+	)
+	on btnMyScripts3 rightclick do 
+	(
+		try(destroydialog rolAddMyScripts)catch()
+		createDialog rolAddMyScripts fgcolor:(color 255 20 100) \
+		pos:[mouse.screenpos.x,mouse.screenpos.y]
+	)
+	on btnMyScripts4 rightclick do 
+	(
+		try(destroydialog rolAddMyScripts)catch()
+		createDialog rolAddMyScripts fgcolor:(color 255 20 100) \
+		pos:[mouse.screenpos.x,mouse.screenpos.y]
+	)
+
+	on btnHideUnSel pressed do 
+	(
+		arrTempAllObj = for o in objects where o.isHidden == false collect o
+		numTempCurrentSel = selection.count
+		if arrTempAllObj.count > numTempCurrentSel then
+		(
+			arrTempSelObj = if selection.count != 0 then selection as array else #()
+			if arrTempUnSelection.count != 0 then arrTempUnSelection = #()
+			for i in arrTempSelObj where (arrTempSelObj.count != 0) do
+			(
+				num = finditem arrTempAllObj i
+				if num != 0 then deleteItem arrTempAllObj num
+			)
+			arrTempUnSelection = arrTempAllObj
+			actionMan.executeAction 0 "281"
+		)
+	)
+
+	on btnHideUnSel rightclick do
+	(
+		if arrTempUnSelection.count != 0 then
+		(
+			for i in arrTempUnSelection do i.isHidden = false
+		)
+	)
+
+	on btnQuickPrev pressed do 
+	(
+		createPreview percentSize:100 \
+		dspGeometry:true dspShapes:false dspLights:false \
+		dspCameras:false dspHelpers:false dspParticles:true dspBones:false \
+		dspGrid:true dspSafeFrame:false dspFrameNums:false dspBkg:true \
+		rndLevel:#smoothhighlights
+	)
+
+	on btnQuickPrev rightclick do 
+	(
+		shellLaunch (getdir #preview) ""
 	)
 )
-CreateDialog rolBsOpenTools pos:iniPosOpenTools fgcolor:(color 255 20 100) \
-style:#() lockHeight:true
+Createdialog rolloutBulletKeyTools fgcolor:(color 255 20 100) pos:iniPos style:#()
+clearListener()  ---------清除侦听器
+
 
 ------------------------toolbar----------------------------------------------------
-macroScript BsOpenTools
+macroScript BulletKeyTools
 category:"_[BulletTools]"
-buttonText:"时光机"
-toolTip:"时光机"
+buttonText:"K帧工具"
+toolTip:"K帧工具"
 -- Icon:#("Systems",2)
 (
 	on execute do
 	(
-		fileIn ((getDir #Scripts)+ "\\BulletScripts\\" + "BsOpenTools.ms")
+		fileIn ((getDir #Scripts)+ "\\BulletScripts\\" + "BulletKeyTools.ms")
 	)
 )
 -------------------------------------------------------------------------------------
