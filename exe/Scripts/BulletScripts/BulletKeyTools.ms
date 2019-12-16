@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-15 14:05:05
+ * @LastEditTime: 2019-12-16 11:31:41
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -251,17 +251,21 @@ rollout rolAddMyScripts "我的脚本" width:250 height:155
 			nameMyScript = getFilenameFile dirScript
 			btnMsName.text = nameMyScript
 			btnMsDir.text = "已修改"
-			iniArrMyScripts[id].dir = dirScript
+			if iniArrMyScripts[id] != undefiend then iniArrMyScripts[id].dir = dirScript
+			else
+			(
+				append iniArrMyScripts (myScript id edtRenameMs1.text dirScript)
+			)
 		)
 		-- print dirScript
 	)
 
 	on rolAddMyScripts open do 
 	(
-		edtRenameMs1.text = if iniArrMyScripts[1] != undefined then iniArrMyScripts[1].msName
-		edtRenameMs2.text = if iniArrMyScripts[2] != undefined then iniArrMyScripts[2].msName
-		edtRenameMs3.text = if iniArrMyScripts[3] != undefined then iniArrMyScripts[3].msName
-		edtRenameMs4.text = if iniArrMyScripts[4] != undefined then iniArrMyScripts[4].msName
+		edtRenameMs1.text = if iniArrMyScripts[1] != undefined then iniArrMyScripts[1].msName else ""
+		edtRenameMs2.text = if iniArrMyScripts[2] != undefined then iniArrMyScripts[2].msName else ""
+		edtRenameMs3.text = if iniArrMyScripts[3] != undefined then iniArrMyScripts[3].msName else ""
+		edtRenameMs4.text = if iniArrMyScripts[4] != undefined then iniArrMyScripts[4].msName else ""
 	)
 
 	on btnReAddMs1 pressed do 
@@ -310,10 +314,17 @@ rollout rolAddMyScripts "我的脚本" width:250 height:155
 
 	on btnDoit pressed do
 	(
-		iniArrMyScripts[1].msName = if edtRenameMs1.text != "" then edtRenameMs1.text
-		iniArrMyScripts[2].msName = if edtRenameMs2.text != "" then edtRenameMs2.text
-		iniArrMyScripts[3].msName = if edtRenameMs3.text != "" then edtRenameMs3.text
-		iniArrMyScripts[4].msName = if edtRenameMs4.text != "" then edtRenameMs4.text
+		fn fnAddMsName id edtRenameMs =
+		(
+			if iniArrMyScripts[id] != undefined then
+			(
+				iniArrMyScripts[id].msName = if edtRenameMs.text != "" then edtRenameMs.text
+			)
+		)
+		fnAddMsName 1 edtRenameMs1
+		fnAddMsName 2 edtRenameMs2
+		fnAddMsName 3 edtRenameMs3
+		fnAddMsName 4 edtRenameMs4
 
 		arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1,rolloutBulletKeyTools.btnMyScripts2,rolloutBulletKeyTools.btnMyScripts3,rolloutBulletKeyTools.btnMyScripts4)
 		for b = 1 to 4 do 
