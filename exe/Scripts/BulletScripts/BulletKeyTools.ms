@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-16 11:31:41
+ * @LastEditTime: 2019-12-16 12:35:42
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -227,7 +227,7 @@ rcmenu menuSetSpeed
 	)
 )
 ------------------帧率,播放速度------------------------------------------------------------
-rollout rolAddMyScripts "我的脚本" width:250 height:155
+rollout rolAddMyScripts "我的脚本" width:250 height:190
 (
 	label lblRename "↓请输入重命名↓" pos:[20,5]
 	label lblReDir "↓指定路径↓" pos:[125,5]
@@ -241,6 +241,7 @@ rollout rolAddMyScripts "我的脚本" width:250 height:155
 	edittext edtRenameMs4 " 4 "  pos:[5,130] width:100 height:20 text:""
 	button btnReAddMs4 "..."  pos:[115,130] width:80 height:20 border:true
 	button btnDoit "确认" pos:[205,25] width:35 height:125 border:true
+	button btnClearMyScripts "! 清除所有脚本引用 !" pos:[5,160] width:240 height:25 border:true
 
 	fn fnRefreshBtnReAddMs btnMsName btnMsDir id =
 	(
@@ -251,7 +252,7 @@ rollout rolAddMyScripts "我的脚本" width:250 height:155
 			nameMyScript = getFilenameFile dirScript
 			btnMsName.text = nameMyScript
 			btnMsDir.text = "已修改"
-			if iniArrMyScripts[id] != undefiend then iniArrMyScripts[id].dir = dirScript
+			if iniArrMyScripts[id] != undefined then iniArrMyScripts[id].dir = dirScript
 			else
 			(
 				append iniArrMyScripts (myScript id edtRenameMs1.text dirScript)
@@ -260,12 +261,67 @@ rollout rolAddMyScripts "我的脚本" width:250 height:155
 		-- print dirScript
 	)
 
+	fn fnAddMsName id edtRenameMs =
+	(
+		if (iniArrMyScripts[id] != undefined) then
+		(
+			if edtRenameMs.text != "" then iniArrMyScripts[id].msName = edtRenameMs.text
+			else iniArrMyScripts[id].msName = "<未命名脚本>"
+		)
+	)
+
+	fn fnRefreshMyScriptsUI =
+	(
+		local tempArrBtn = #(rolAddMyScripts.edtRenameMs1,rolAddMyScripts.edtRenameMs2, \
+							rolAddMyScripts.edtRenameMs3,rolAddMyScripts.edtRenameMs4)
+
+		for b = 1 to tempArrBtn.count do
+		(
+			if iniArrMyScripts[b] != undefined then
+			(
+				if iniArrMyScripts[b].msName != undefined then 
+				(
+					tempArrBtn[b].text = iniArrMyScripts[b].msName 
+				)
+				else tempArrBtn[b].text = ""
+			)
+		)
+	)
+
+	fn fnClearMyScripts = --清除脚本
+	(
+		--设置dotNet窗口元素
+		local mb = dotNetClass "System.Windows.Forms.MessageBox"
+		local buttons = dotNetClass "System.Windows.Forms.MessageBoxButtons"
+		local icons = dotNetClass "System.Windows.Forms.MessageBoxIcon"
+		local defaultButton = dotNetClass "System.Windows.Forms.MessageBoxDefaultButton"
+		local dialogResult = dotNetClass "System.Windows.Forms.DialogResult"
+
+		local result = mb.show "确定清除4个引用的脚本按钮吗 ?" "自定脚本一键清除" buttons.YesNoCancel icons.Information defaultButton.Button3
+
+		--选项按钮
+		if ( result == dialogResult.Yes ) then
+		(
+			iniArrMyScripts = #()
+			arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1,rolloutBulletKeyTools.btnMyScripts2,rolloutBulletKeyTools.btnMyScripts3,rolloutBulletKeyTools.btnMyScripts4)
+			for b = 1 to 4 do 
+			(
+				arrMyScriptTemp[b].text = "< ＋＋＋ >"
+			)
+		)
+		else if ( result == dialogResult.No ) then
+		(
+			format "NO\n"
+		)
+		else if ( result == dialogResult.Cancel ) then
+		(
+			format "CANCEL\n"
+		)
+	)
+
 	on rolAddMyScripts open do 
 	(
-		edtRenameMs1.text = if iniArrMyScripts[1] != undefined then iniArrMyScripts[1].msName else ""
-		edtRenameMs2.text = if iniArrMyScripts[2] != undefined then iniArrMyScripts[2].msName else ""
-		edtRenameMs3.text = if iniArrMyScripts[3] != undefined then iniArrMyScripts[3].msName else ""
-		edtRenameMs4.text = if iniArrMyScripts[4] != undefined then iniArrMyScripts[4].msName else ""
+		fnRefreshMyScriptsUI ()
 	)
 
 	on btnReAddMs1 pressed do 
@@ -314,13 +370,6 @@ rollout rolAddMyScripts "我的脚本" width:250 height:155
 
 	on btnDoit pressed do
 	(
-		fn fnAddMsName id edtRenameMs =
-		(
-			if iniArrMyScripts[id] != undefined then
-			(
-				iniArrMyScripts[id].msName = if edtRenameMs.text != "" then edtRenameMs.text
-			)
-		)
 		fnAddMsName 1 edtRenameMs1
 		fnAddMsName 2 edtRenameMs2
 		fnAddMsName 3 edtRenameMs3
@@ -329,11 +378,19 @@ rollout rolAddMyScripts "我的脚本" width:250 height:155
 		arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1,rolloutBulletKeyTools.btnMyScripts2,rolloutBulletKeyTools.btnMyScripts3,rolloutBulletKeyTools.btnMyScripts4)
 		for b = 1 to 4 do 
 		(
-			if ((iniArrMyScripts[b] != undefined) and (doesfileexist iniArrMyScripts[b].dir)) then 
+			if iniArrMyScripts[b] != undefined then
 			(
-				arrMyScriptTemp[b].text = iniArrMyScripts[b].msName
+				if (iniArrMyScripts[b].msName != undefined) then 
+				(
+					arrMyScriptTemp[b].text = iniArrMyScripts[b].msName
+				)
 			)
 		)
+	)
+
+	on btnClearMyScripts pressed do 
+	(
+		fnClearMyScripts ()
 	)
 )
 ---------------------滑动帧切换rollout---------------------------------
@@ -1539,9 +1596,13 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1,rolloutBulletKeyTools.btnMyScripts2,rolloutBulletKeyTools.btnMyScripts3,rolloutBulletKeyTools.btnMyScripts4)
 		for b = 1 to 4 do 
 		(
-			if ((iniArrMyScripts[b] != undefined) and (doesfileexist iniArrMyScripts[b].dir)) then 
+			if iniArrMyScripts[b] != undefined then
 			(
-				arrMyScriptTemp[b].text = iniArrMyScripts[b].msName
+				if (iniArrMyScripts[b].msName != undefined) then 
+				(
+					arrMyScriptTemp[b].text = iniArrMyScripts[b].msName
+				)
+				else arrMyScriptTemp[b].text = "<未命名脚本>"
 			)
 		)
 	)
