@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-16 16:29:46
+ * @LastEditTime: 2019-12-16 21:58:36
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -46,15 +46,15 @@ Global fnAddLinkParamsKeys
 Global keyMovedOffset = 5
 Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
-Global arrTraj          = #()  ---轨迹存放数组, 方便删除
-Global arrTempBones     = #()  ---隐藏骨骼临时存放数组
-Global arrTempBiped     = #()  ---隐藏骨骼临时存放数组
+Global arrTraj            = #()  ---轨迹存放数组, 方便删除
+Global arrTempBones       = #()  ---隐藏骨骼临时存放数组
+Global arrTempBiped       = #()  ---隐藏骨骼临时存放数组
 Global arrTempUnSelection = #()  ---隐藏未选中临时存放数组
-Global arrToolC1        = #()  ----------工具按钮数组
-Global arrToolC2        = #()  ----------工具按钮数组
-Global arrToolC3        = #()  ----------工具按钮数组
-Global arrToolC4        = #()  ----------工具按钮数组
-Global arrToolC5        = #()  ----------工具按钮数组
+Global arrToolC1          = #()  ----------工具按钮数组
+Global arrToolC2          = #()  ----------工具按钮数组
+Global arrToolC3          = #()  ----------工具按钮数组
+Global arrToolC4          = #()  ----------工具按钮数组
+Global arrToolC5          = #()  ----------工具按钮数组
 Global uiClientOffsets = undefined
 Global rolloutBulletKeyTools
 -- Global myTimer = dotnetobject "System.Timers.Timer" 500 autoreset:true
@@ -134,22 +134,39 @@ fn fnSetFps numFps =
 	slidertime += 1
 )
 
-fn judgePlaySpeedValue =
+fn fnRefFps =
 (
+	local arrMenuSetFps = #(menuSetFps.menuSet60Fps,menuSetFps.menuSet30Fps, \
+							menuSetFps.menuSet24Fps,menuSetFps.menuCustomFps)
+	for i in arrMenuSetFps do i.checked = false
 	case of
 	(
-		(timeConfiguration.playbackSpeed == 1):(valuePlaySpeed = "--1/4x--")
-		(timeConfiguration.playbackSpeed == 2):(valuePlaySpeed = "--1/2x--")
-		(timeConfiguration.playbackSpeed == 3):(valuePlaySpeed = "-- 1x --")
-		(timeConfiguration.playbackSpeed == 4):(valuePlaySpeed = "-- 2x --")
-		(timeConfiguration.playbackSpeed == 5):(valuePlaySpeed = "-- 4x --")
+		(framerate == 60):(menuSetFps.menuSet60Fps.checked = true)
+		(framerate == 30):(menuSetFps.menuSet30Fps.checked = true)
+		(framerate == 24):(menuSetFps.menuSet24Fps.checked = true)
+		default:(menuSetFps.menuCustomFps.checked = true)
+	)
+)
+
+fn fnRefPlaySpeedValue =
+(
+	local arrMenuSetSpeed = #(menuSetSpeed.menuSet14Speed,menuSetSpeed.menuSet12Speed, \
+		menuSetSpeed.menuSet1Speed,menuSetSpeed.menuSet2Speed,menuSetSpeed.menuSet4Speed)
+		for i in arrMenuSetSpeed do i.checked = false
+	case of
+	(
+		(timeConfiguration.playbackSpeed == 1):(valuePlaySpeed = "--1/4x--";menuSetSpeed.menuSet14Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 2):(valuePlaySpeed = "--1/2x--";menuSetSpeed.menuSet12Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 3):(valuePlaySpeed = "-- 1x --";menuSetSpeed.menuSet1Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 4):(valuePlaySpeed = "-- 2x --";menuSetSpeed.menuSet2Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 5):(valuePlaySpeed = "-- 4x --";menuSetSpeed.menuSet4Speed.checked =true)
 	)
 )
 
 fn fnSetSpeed numSpeed =
 (
 	timeConfiguration.playbackSpeed = numSpeed
-	judgePlaySpeedValue ()
+	fnRefPlaySpeedValue ()
 	rolloutBulletKeyTools.btnSetFpsAndSpeed.text = " |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
 )
 
@@ -164,7 +181,11 @@ rcmenu menuSetFps
 
 	on menuSetFps open do 
 	(
+		strCurrentFps = framerate as string + " FPS"
+		fnRefPlaySpeedValue ()
 		menuSetFps.menuCurrentFps.text = "当前帧率: " + framerate as string + " FPS"
+		fnRefFps ()
+		rolloutBulletKeyTools.btnSetFpsAndSpeed.text = " |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
 	)
 
 	on menuSet60Fps picked do 
@@ -201,8 +222,10 @@ rcmenu menuSetSpeed
 
 	on menuSetSpeed open do 
 	(
-		judgePlaySpeedValue ()
+		strCurrentFps = framerate as string + " FPS"
+		fnRefPlaySpeedValue ()
 		menuSetSpeed.menuCurrentSpeed.text = "当前播速: " + valuePlaySpeed
+		rolloutBulletKeyTools.btnSetFpsAndSpeed.text = " |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
 	)
 
 	on menuSet14Speed picked do 
@@ -544,7 +567,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnMoveKeys " " width:30 height:30 \
 		pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~" border:false
 		checkbutton ckbFnBoxDisplay "📦 BOX" width:42 height:23 border:false \
-		toolTip:"左:骨骼切换Box显示\r\n右:Clay显示开关" pos:[10,125]
+		toolTip:"骨骼切换Box显示" pos:[10,125]
 		checkbutton ckbFreezeMesh "❄️ 冻结模型" width:68 height:23 border:false \
 		toolTip:"冻结解冻模型" pos:[52,125]
 		button btnHideBones "⛅️ 隐藏骨骼" width:70 height:23 border:false \
@@ -612,7 +635,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnAnimMirror "🔰 动画镜像工具  " width:150 height:30   visible:false \
 		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化"
 		checkbutton ckbFnMtlDisplay "💡  白模材质切换            " width:150 height:30   visible:false \
-		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:\r\n注意：暂不支持子材质和Vray材质..."
+		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:Clay显示开关\r\n注意：暂不支持子材质和Vray材质..."
 		button btnCSTools "🚹  CS 选择工具       " width:150 height:30   visible:false \
 		toolTip:"快速选择CS骨骼\r\n右键添加或解除自启"
 		button btnCutSequence "✂️  动画片断记录    " width:150 height:30   visible:false \
@@ -1623,7 +1646,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		fnSetConfig ()  ----------------保存位置信息到ini文件
 		registerTimeCallback fnChangetRangeTime  -------------帧范围改变添加回调
 		rolloutBulletKeyTools.gbxMinTools.visible  = false
-		judgePlaySpeedValue ()  -----判断播放速度
+		fnRefPlaySpeedValue ()  -----判断播放速度
 		rolloutBulletKeyTools.btnSetFpsAndSpeed.text = " |  " + strCurrentFps + "  | " + valuePlaySpeed + " |"
 		fnRefreshMagicBtn ()
 		fnSwitchToolsBtn idBtn
@@ -1807,10 +1830,18 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 
 	on btnBipedTraj rightclick do
 	(
-		delLayer = LayerManager.getLayerFromName "Biped_Trajectories"
-		delLayer.lock = off
-		delete (LayerManager.getLayerObject "Biped_Trajectories")
-		LayerManager.deleteLayerByName "Biped_Trajectories"
+		delLayerObj = #()
+
+		delLayer    = LayerManager.getLayerFromName "Biped_Trajectories"
+		layerRT     = delLayer.layerAsRefTarg
+		delLayerObj = refs.dependents layerRT
+		if delLayer != undefined then
+		(
+			delLayer.lock = off
+			for i in delLayerObj where ((delLayerObj.count != 0) and (classof i == point)) do delete i
+			LayerManager.deleteLayerByName "Biped_Trajectories"
+			delLayerObj = #()
+		)
 	)
 
 	-- on btnBipedTraj rightclick do
@@ -2232,12 +2263,6 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 			)
 		)
 	)
-	on ckbFnBoxDisplay rightclick do 
-	(
-		local disp = NitrousGraphicsManager.GetActiveViewportSetting() 
-		if disp.VisualStyleMode == #clay then disp.VisualStyleMode = #Realistic
-		else disp.VisualStyleMode =  #clay
-	)
 	
 	on ckbFnMtlDisplay changed state do 
 	(
@@ -2253,10 +2278,12 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 	)
 
-	-- on ckbFnMtlDisplay rightclick do 
-	-- (
-		
-	-- )
+	on ckbFnMtlDisplay rightclick do 
+		(
+			local disp = NitrousGraphicsManager.GetActiveViewportSetting() 
+			if disp.VisualStyleMode == #clay then disp.VisualStyleMode = #Realistic
+			else disp.VisualStyleMode =  #clay
+		)
 
 	on btnMopherSlider pressed do 
 	(
@@ -2342,12 +2369,15 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 
 	on btnHideUnSel pressed do 
 	(
-		arrTempAllObj = for o in objects where o.isHidden == false collect o
+		arrTemp = objects as array
+		arrTempAllObj = for o in arrTemp where o.isHidden == false collect o
 		numTempCurrentSel = selection.count
 		if arrTempAllObj.count > numTempCurrentSel then
 		(
-			arrTempSelObj = if selection.count != 0 then selection as array else #()
-			if arrTempUnSelection.count != 0 then arrTempUnSelection = #()
+			if numTempCurrentSel != 0 then 
+			(
+				arrTempSelObj = selection as array
+			)
 			for i in arrTempSelObj where (arrTempSelObj.count != 0) do
 			(
 				num = finditem arrTempAllObj i
