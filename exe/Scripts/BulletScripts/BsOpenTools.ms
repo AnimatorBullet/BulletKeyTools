@@ -1,11 +1,11 @@
 /*
- * @Description: 快速打开max文件，并保存常用目录
- * @Author: Bullet.S
- * @Date: 2019-11-23 01:41:13
+* @Description: 快速打开max文件，并保存常用目录
+* @Author: Bullet.S
+* @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-16 11:36:34
- * @Email: animator.bullet@foxmail.com
- */
+ * @LastEditTime: 2019-12-16 16:31:21
+* @Email: animator.bullet@foxmail.com
+*/
 
 
 try(destroydialog rolBsOpenTools)catch()
@@ -13,6 +13,7 @@ try(destroydialog rolAddItem)catch()
 
 struct itemsFolder (name,dir)
 
+Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPosOpenTools
 Global iniWidthOpenTools  = 300
 Global iniDesktop         = (itemsFolder name:"Desktop" dir:"")
@@ -153,10 +154,10 @@ rollout rolAddItem "添加" width:320 height:130
 	)
 )
 
-rollout rolBsOpenTools "" width:300 height:370
+rollout rolBsOpenTools "" width:300 height:345
 (
-	groupbox grpMain " 时光机_v0.1 --- 此处拖动,中键关闭,右击上层目录 " \
-	width:290 height:365 pos:[5,0]
+	groupbox grpMain " 时光机_v0.2 --- 此处拖动,中键关闭,右击上层目录 " \
+	width:290 height:340 pos:[5,0]
 	editText edtBrowseFolder "" text:"" labelOnTop:true align:#right \
 	height:20 fieldWidth:220 pos:[70,20] readOnly:true 
 	button btnOpenAddress "..." align:#right tooltip:"左：选择打开目录\r\n右：打开右侧目录文件夹" \
@@ -172,33 +173,33 @@ rollout rolBsOpenTools "" width:300 height:370
 	dropdownlist ddlLikedFolder "" align:#left selection:1 \
 	height:15 width:70 pos:[10,70]
 	listBox ltbFilesList "" align:#right selection:0 \
-	height:20 width:205 pos:[85,70]
+	height:18 width:205 pos:[85,70]
 	button btnFilterPrefix "✚过滤词缀✚" border:false \
-	height:20 width:70 pos:[10,95] tooltip:"左：添加过滤\r\n右：取消过滤\r\n选中过滤列表\r\n右击删除条目"
+	height:23 width:70 pos:[10,95] tooltip:"左：添加过滤\r\n右：取消过滤\r\n选中过滤列表\r\n右击删除条目"
 	listBox ltbFilterPrefix "" align:#left selection:0 \
-	height:6 width:70 pos:[10,117]
+	height:6 width:70 pos:[10,120]
 	radioButtons rdoFileType "" columns:4 offsets:#([7,0],[7,0],[7,0],[7,0]) \
 	pos:[82,48] labels:#(".max",".fbx",".bip",".ms") 
-	button btnCountTips "" border:false enabled:false \
-	height:20 width:70 pos:[10,339]
 
 	button btnRecentFileDir "~念念不忘~" border:false \
-	height:25 width:70 pos:[10,206] tooltip:"最近打开文件"
+	height:25 width:70 pos:[10,208] tooltip:"最近打开文件"
 	button btnDesktopDir "• 希望之地 •" border:false \
-	height:25 width:70 pos:[10,232] tooltip:"自定文件夹，默认桌面，右键可设"
+	height:25 width:70 pos:[10,234] tooltip:"自定文件夹，默认桌面，右键可设"
 	button btnAutobackDir "×崩坏神域×" border:false \
-	height:25 width:70 pos:[10,258] tooltip:"自动保存目录"
+	height:25 width:70 pos:[10,260] tooltip:"自动保存目录"
 	button btnScriptsDir "★逆商科技★" border:false \
-	height:25 width:70 pos:[10,284] tooltip:"脚本文件夹\r\n左：根目录\r\n右：自启目录"
-	button btnPreviewDir "<轮回梦境>" border:false \
-	height:25 width:70 pos:[10,310] tooltip:"左：预览视频默认文件夹\r\n右：快速拍屏渲染预览动画"
+	height:25 width:70 pos:[10,286] tooltip:"脚本文件夹\r\n左：根目录\r\n右：自启目录"
+	-- button btnPreviewDir "<轮回梦境>" border:false \
+	-- height:25 width:70 pos:[10,310] tooltip:"左：预览视频默认文件夹\r\n右：快速拍屏渲染预览动画"
+	button btnCountTips "" border:false enabled:false \
+	height:20 width:70 pos:[10,312]
 	HyperLink lnkLink ""
 	color:(color 255 20 100) hovercolor:(color 255 0 255) visitedcolor:(color 255 20 100) \
-	pos:[390,343] address:"https://space.bilibili.com/2031113"
-	checkbutton ckbLockWidth "" pos:[88,339] width:16 height:20 border:false \
+	pos:[390,316] address:"https://space.bilibili.com/2031113"
+	checkbutton ckbLockWidth "🔒" pos:[86,312] width:20 height:20 border:false \
 	toolTip:"是否解锁宽度调节\r\n右：重置宽度" checked:false
-	slider sldSetWidth pos:[111,337] range:[300,500,iniWidthOpenTools] ticks:0 \
-	width:184 type:#integer toolTip:"调节面板宽度,以显示更多字" enabled:false
+	slider sldSetWidth "" pos:[113,312] range:[300,500,iniWidthOpenTools] ticks:0 \
+	width:182 type:#integer toolTip:"调节面板宽度,以显示更多字" enabled:false
 	-- label labLogo "-------------------------  TECH OTAKUS SAVE THE WORLD -" pos:[12,365]
 	------------------------------------------------- ↑ UI -------------------------------------
 	
@@ -226,9 +227,9 @@ rollout rolBsOpenTools "" width:300 height:370
 		b = bBase + bDigits
 	
 		case of (
-			(a == b): 0
-			(a < b): -1
-			(a > b): 1
+		(a == b): 0
+		(a < b): -1
+		(a > b): 1
 		)
 	)
 -------------------------------------↑ 文件排序方法 --------------------------------------------------
@@ -256,7 +257,7 @@ rollout rolBsOpenTools "" width:300 height:370
 		(
 			for c in arrRecentFiles do  --获取文件夹名字,后面切换脚本类别和列表会用到
 			(
-				append arrRecentFilesName ("○ " + (getFilenameFile (substring c 1 (c.count-1))))
+				append arrRecentFilesName ("📄 " + (getFilenameFile (substring c 1 (c.count-1))))
 			)
 		)
 	)
@@ -306,14 +307,14 @@ rollout rolBsOpenTools "" width:300 height:370
 			(
 				for c in arrFolders do  --获取文件夹名字,后面切换脚本类别和列表会用到
 				(
-					append arrFoldersName ("○ " + (getFilenameFile c))
+					append arrFoldersName ("📂 " + (getFilenameFile c))
 				)
 			)
 			if arrFiles[1] != undefined then
 			(
 				for c in arrFiles do  --获取文件名字,后面切换脚本类别和列表会用到
 				(
-					append arrFilesName ("● " + (getFilenameFile c) + type)
+					append arrFilesName ("📄 " + (getFilenameFile c) + type)
 				)
 			)
 			rolBsOpenTools.ltbFilesList.items = arrFoldersName + arrFilesName
@@ -502,7 +503,7 @@ rollout rolBsOpenTools "" width:300 height:370
 	(
 		if (doesDirectoryExist edtBrowseFolder.text) then
 		(
-			shellLaunch "explorer.exe" edtBrowseFolder.text
+			shellLaunch edtBrowseFolder.text ""
 		)
 	)
 
@@ -687,19 +688,19 @@ rollout rolBsOpenTools "" width:300 height:370
 		fnRefreshList (getdir #startupScripts) type:".ms*"
 	)
 
-	on btnPreviewDir pressed do 
-	(
-		fnRefreshList (getdir #preview) type:".avi"
-	)
+	-- on btnPreviewDir pressed do 
+	-- (
+	-- 	fnRefreshList (getdir #preview) type:".avi"
+	-- )
 
-	on btnPreviewDir rightclick do 
-	(
-		createPreview percentSize:100 \
-		dspGeometry:true dspShapes:false dspLights:false \
-		dspCameras:false dspHelpers:false dspParticles:true dspBones:false \
-		dspGrid:true dspSafeFrame:false dspFrameNums:false dspBkg:true \
-		rndLevel:#smoothhighlights
-	)
+	-- on btnPreviewDir rightclick do 
+	-- (
+	-- 	createPreview percentSize:100 \
+	-- 	dspGeometry:true dspShapes:false dspLights:false \
+	-- 	dspCameras:false dspHelpers:false dspParticles:true dspBones:false \
+	-- 	dspGrid:true dspSafeFrame:false dspFrameNums:false dspBkg:true \
+	-- 	rndLevel:#smoothhighlights
+	-- )
 
 	on btnRecentFileDir pressed do 
 	(
@@ -708,9 +709,9 @@ rollout rolBsOpenTools "" width:300 height:370
 		(
 			if doesFileExist i then
 			(
-				append arrRecentFilesName ("● " + (getFilenameFile i) + ".max")
+				append arrRecentFilesName ("📄 " + (getFilenameFile i) + ".max")
 			)
-			else append arrRecentFilesName ("● (疑丢失) " + (getFilenameFile i) + ".max")
+			else append arrRecentFilesName ("📄 (疑丢失) " + (getFilenameFile i) + ".max")
 		)
 		rdoFileType.state  = 1
 		ltbFilesList.items = arrRecentFilesName
