@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-16 21:58:36
+ * @LastEditTime: 2019-12-17 15:02:33
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -57,6 +57,8 @@ Global arrToolC4          = #()  ----------工具按钮数组
 Global arrToolC5          = #()  ----------工具按钮数组
 Global uiClientOffsets = undefined
 Global rolloutBulletKeyTools
+Global menuSetFps
+Global menuSetSpeed
 -- Global myTimer = dotnetobject "System.Timers.Timer" 500 autoreset:true
 ------------------全局变量-------------------------------------------------------------------
 
@@ -1833,10 +1835,11 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		delLayerObj = #()
 
 		delLayer    = LayerManager.getLayerFromName "Biped_Trajectories"
-		layerRT     = delLayer.layerAsRefTarg
-		delLayerObj = refs.dependents layerRT
+		
 		if delLayer != undefined then
 		(
+			layerRT = delLayer.layerAsRefTarg
+			delLayerObj = refs.dependents layerRT
 			delLayer.lock = off
 			for i in delLayerObj where ((delLayerObj.count != 0) and (classof i == point)) do delete i
 			LayerManager.deleteLayerByName "Biped_Trajectories"
