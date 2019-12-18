@@ -2,8 +2,8 @@
 * @Description: 关键帧小工具,逐渐丰富中
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
- * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-17 15:02:33
+ * @LastEditors  : Bullet.S
+ * @LastEditTime : 2019-12-19 00:36:53
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -2411,6 +2411,17 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	on btnQuickPrev rightclick do 
 	(
 		shellLaunch (getdir #preview) ""
+	)
+
+	on btnSelByColor pressed do
+	(
+		for i in selection as array where (i.ishidden == false) do
+		(
+			for o in objects as array where (i.ishidden == false) do
+			(
+				if o.wirecolor == i.wirecolor then selectmore o
+			)
+		)
 	)
 )
 Createdialog rolloutBulletKeyTools fgcolor:(color 255 20 100) pos:iniPos style:#()

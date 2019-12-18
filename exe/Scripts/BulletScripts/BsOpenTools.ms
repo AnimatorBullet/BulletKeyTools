@@ -2,8 +2,8 @@
 * @Description: 快速打开max文件，并保存常用目录
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
- * @LastEditors: Bullet.S
- * @LastEditTime: 2019-12-16 16:31:21
+ * @LastEditors  : Bullet.S
+ * @LastEditTime : 2019-12-19 00:16:39
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -273,7 +273,6 @@ rollout rolBsOpenTools "" width:300 height:345
 				strLastFolder = strLastFolder  + arrFilterStr[i] + "\\"
 			)
 		)
-		return strLastFolder
 	)
 	\
 	fn fnRefreshList strFilesDir type:".max" =
@@ -282,61 +281,65 @@ rollout rolBsOpenTools "" width:300 height:345
 		arrFiles = #()
 		arrFoldersName = #()
 		arrFilesName = #()
-		if ((strFilesDir != "") and (doesDirectoryExist strFilesDir)) then
+		if strFilesDir != undefined then 
 		(
-			local tempDir = GetDirectories (strFilesDir + "/*")
-			for i in tempDir do 
+			if ((strFilesDir != "") and (doesDirectoryExist strFilesDir)) then
 			(
-				append arrFolders (substring i 1 (i.count-1))
-			)
-			qsort arrFolders fnPseudoNaturalSort
-			arrFilesBeforeFilter = getFiles (strFilesDir + "\\*" + type)
-			qsort arrFilesBeforeFilter fnPseudoNaturalSort
-			if (rolBsOpenTools.ltbFilterPrefix.selected != undefined) then
-			(
-				for i in arrFilesBeforeFilter do 
+				local tempDir = GetDirectories (strFilesDir + "/*")
+				for i in tempDir do 
 				(
-					if (matchpattern (getfilenamefile i) \
-					pattern:("*" + rolBsOpenTools.ltbFilterPrefix.selected + "*")) then 
-					(append arrFiles i)
+					append arrFolders (substring i 1 (i.count-1))
+				)
+				qsort arrFolders fnPseudoNaturalSort
+				arrFilesBeforeFilter = getFiles (strFilesDir + "\\*" + type)
+				qsort arrFilesBeforeFilter fnPseudoNaturalSort
+				if (rolBsOpenTools.ltbFilterPrefix.selected != undefined) then
+				(
+					for i in arrFilesBeforeFilter do 
+					(
+						if (matchpattern (getfilenamefile i) \
+						pattern:("*" + rolBsOpenTools.ltbFilterPrefix.selected + "*")) then 
+						(append arrFiles i)
+					)
+				)
+				else arrFiles = arrFilesBeforeFilter
+				
+				if arrFolders[1] != undefined then
+				(
+					for c in arrFolders do  --获取文件夹名字,后面切换脚本类别和列表会用到
+					(
+						append arrFoldersName ("📂 " + (getFilenameFile c))
+					)
+				)
+				if arrFiles[1] != undefined then
+				(
+					for c in arrFiles do  --获取文件名字,后面切换脚本类别和列表会用到
+					(
+						append arrFilesName ("📄 " + (getFilenameFile c) + type)
+					)
+				)
+				rolBsOpenTools.ltbFilesList.items = arrFoldersName + arrFilesName
+				rolBsOpenTools.edtBrowseFolder.text = strFilesDir
+				for i = 1 to iniLikedFolder.count do 
+				(
+					if matchPattern iniLikedFolder[i].dir pattern:strFilesDir then 
+					(
+						rolBsOpenTools.ddlLikedFolder.selection = iniLikedFolder.count + 1 - i
+						rolBsOpenTools.ddlLikedFolder.tooltip = iniLikedFolder[i].dir
+					)
 				)
 			)
-			else arrFiles = arrFilesBeforeFilter
-			
-			if arrFolders[1] != undefined then
+			else 
 			(
-				for c in arrFolders do  --获取文件夹名字,后面切换脚本类别和列表会用到
+				if ((iniSelectedID != 0) and (iniLikedFolder.count > 0)) then
 				(
-					append arrFoldersName ("📂 " + (getFilenameFile c))
-				)
-			)
-			if arrFiles[1] != undefined then
-			(
-				for c in arrFiles do  --获取文件名字,后面切换脚本类别和列表会用到
-				(
-					append arrFilesName ("📄 " + (getFilenameFile c) + type)
-				)
-			)
-			rolBsOpenTools.ltbFilesList.items = arrFoldersName + arrFilesName
-			rolBsOpenTools.edtBrowseFolder.text = strFilesDir
-			for i = 1 to iniLikedFolder.count do 
-			(
-				if matchPattern iniLikedFolder[i].dir pattern:strFilesDir then 
-				(
-					rolBsOpenTools.ddlLikedFolder.selection = iniLikedFolder.count + 1 - i
-					rolBsOpenTools.ddlLikedFolder.tooltip = iniLikedFolder[i].dir
+					rolBsOpenTools.ddlLikedFolder.selection = iniSelectedID
+					fnRefreshList iniLikedFolder[iniLikedFolder.count + 1 - iniSelectedID].dir
+					rolBsOpenTools.ddlLikedFolder.tooltip = iniLikedFolder[iniLikedFolder.count + 1 - iniSelectedID].dir
 				)
 			)
 		)
-		else 
-		(
-			if ((iniSelectedID != 0) and (iniLikedFolder.count > 0)) then
-			(
-				rolBsOpenTools.ddlLikedFolder.selection = iniSelectedID
-				fnRefreshList iniLikedFolder[iniLikedFolder.count + 1 - iniSelectedID].dir
-				rolBsOpenTools.ddlLikedFolder.tooltip = iniLikedFolder[iniLikedFolder.count + 1 - iniSelectedID].dir
-			)
-		)
+		else messagebox "-------------------------------------\r\n上级目录可能已不存在\r\n请尝试刷新\r\n"
 		btnCountTips.text = "文件：" + arrFiles.count as string
 	)
 	
