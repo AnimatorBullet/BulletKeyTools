@@ -273,6 +273,7 @@ rollout rolBsOpenTools "" width:300 height:345
 				strLastFolder = strLastFolder  + arrFilterStr[i] + "\\"
 			)
 		)
+		return strLastFolder
 	)
 	\
 	fn fnRefreshList strFilesDir type:".max" =
