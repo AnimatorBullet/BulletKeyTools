@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors  : Bullet.S
- * @LastEditTime : 2019-12-19 00:36:53
+ * @LastEditTime : 2019-12-21 13:23:05
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -540,7 +540,7 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 rollout rolloutBulletKeyTools "" width:200 height:235
 (
 	---------------------------------UI--------------------------------------
-	groupbox gbxMainUI "[ AnimBullet _ v0.8 ] ---- 中键关闭" pos:[5,5] width:190 height:195
+	groupbox gbxMainUI "[ AnimBullet _ v0.8.5 ] -- 中键关闭" pos:[5,5] width:190 height:195
 	
 		label lblRangeTimeText "| 起始帧 |      | 结束帧 |" pos:[10,25] width:180 \
 		spinner spiStartTime "" pos:[10,45] width:50 type:#integer \
@@ -1405,40 +1405,43 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 
 	fn fnCutDisplayKeyRange keyFirst keyEnd =  ---显示首尾帧范围
 	(
-		if (arrKeysTime.count != 0) then
+		if ((keyFirst != undefined) and (keyEnd != undefined)) then
 		(
-			if (arrLinkKeys.count != 0) then
+			if (arrKeysTime.count != 0) then
 			(
-				case of  ------万恶的link帧导致更多判定
+				if (arrLinkKeys.count != 0) then
 				(
-					((arrLinkKeys[1].time >= keyFirst) and (arrLinkKeys[arrLinkKeys.count].time <= keyEnd)):
-					(animationrange = (interval keyFirst keyEnd))
-					((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time <= keyEnd)):
-					(animationrange = (interval arrLinkKeys[1].time keyEnd))
-					((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time >= keyEnd)):
-					(animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time))
-					((arrLinkKeys[1].time >= keyFirst) and (arrLinkKeys[arrLinkKeys.count].time > keyEnd)):
-					(animationrange = (interval keyFirst arrLinkKeys[arrLinkKeys.count].time))
-					((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time > keyEnd)):
-					(animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time))
+					case of  ------万恶的link帧导致更多判定
+					(
+						((arrLinkKeys[1].time >= keyFirst) and (arrLinkKeys[arrLinkKeys.count].time <= keyEnd)):
+						(animationrange = (interval keyFirst keyEnd))
+						((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time <= keyEnd)):
+						(animationrange = (interval arrLinkKeys[1].time keyEnd))
+						((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time >= keyEnd)):
+						(animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time))
+						((arrLinkKeys[1].time >= keyFirst) and (arrLinkKeys[arrLinkKeys.count].time > keyEnd)):
+						(animationrange = (interval keyFirst arrLinkKeys[arrLinkKeys.count].time))
+						((arrLinkKeys[1].time < keyFirst) and (arrLinkKeys[arrLinkKeys.count].time > keyEnd)):
+						(animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time))
+					)
 				)
-			)
-			else
-			(
-				animationrange = interval keyFirst keyEnd
-			)
-		)
-		else 
-		(
-			if ((arrLinkKeys.count != 0) and (arrLinkKeys.count > 1)) then 
-			(
-				animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time)
+				else
+				(
+					animationrange = interval keyFirst keyEnd
+				)
 			)
 			else 
 			(
-				if (arrLinkKeys.count == 1) then
+				if ((arrLinkKeys.count != 0) and (arrLinkKeys.count > 1)) then 
 				(
-					animationrange = (interval arrLinkKeys[1].time (arrLinkKeys[1].time + 1))
+					animationrange = (interval arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time)
+				)
+				else 
+				(
+					if (arrLinkKeys.count == 1) then
+					(
+						animationrange = (interval arrLinkKeys[1].time (arrLinkKeys[1].time + 1))
+					)
 				)
 			)
 		)
@@ -2138,8 +2141,8 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	(
 		if switchSelKeyRange == 0 then
 		(
-			arrLastSelRange = #(animationrange.start,animationrange.end)
 			fnCollectKeys ()
+			arrLastSelRange = #(animationrange.start,animationrange.end)
 			fnCutDisplayKeyRange keySelFirst keySelEnd
 			switchSelKeyRange = 1
 		)
@@ -2154,8 +2157,8 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	(
 		if switchAllKeyRange == 0 then
 		(
-			arrLastAllRange = #(animationrange.start,animationrange.end)
 			fnCollectKeys ()
+			arrLastAllRange = #(animationrange.start,animationrange.end)
 			fnCutDisplayKeyRange keyFirst keyEnd
 			switchAllKeyRange = 1
 		)
