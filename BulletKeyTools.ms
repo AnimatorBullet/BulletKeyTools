@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors  : Bullet.S
- * @LastEditTime : 2019-12-21 13:23:05
+ * @LastEditTime : 2019-12-21 14:15:48
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -636,7 +636,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		toolTip:"目前引用吇鱼大佬的插件\r\n后面随缘新写或优化"
 		button btnAnimMirror "🔰 动画镜像工具  " width:150 height:30   visible:false \
 		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化"
-		checkbutton ckbFnMtlDisplay "💡  白模材质切换            " width:150 height:30   visible:false \
+		checkbutton ckbFnMtlDisplay "💡  白模 | 红模材质切换 " width:150 height:30   visible:false \
 		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:Clay显示开关\r\n注意：暂不支持子材质和Vray材质..."
 		button btnCSTools "🚹  CS 选择工具       " width:150 height:30   visible:false \
 		toolTip:"快速选择CS骨骼\r\n右键添加或解除自启"
