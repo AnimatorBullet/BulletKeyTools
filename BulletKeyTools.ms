@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors  : Bullet.S
- * @LastEditTime : 2019-12-21 14:15:48
+ * @LastEditTime : 2019-12-23 11:35:31
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -574,12 +574,12 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		toolTip:"冻结解冻模型" pos:[52,125]
 		button btnHideBones "⛅️ 隐藏骨骼" width:70 height:23 border:false \
 		toolTip:"左：隐藏 bone\r\n右：隐藏 biped" pos:[120,125]
-		button btnFileOpen "🎞 美好时光 " pos:[10,149] width:70 height:23 \
+		button btnFileOpen "🎞 快速打开 " pos:[10,149] width:70 height:23 \
 		tooltip:"快速打开max文件\r\n可收藏常用目录" border:false
 		button btnCutFrameDisplay "🎹 帧预览" pos:[80,149] width:60 height:23 \
 		tooltip:"左：预览选择帧范围\r\n右：预览全部帧范围\r\n再点回到上次帧范围\r\n别晃晕了。╮(￣▽￣)╭" border:false
 		button btnSpringMagic "💎 飘带" pos:[140,149] width:50 height:23 \
-		tooltip:"左点新版,右点旧版\r\n不久可能会有强化版~" border:false
+		tooltip:"左点新版,右点旧版" border:false
 		button btnQuickSave "💣 备份|另存" pos:[10,173] width:70 height:23 \
 		toolTip:"左：快速备份\r\n右：另存文件" border:false
 		button btnSetFpsAndSpeed " " pos:[80,173] width:110 height:23 \
@@ -612,8 +612,8 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		tooltip:"Bone骨骼过滤欧拉旋转"
 		button btnBoneTool " 🗝  BoneOn 开关切换" width:150 height:30   visible:false \
 		tooltip:"骨骼BoneOn切换"
-		button btnNiceSet "⚙️  系统易用设置     " width:150 height:30   visible:false \
-		tooltip:"改K帧键，自动备份等设置"
+		button btnNull1 "🔔待添加" width:150 height:30   visible:false \
+		tooltip:""
 		-- button btnClearSelKeys "▲ 取消选择帧" width:150 height:30   visible:false \
 		-- tooltip:"取消关键帧选择 (非删除帧)"
 		button btnDelOutKeys " ✖️ 删选中 | 所有帧" width:150 height:30   visible:false \
@@ -642,12 +642,12 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		toolTip:"快速选择CS骨骼\r\n右键添加或解除自启"
 		button btnCutSequence "✂️  动画片断记录    " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
-		button btnPoseTool "🚻  Pose 库存取    " width:150 height:30   visible:false \
+		button btnPoseTool "🚻   Pose 库存取       " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
 		button btnMopherSlider "😍  表情滑条             " width:150 height:30   visible:false \
 		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~"
-		button btnImportOut "🔔  批量导入导出     " width:150 height:30   visible:false \
-		toolTip:"功能待添加"
+		button btnNull2 "🔔待添加" width:150 height:30   visible:false \
+		toolTip:"CS缩放添加清除（项目慎用）"
 	
 	-- groupbox gbxMyScripts "" pos:[5,230] width:335 height:45
 
@@ -728,7 +728,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 						rolloutBulletKeyTools.btnCopyKeyTools,\
 						rolloutBulletKeyTools.btnAnimMirror,\
 						rolloutBulletKeyTools.btnFnKeyType,\
-						rolloutBulletKeyTools.btnPoseTool)
+						rolloutBulletKeyTools.btnNull1)
 		arrToolC2 = #(rolloutBulletKeyTools.btnBoneTraj,\
 						rolloutBulletKeyTools.btnBipedTraj,\
 						rolloutBulletKeyTools.btnHideUnSel,\
@@ -740,12 +740,12 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 						rolloutBulletKeyTools.btnCutSequence,\
 						rolloutBulletKeyTools.btnMopherSlider,\
 						rolloutBulletKeyTools.btnCSTools,\
-						rolloutBulletKeyTools.btnNiceSet)
+						rolloutBulletKeyTools.btnPoseTool)
 		arrToolC4 = #(rolloutBulletKeyTools.btnFnTCB,\
 						rolloutBulletKeyTools.btnEulerFilter,\
 						rolloutBulletKeyTools.btnEndBone,\
 						rolloutBulletKeyTools.btnCleanOutKeys,\
-						rolloutBulletKeyTools.btnImportOut,\
+						rolloutBulletKeyTools.btnNull2,\
 						rolloutBulletKeyTools.btnBoneTool)
 		-- arrToolC5 = #(rolloutBulletKeyTools.btnPoseTool,\
 		-- 				rolloutBulletKeyTools.btnMopherSlider,\
