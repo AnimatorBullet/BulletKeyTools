@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors  : Bullet.S
- * @LastEditTime : 2019-12-23 11:19:19
+ * @LastEditTime : 2019-12-27 13:43:00
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -47,8 +47,6 @@ Global keyMovedOffset = 5
 Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
 Global arrTraj            = #()  ---轨迹存放数组, 方便删除
-Global arrTempBones       = #()  ---隐藏骨骼临时存放数组
-Global arrTempBiped       = #()  ---隐藏骨骼临时存放数组
 Global arrTempUnSelection = #()  ---隐藏未选中临时存放数组
 Global arrToolC1          = #()  ----------工具按钮数组
 Global arrToolC2          = #()  ----------工具按钮数组
@@ -252,6 +250,7 @@ rcmenu menuSetSpeed
 	)
 )
 ------------------帧率,播放速度------------------------------------------------------------
+
 rollout rolAddMyScripts "我的脚本" width:250 height:190
 (
 	label lblRename "↓请输入重命名↓" pos:[20,5]
@@ -572,8 +571,8 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		toolTip:"骨骼切换Box显示" pos:[10,125]
 		checkbutton ckbFreezeMesh "❄️ 冻结模型" width:68 height:23 border:false \
 		toolTip:"冻结解冻模型" pos:[52,125]
-		button btnHideBones "⛅️ 隐藏骨骼" width:70 height:23 border:false \
-		toolTip:"左：隐藏 bone\r\n右：隐藏 biped" pos:[120,125]
+		checkbutton ckbHideButton "⛅️ 隐藏骨骼" width:70 height:23 border:false \
+		toolTip:"左：隐藏 bone\r\n右：隐藏所有骨骼" pos:[120,125]
 		button btnFileOpen "🎞 快速打开 " pos:[10,149] width:70 height:23 \
 		tooltip:"快速打开max文件\r\n可收藏常用目录" border:false
 		button btnCutFrameDisplay "🎹 帧预览" pos:[80,149] width:60 height:23 \
@@ -613,7 +612,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnBoneTool " 🗝  BoneOn 开关切换" width:150 height:30   visible:false \
 		tooltip:"骨骼BoneOn切换"
 		button btnNull1 "🔔待添加" width:150 height:30   visible:false \
-		tooltip:"改K帧键，自动备份等设置"
+		tooltip:""
 		-- button btnClearSelKeys "▲ 取消选择帧" width:150 height:30   visible:false \
 		-- tooltip:"取消关键帧选择 (非删除帧)"
 		button btnDelOutKeys " ✖️ 删选中 | 所有帧" width:150 height:30   visible:false \
@@ -647,7 +646,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		button btnMopherSlider "😍  表情滑条             " width:150 height:30   visible:false \
 		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~"
 		button btnNull2 "🔔待添加" width:150 height:30   visible:false \
-		toolTip:"功能待添加"
+		toolTip:"CS缩放添加清除（项目慎用）"
 	
 	-- groupbox gbxMyScripts "" pos:[5,230] width:335 height:45
 
@@ -1548,58 +1547,6 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	-- 	)
 	-- )
 
-	fn fnHidebyCategory cate:BoneGeometry =
-	(
-		if cate == BoneGeometry then
-		(
-			if switchHideBones == 0 then
-			(
-				for o in objects where ((classof o == BoneGeometry) and (o.isHidden == false)) do
-				(
-					append arrTempBones o
-				)
-				for b in arrTempBones do
-				(
-					b.isHidden = true
-				)
-				switchHideBones = 1
-			)
-			else if switchHideBones == 1 then
-			(
-				for b in arrTempBones do
-				(
-					b.isHidden = false
-				)
-				arrTempBones = #()
-				switchHideBones = 0
-			)
-		)
-		else
-		(
-			if switchHideBiped == 0 then 
-			(
-				for o in objects where ((classof o == Biped_Object) and (o.isHidden == false)) do
-				(
-					append arrTempBiped o
-				)
-				for b in arrTempBiped do
-				(
-					b.isHidden = true
-				)
-				switchHideBiped = 1
-			)
-			else if switchHideBiped == 1 then 
-			(
-				for b in arrTempBiped do
-				(
-					b.isHidden = false
-				)
-				arrTempBiped = #()
-				switchHideBiped = 0
-			)
-		)
-	)
-
 	fn fnAddMyScript btnMyScript idMyScript =
 	(
 		dirScript = getOpenFileName caption:"请选择添加的Max脚本:" historyCategory:"myScripts" \
@@ -2075,27 +2022,40 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 	)
 
-	on btnHideBones pressed do
+	on ckbHideButton changed state do
 	(
--- 		if hideByCategory.bones == false then 
--- 		(
--- 			hideByCategory.bones = true
--- 			btnHideBones.text = "☀ 显示骨骼"
--- 		)
--- 		else 
--- 		(
--- 			hideByCategory.bones = false
--- 			btnHideBones.text = "☁ 隐藏骨骼"
--- 		)
--- 		redrawviews()
--- 		slidertime -= 1
--- 		slidertime += 1
-		fnHidebyCategory cate:BoneGeometry
+		if state == false then
+		(
+			for o in objects as array where (classof o == BoneGeometry) do o.isHidden = false
+			rolloutBulletKeyTools.ckbHideButton.text = "⛅️ 隐藏骨骼"
+		)
+		else
+		(
+			for o in objects as array where (classof o == BoneGeometry) do o.isHidden = true
+			rolloutBulletKeyTools.ckbHideButton.text = "💫 显示骨骼"
+		)
 	)
 	
-	on btnHideBones rightclick do
+	on ckbHideButton rightclick do
 	(
-		fnHidebyCategory cate:Biped_Object
+		if hideByCategory.bones == true then 
+		(
+			hideByCategory.bones = false
+		)
+		else
+		(
+			hideByCategory.bones = true
+		)
+		if hideByCategory.spacewarps == true then 
+		(
+			hideByCategory.spacewarps = false
+			hideByCategory.spacewarps = true
+		)
+		else 
+		(
+			hideByCategory.spacewarps = true
+			hideByCategory.spacewarps = false
+		)
 	)
 
 	on ckbFreezeMesh changed state do 
@@ -2285,11 +2245,11 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	)
 
 	on ckbFnMtlDisplay rightclick do 
-		(
-			local disp = NitrousGraphicsManager.GetActiveViewportSetting() 
-			if disp.VisualStyleMode == #clay then disp.VisualStyleMode = #Realistic
-			else disp.VisualStyleMode =  #clay
-		)
+	(
+		local disp = NitrousGraphicsManager.GetActiveViewportSetting() 
+		if disp.VisualStyleMode == #clay then disp.VisualStyleMode = #Realistic
+		else disp.VisualStyleMode =  #clay
+	)
 
 	on btnMopherSlider pressed do 
 	(
