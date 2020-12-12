@@ -2,8 +2,8 @@
 * @Description: 关键帧小工具,逐渐丰富中
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
- * @LastEditors  : Bullet.S
- * @LastEditTime : 2019-12-27 13:43:00
+ * @LastEditors: Bullet.S
+ * @LastEditTime: 2020-12-13 03:06:58
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -15,24 +15,25 @@ struct myScript (id,msName,dir)
 
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPos  	--位置保存记录
-Global iniHelpBtn        = off--记录是否打开帮助模式
-Global iniArrMyScripts   = #()
-Global idBtn             = 1
-Global posMouX           = mouse.screenpos.x
-Global posMouY           = mouse.screenpos.y  --获取鼠标位置
-Global posMouMoved       = [0,0]
-Global posToolBtn        = [205,45]
-Global switchMouseState  = false
-Global switchSelKeyRange = 0
-Global switchHideBones   = 0
-Global switchHideBiped   = 0
-Global switchToolPanel   = 0
-Global arrLastSelRange   = #()
-Global switchAllKeyRange = 0
-Global arrLastAllRange   = #()
-Global arrKeysTime       = #()  ----------biped和bone的首尾帧
-Global arrLinkKeys       = #()  -----------存link帧
-Global arrKeysSelected   = #()  -----------存选中的帧
+Global iniHelpBtn         = off--记录是否打开帮助模式
+Global iniArrMyScripts    = #()
+Global idBtn              = 1
+Global posMouX            = mouse.screenpos.x
+Global posMouY            = mouse.screenpos.y  --获取鼠标位置
+Global posMouMoved        = [0,0]
+Global posToolBtn         = [205,45]
+Global switchMouseState   = false
+Global switchSelKeyRange  = 0
+Global switchHideBones    = 0
+Global switchHideBiped    = 0
+Global switchToolPanel    = 0
+Global arrLastSelRange    = #()
+Global switchAllKeyRange  = 0
+Global arrLastAllRange    = #()
+Global arrKeysTime        = #()  -----------biped和bone的首尾帧
+Global arrLinkKeys        = #()  -----------存link帧
+Global arrKeysSelected    = #()  -----------存选中的帧
+global arrBlockingKeys    = #()  -----------选中或者所有物体的所有关键帧
 Global keyFirst
 Global keyEnd
 Global keySelFirst
@@ -53,7 +54,7 @@ Global arrToolC2          = #()  ----------工具按钮数组
 Global arrToolC3          = #()  ----------工具按钮数组
 Global arrToolC4          = #()  ----------工具按钮数组
 Global arrToolC5          = #()  ----------工具按钮数组
-Global uiClientOffsets = undefined
+Global uiClientOffsets    = undefined
 Global rolloutBulletKeyTools
 Global menuSetFps
 Global menuSetSpeed
@@ -539,113 +540,119 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 rollout rolloutBulletKeyTools "" width:200 height:235
 (
 	---------------------------------UI--------------------------------------
-	groupbox gbxMainUI "[ AnimBullet _ v0.8.5 ] -- 中键关闭" pos:[5,5] width:190 height:195
+	groupbox gbxMainUI "[ BsKeyTools v0.9.0 ] - 中键关闭" pos:[5,5] width:190 height:197
 	
-		label lblRangeTimeText "| 起始帧 |      | 结束帧 |" pos:[10,25] width:180 \
+		label lblRangeTimeText "| 起始帧 |      | 结束帧 |" pos:[10,25] width:180
 		spinner spiStartTime "" pos:[10,45] width:50 type:#integer \
 		range:[-999999999,999999999,animationrange.start] scale:1
-		label lblTo "▃"  pos:[65,41] tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" \
+		label lblTo "--"  pos:[65,45] tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" \
 		width:20 height:20
 		spinner spiEndTime "" pos:[80,45] width:50 type:#integer \
 		range:[-999999999,999999999,animationrange.end] scale:1
-		-- checkbutton ckbHelpBtn "？觉醒" pos:[135,23] width:55 height:20 border:false \
+		-- checkbutton ckbHelpBtn "？觉醒" pos:[135,23] width:55 height:20   \
 		-- tooltip:"打开帮助模式！"
-		button btnMagicBtn "✧(≖ ◡ ≖" pos:[135,26] width:55 height:35 border:false \
-		tooltip:"点我点我点我~良心小工具"
-		edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
-		pos:[10,70] labelOnTop:false text:"5f" bold:true readOnly:false 
-		button btnSet5 "5f" width:35 pos:[90,67]
-		button btnSetAdd "+5f" width:35 pos:[125,67]
-		button btnSetOpposite "负" width:30 pos:[160,67]
-		checkBox btnJudgeLinkKey "Link?" \
-		pos:[18,102] tooltip:"是否存在Link帧?" checked:false 
-		button btnSelBeforeKeys " " \
-		pos:[70,93] width:30 height:30 toolTip:"选择滑条前面关键帧" border:false
-		button btnSelAllKeys " " \
-		pos:[100,93] width:30 height:30 toolTip:"选择所有关键帧" border:false
-		button btnSelAfterKeys " " \
-		pos:[130,93] width:30 height:30 toolTip:"选择滑条后面关键帧" border:false
-		button btnMoveKeys " " width:30 height:30 \
-		pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~" border:false
-		checkbutton ckbFnBoxDisplay "📦 BOX" width:42 height:23 border:false \
-		toolTip:"骨骼切换Box显示" pos:[10,125]
-		checkbutton ckbFreezeMesh "❄️ 冻结模型" width:68 height:23 border:false \
-		toolTip:"冻结解冻模型" pos:[52,125]
-		checkbutton ckbHideButton "⛅️ 隐藏骨骼" width:70 height:23 border:false \
-		toolTip:"左：隐藏 bone\r\n右：隐藏所有骨骼" pos:[120,125]
-		button btnFileOpen "🎞 快速打开 " pos:[10,149] width:70 height:23 \
-		tooltip:"快速打开max文件\r\n可收藏常用目录" border:false
-		button btnCutFrameDisplay "🎹 帧预览" pos:[80,149] width:60 height:23 \
-		tooltip:"左：预览选择帧范围\r\n右：预览全部帧范围\r\n再点回到上次帧范围\r\n别晃晕了。╮(￣▽￣)╭" border:false
-		button btnSpringMagic "💎 飘带" pos:[140,149] width:50 height:23 \
-		tooltip:"左点新版,右点旧版" border:false
-		button btnQuickSave "💣 备份|另存" pos:[10,173] width:70 height:23 \
-		toolTip:"左：快速备份\r\n右：另存文件" border:false
-		button btnSetFpsAndSpeed " " pos:[80,173] width:110 height:23 \
-		toolTip:"左：设置帧率\r\n右：播放速度" border:false
+		button btnMagicBtn "✧(≖ ◡ ≖" pos:[135,26] width:55 height:35   \
+		tooltip:"点我点我点我~良心小工具" border:false
+		-- edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
+		-- pos:[10,70] labelOnTop:false text:"5f" bold:true readOnly:false 
+		-- button btnSet5 "5f" width:35 pos:[90,67]
+		-- button btnSetAdd "+5f" width:35 pos:[125,67]
+		-- button btnSetOpposite "负" width:30 pos:[160,67]
+		checkbutton btnJudgeLinkKey "有 Link ?" \
+		pos:[10,65] tooltip:"是否存在Link帧?" width:55 height:30 checked:false  
+		button btnSelBeforeKeys "左帧" \
+		pos:[65,65] width:40 height:30 toolTip:"选择滑条前面关键帧"  
+		button btnSelAllKeys "全部帧" \
+		pos:[105,65] width:45 height:30 toolTip:"选择所有关键帧"  
+		button btnSelAfterKeys "右帧" \
+		pos:[150,65] width:40 height:30 toolTip:"选择滑条后面关键帧"  
+		-- button btnMoveKeys " " width:30 height:30 \
+		-- pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~"  
+		checkbutton ckbFnBoxDisplay "BOX 显示" width:55 height:25  \
+		toolTip:"骨骼切换Box显示" pos:[10,97]
+		checkbutton ckbFreezeMesh "冻结模型" width:65 height:25   \
+		toolTip:"冻结解冻模型" pos:[65,97]
+		checkbutton ckbHideButton "隐藏骨骼" width:60 height:25   \
+		toolTip:"左：隐藏 bone\r\n右：隐藏所有骨骼" pos:[130,97]
+		button btnFileOpen "快速打开" pos:[10,122] width:55 height:25 \
+		tooltip:"快速打开max文件\r\n可收藏常用目录"  
+		button btnCutFrameDisplay "选帧预览" pos:[65,122] width:65 height:25 \
+		tooltip:"预览选择帧\r\n再点回到上次帧范围" 
+		button btnAllFrameDisplay "全帧预览" pos:[130,122] width:60 height:25 \
+		tooltip:"预览全部帧\r\n再点回到上次帧范围" 
+		checkButton ckbPlayBlocking "Blocking" pos:[10,147] width:55 height:25 \
+		tooltip:"点击预览关键帧 Blocking 动画\r\n若有 Link 帧需要按下上面按钮" checked:false
+		timer clock "PlayClock" interval:1 active:false
+		button btnSpringMagic "SpringMagic" pos:[65,147] width:65 height:25 \
+		tooltip:"左点新版,右点旧版" 
+		button btnCSTools "CS_Tools" pos:[130,147] width:60 height:25 \
+		toolTip:"快速选择CS骨骼和调Biped等" 
+		button btnQuickSave "备份|另存" pos:[10,172] width:70 height:25 \
+		toolTip:"左：快速备份\r\n右：另存文件"  
+		button btnSetFpsAndSpeed " " pos:[80,172] width:110 height:25 \
+		toolTip:"左：设置帧率\r\n右：播放速度" 
 	
 	groupbox gbxMinTools "" pos:[200,5] width:160 height:225
 	
-		checkbutton ckbC1 "帧" width:38 height:26 \
+		checkbutton ckbC1 "坚" width:38 height:26 \
 		pos:[205,15] toolTip:""
-		checkbutton ckbC2 "显" width:37 height:26 \
+		checkbutton ckbC2 "持" width:37 height:26 \
 		pos:[243,15] toolTip:""
-		checkbutton ckbC3 "选" width:37 height:26 \
+		checkbutton ckbC3 "热" width:37 height:26 \
 		pos:[280,15] toolTip:""
-		checkbutton ckbC4 "骨" width:38 height:26 \
+		checkbutton ckbC4 "爱" width:38 height:26 \
 		pos:[317,15] toolTip:""
 		-- checkbutton ckbC5 "乱" width:30 height:25 \
 		-- pos:[325,15] toolTip:""
 
-		button btnBoneTraj "〽️ 显示 | 清除 Bone轨迹" width:150 height:30   visible:false \
+		button btnBoneTraj "显示 | 清除 Bone轨迹" width:150 height:30   visible:false \
 		toolTip:"左：切换显示Bone轨迹,\r\n右：清除所有Bone轨迹"
-		button btnBipedTraj "〰️ 单加 | 清除 Biped轨迹" width:150 height:30   visible:false \
+		button btnBipedTraj "单加 | 清除 Biped轨迹" width:150 height:30   visible:false \
 		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除添加的所有Biped轨迹~"
-		button btnFnFrame "💬  整数小数帧切换        " width:150 height:30   visible:false \
+		button btnFnFrame "整数小数帧切换        " width:150 height:30   visible:false \
 		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿"
-		button btnSelByColor "💊  以同颜色选择     " width:150 height:30   visible:false \
+		button btnSelByColor "以同颜色选择     " width:150 height:30   visible:false \
 		tooltip:"选择同颜色物体"
-		button btnFnTCB "🔄   Euler  |  TCB 互转" width:150 height:30   visible:false \
+		button btnFnTCB "Euler  |  TCB 互转" width:150 height:30   visible:false \
 		tooltip:"欧拉和TCB互转"
-		button btnEulerFilter "💢   欧拉曲线过滤    " width:150 height:30   visible:false \
+		button btnEulerFilter "欧拉曲线过滤    " width:150 height:30   visible:false \
 		tooltip:"Bone骨骼过滤欧拉旋转"
-		button btnBoneTool " 🗝  BoneOn 开关切换" width:150 height:30   visible:false \
+		button btnBoneTool "BoneOn 开关切换" width:150 height:30   visible:false \
 		tooltip:"骨骼BoneOn切换"
-		button btnNull1 "🔔待添加" width:150 height:30   visible:false \
+		button btnNull1 "待添加" width:150 height:30   visible:false \
 		tooltip:""
 		-- button btnClearSelKeys "▲ 取消选择帧" width:150 height:30   visible:false \
 		-- tooltip:"取消关键帧选择 (非删除帧)"
-		button btnDelOutKeys " ✖️ 删选中 | 所有帧" width:150 height:30   visible:false \
+		button btnDelOutKeys "删选中 | 所有帧" width:150 height:30   visible:false \
 		toolTip:"左：清除选择\r\n右：清除所有帧\r\nLink帧请手动删~"
-		button btnCleanOutKeys "🚫  清范围外关键帧 " width:150 height:30   visible:false \
+		button btnCleanOutKeys "清范围外关键帧 " width:150 height:30   visible:false \
 		toolTip:"清范围外帧(无限帧)"
-		button btnHideUnSel "✳️  隐藏当前未选中物体" width:150 height:30   visible:false \
+		button btnHideUnSel "隐藏当前未选中物体" width:150 height:30   visible:false \
 		toolTip:"隐藏当前显示的未选中物体，可再重新显示"
-		button btnSelBoneBiped "☑️  Biped | Bone 选择" width:150 height:30   visible:false \
+		button btnSelBoneBiped "Biped | Bone 选择" width:150 height:30   visible:false \
 		toolTip:"左：选择所有biped\r\n右：选择所有bone"
-		button btnEndBone "➕  清除 | 添加  末端" width:150 height:30   visible:false \
+		button btnEndBone "清除 | 添加  末端" width:150 height:30   visible:false \
 		toolTip:"清除添加Bone末端"
-		button btnQuickPrev "🎥 快速拍屏 | 打开目录 " width:150 height:30   visible:false \
+		button btnQuickPrev "快速拍屏 | 打开目录 " width:150 height:30   visible:false \
 		toolTip:"左：快速拍屏预览\r\n右：打开预览文件夹"
-		button btnFastAlign "🌏 快速对齐工具  " width:150 height:30   visible:false \
+		button btnFastAlign "快速对齐工具  " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
-		button btnFnKeyType "📍  批量改滑动帧  " width:150 height:30   visible:false \
+		button btnFnKeyType "批量改滑动帧  " width:150 height:30   visible:false \
 		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置"
-		button btnCopyKeyTools "⚡️ 暴力粘贴工具  " width:150 height:30   visible:false \
+		button btnCopyKeyTools "暴力粘贴工具  " width:150 height:30   visible:false \
 		toolTip:"目前引用吇鱼大佬的插件\r\n后面随缘新写或优化"
-		button btnAnimMirror "🔰 动画镜像工具  " width:150 height:30   visible:false \
+		button btnAnimMirror "动画镜像工具  " width:150 height:30   visible:false \
 		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化"
-		checkbutton ckbFnMtlDisplay "💡  白模 | 红模材质切换 " width:150 height:30   visible:false \
+		checkbutton ckbFnMtlDisplay "白模 | 红模材质切换 " width:150 height:30   visible:false \
 		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:Clay显示开关\r\n注意：暂不支持子材质和Vray材质..."
-		button btnCSTools "🚹  CS 选择工具       " width:150 height:30   visible:false \
-		toolTip:"快速选择CS骨骼\r\n右键添加或解除自启"
-		button btnCutSequence "✂️  动画片断记录    " width:150 height:30   visible:false \
+		
+		button btnCutSequence "动画片断记录    " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
-		button btnPoseTool "🚻   Pose 库存取       " width:150 height:30   visible:false \
+		button btnPoseTool "ose 库存取       " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
-		button btnMopherSlider "😍  表情滑条             " width:150 height:30   visible:false \
+		button btnMopherSlider "表情滑条             " width:150 height:30   visible:false \
 		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~"
-		button btnNull2 "🔔待添加" width:150 height:30   visible:false \
+		button btnNull2 "待添加" width:150 height:30   visible:false \
 		toolTip:"CS缩放添加清除（项目慎用）"
 	
 	-- groupbox gbxMyScripts "" pos:[5,230] width:335 height:45
@@ -660,11 +667,16 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	
 		HyperLink lnkLink "---  | 2019.9  miHoYo_Bullet.S |  - ？ --"
 		color:(color 255 20 100) hovercolor:(color 255 0 255) visitedcolor:(color 255 20 100) \
-		pos:[7,210] address:"https://acedocs.tk/"
+		pos:[7,210] address:"https://www.anibullet.com/post/6271.html"
 		-- label labmiHoYo "--- TECH OTAKUS SAVE THE WORLD --" \
 		-- pos:[7,210]
 
 		-- timer tick_tock interval:666 active:iniHelpBtn
+
+	local m_PBKeyTimeArray
+	local m_PBKeyMiliSecArray
+	local m_PBStartTime
+	local m_PBPointer
 ----------------------------------UI及作者ID------------------------------------------------
 	fn fnRefreshMagicBtn =
 	(
@@ -738,7 +750,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 						rolloutBulletKeyTools.btnSelBoneBiped,\
 						rolloutBulletKeyTools.btnCutSequence,\
 						rolloutBulletKeyTools.btnMopherSlider,\
-						rolloutBulletKeyTools.btnCSTools,\
+						rolloutBulletKeyTools.btnPoseTool,\
 						rolloutBulletKeyTools.btnPoseTool)
 		arrToolC4 = #(rolloutBulletKeyTools.btnFnTCB,\
 						rolloutBulletKeyTools.btnEulerFilter,\
@@ -854,7 +866,8 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 						(
 							appendIfUnique arrLinkKeys i  ---------添加link帧到数组
 							appendIfUnique arrKeysTime i.time
-							if i.selected == true then appendIfUnique arrKeysSelected i.time
+							appendIfUnique arrBlockingKeys i.time
+							if i.selected == true then (appendIfUnique arrKeysSelected i.time)
 						)
 					)
 				)
@@ -887,7 +900,10 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 									appendIfUnique arrKeysTime keyTimeEndTemp
 									for i in tempLinkController[i].keys do 
 									(
-										if i.selected == true then appendIfUnique arrKeysSelected i.time
+										appendIfUnique arrBlockingKeys i.time
+										if i.selected == true then (
+											appendIfUnique arrKeysSelected i.time
+										)
 									)
 								)
 							)
@@ -919,7 +935,10 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 					appendIfUnique arrKeysTime keyTimeEndTemp
 					for i in tempObj.controller[i].keys do 
 					(
-						if i.selected == true then appendIfUnique arrKeysSelected i.time
+						appendIfUnique arrBlockingKeys i.time
+						if i.selected == true then (
+							appendIfUnique arrKeysSelected i.time
+						)
 					)
 				)
 			)
@@ -941,7 +960,10 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 					for i in tempObj.controller.keys do 
 					(
 						appendIfUnique arrKeysTime i.time   ---添加到数组
-						if i.selected == true then appendIfUnique arrKeysSelected i.time
+						appendIfUnique arrBlockingKeys i.time
+						if i.selected == true then (
+							appendIfUnique arrKeysSelected i.time
+						)
 					)
 				)
 				subanimBipedScale = GetSubAnim tempObj.controller[1] 1
@@ -956,7 +978,10 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 						appendIfUnique arrKeysTime keyTimeEndTemp
 						for i in subanimBipedScale[1].keys do 
 						(
-							if i.selected == true then appendIfUnique arrKeysSelected i.time
+							appendIfUnique arrBlockingKeys i.time
+							if i.selected == true then (
+								appendIfUnique arrKeysSelected i.time
+							)
 						)
 					)
 				)
@@ -982,7 +1007,10 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 							appendIfUnique arrKeysTime keyTimeEndTemp
 							for i in c.keys do 
 							(
-								if i.selected == true then appendIfUnique arrKeysSelected i.time
+								appendIfUnique arrBlockingKeys i.time
+								if i.selected == true then (
+									appendIfUnique arrKeysSelected i.time
+								)
 							)
 						)
 					)
@@ -1090,6 +1118,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		arrKeysTime     = #()
 		arrKeysSelected = #() ----------------先清空数组
 		arrLinkKeys     = #()
+		arrBlockingKeys = #()
 		case of  -----------处理选中,未选中则处理全部
 		(
 			(selection.count == 0):
@@ -1171,160 +1200,160 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 	)
 	
-	mapped fn fnMoveKeysAndLinkKeys obj offset =  ----https://forums.cgsociety.org/t/moving-keys-from-link-constraint-keys-access/1575053
-	(
-		local arrTargetID  = #()
-		moveKeys obj offset #selection  ---先移动非link帧
-		if rolloutBulletKeyTools.btnJudgeLinkKey.checked == true then 
-		(
-			if classof obj.controller == Link_Constraint do
-			(
-				nTargets = obj.controller.getNumTargets()  ---得到link的帧数量
-	
-				if nTargets > 0 do
-				(
-					for i = nTargets to 1 by -1 do  ------如果大于0则从最后link帧开始移
-					(
-						fNumber = obj.controller.getFrameNo i
-						if ((fNumber >= keySelFirst) and (fNumber <= keySelEnd)) then
-						(
-							appendIfUnique arrTargetID i
-						)
-					)
-					if offset > 0 then  --------判断向前还是向后移动帧
-					(
-						for i = arrTargetID.count to 1 by -1 do  ------如果大于0则从最后link帧开始移
-						(
-							fNumber = obj.controller.getFrameNo arrTargetID[i]
-							obj.controller.setFrameNo i (fNumber + offset)
-						)
-					)
-					else
-					(
-						for i = 1 to arrTargetID.count do  ---如果移动帧小于0,从第一个link帧开始移
-						(
-							fNumber = obj.controller.getFrameNo arrTargetID[i]
-							obj.controller.setFrameNo i (fNumber + offset)
-						)
-					)
-				)
-			)
-		)
-	)
-
-	-- fn fnSplitSelBiped = --分开选择四肢和身体,例如同一条手臂只选择最父级的(方便移动帧)
+	-- mapped fn fnMoveKeysAndLinkKeys obj offset =  ----https://forums.cgsociety.org/t/moving-keys-from-link-constraint-keys-access/1575053
 	-- (
-	-- 	arrSelBiped = for i in selection where classof i.controller == BipSlave_Control collect i 
-
+	-- 	local arrTargetID  = #()
+	-- 	moveKeys obj offset #selection  ---先移动非link帧
+	-- 	if rolloutBulletKeyTools.btnJudgeLinkKey.checked == true then 
+	-- 	(
+	-- 		if classof obj.controller == Link_Constraint do
+	-- 		(
+	-- 			nTargets = obj.controller.getNumTargets()  ---得到link的帧数量
+	
+	-- 			if nTargets > 0 do
+	-- 			(
+	-- 				for i = nTargets to 1 by -1 do  ------如果大于0则从最后link帧开始移
+	-- 				(
+	-- 					fNumber = obj.controller.getFrameNo i
+	-- 					if ((fNumber >= keySelFirst) and (fNumber <= keySelEnd)) then
+	-- 					(
+	-- 						appendIfUnique arrTargetID i
+	-- 					)
+	-- 				)
+	-- 				if offset > 0 then  --------判断向前还是向后移动帧
+	-- 				(
+	-- 					for i = arrTargetID.count to 1 by -1 do  ------如果大于0则从最后link帧开始移
+	-- 					(
+	-- 						fNumber = obj.controller.getFrameNo arrTargetID[i]
+	-- 						obj.controller.setFrameNo i (fNumber + offset)
+	-- 					)
+	-- 				)
+	-- 				else
+	-- 				(
+	-- 					for i = 1 to arrTargetID.count do  ---如果移动帧小于0,从第一个link帧开始移
+	-- 					(
+	-- 						fNumber = obj.controller.getFrameNo arrTargetID[i]
+	-- 						obj.controller.setFrameNo i (fNumber + offset)
+	-- 					)
+	-- 				)
+	-- 			)
+	-- 		)
+	-- 	)
 	-- )
 
-	fn fnMoveBipedKeys offsetFrame =  -------移动Biped帧
-	(
-		bipedRoot = #()   -------判断选择了几个biped骨架
-		for i in selection where ((classof i == Biped_Object) and (i.ishidden == false)) do  
-		(
-			appendIfUnique bipedRoot i.controller.rootNode  --添加到骨架数组
-		)
-		for c in bipedRoot do  ---按每个骨架处理
-		(
-			ctrlBiped = c.controller
-			bipedAll = #(biped.getNode ctrlBiped #pelvis, -----四肢同帧处理,只处理他首节biped
-						biped.getNode ctrlBiped #spine,
-						biped.getNode ctrlBiped #neck,
-						biped.getNode ctrlBiped #larm,
-						biped.getNode ctrlBiped #rarm,
-						biped.getNode ctrlBiped #lleg,
-						biped.getNode ctrlBiped #rleg,
-						biped.getNode ctrlBiped #prop1,
-						biped.getNode ctrlBiped #prop2,
-						biped.getNode ctrlBiped #prop3,
-						biped.getNode ctrlBiped #tail)
+	-- -- fn fnSplitSelBiped = --分开选择四肢和身体,例如同一条手臂只选择最父级的(方便移动帧)
+	-- -- (
+	-- -- 	arrSelBiped = for i in selection where classof i.controller == BipSlave_Control collect i 
 
-			vertCtrl = ctrlBiped.vertical.controller  -----质心ctrl关键帧
-			horzCtrl = ctrlBiped.horizontal.controller
-			if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
-			(turnCtrl = ctrlBiped.flip.controller)
-			else(turnCtrl = ctrlBiped.turning.controller)
-			bipCtrlTemp = #(vertCtrl,horzCtrl,turnCtrl)
-			for c in bipCtrlTemp do
-			(
-				biped.moveKeys c offsetFrame #selection  -----移动选定的质心帧
-			)
-			for nodeBiped in bipedAll where nodeBiped != undefined do  -----移动其他biped的选定帧
-			(
-				biped.moveKeys nodeBiped.controller offsetFrame #selection
-			)
-		)
-	)		
+	-- -- )
 
-	mapped fn fnMoveBipedScaleKeys tempObj offsetFrame =  -------移动biped的缩放帧
-	(
-		ctrlBiped = tempObj.controller
-		if classof ctrlBiped == BipSlave_Control then  --------下面判定子动画是否为scaleXYZ
-		(
-			if ((ctrlBiped[1][1] != undefined) and ((getSubAnimName ctrlBiped[1][1] 1) == #ScaleXYZ)) then
-			(
-				movekeys ctrlBiped[1][1][1] offsetFrame #selection
-			)
-		)
-	)
+	-- fn fnMoveBipedKeys offsetFrame =  -------移动Biped帧
+	-- (
+	-- 	bipedRoot = #()   -------判断选择了几个biped骨架
+	-- 	for i in selection where ((classof i == Biped_Object) and (i.ishidden == false)) do  
+	-- 	(
+	-- 		appendIfUnique bipedRoot i.controller.rootNode  --添加到骨架数组
+	-- 	)
+	-- 	for c in bipedRoot do  ---按每个骨架处理
+	-- 	(
+	-- 		ctrlBiped = c.controller
+	-- 		bipedAll = #(biped.getNode ctrlBiped #pelvis, -----四肢同帧处理,只处理他首节biped
+	-- 					biped.getNode ctrlBiped #spine,
+	-- 					biped.getNode ctrlBiped #neck,
+	-- 					biped.getNode ctrlBiped #larm,
+	-- 					biped.getNode ctrlBiped #rarm,
+	-- 					biped.getNode ctrlBiped #lleg,
+	-- 					biped.getNode ctrlBiped #rleg,
+	-- 					biped.getNode ctrlBiped #prop1,
+	-- 					biped.getNode ctrlBiped #prop2,
+	-- 					biped.getNode ctrlBiped #prop3,
+	-- 					biped.getNode ctrlBiped #tail)
 
-	fn fnMoveAllKeys keyMovedOffset fnRange:off =
-	(
-		local rangEnd = animationrange.end
-		local rangeStart = animationrange.start
-		local n = 0  --n来判定是否有选中biped
+	-- 		vertCtrl = ctrlBiped.vertical.controller  -----质心ctrl关键帧
+	-- 		horzCtrl = ctrlBiped.horizontal.controller
+	-- 		if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
+	-- 		(turnCtrl = ctrlBiped.flip.controller)
+	-- 		else(turnCtrl = ctrlBiped.turning.controller)
+	-- 		bipCtrlTemp = #(vertCtrl,horzCtrl,turnCtrl)
+	-- 		for c in bipCtrlTemp do
+	-- 		(
+	-- 			biped.moveKeys c offsetFrame #selection  -----移动选定的质心帧
+	-- 		)
+	-- 		for nodeBiped in bipedAll where nodeBiped != undefined do  -----移动其他biped的选定帧
+	-- 		(
+	-- 			biped.moveKeys nodeBiped.controller offsetFrame #selection
+	-- 		)
+	-- 	)
+	-- )		
 
-		if keyMovedOffset != undefined then
-		(
-			if selection.count != 0 then
-			(
-				for i in selection where (i.ishidden == false) do
-				(
-					if classof i != Biped_Object then
-					(
-						fnMoveKeysAndLinkKeys i keyMovedOffset
-					)
-					else 
-					(
-						fnMoveBipedScaleKeys i keyMovedOffset
-						n += 1
-					)
-				)
-				if n != 0 then  ----------分开解决biped多移动的问题,傻瓜式方法
-				(
-					fnMoveBipedKeys keyMovedOffset
-				)
-			)
-			else  ---跟上面一样,只是对所有物体
-			(
-				for i in objects where (i.ishidden == false) do
-				(
-					if classof i != Biped_Object then
-					(
-						fnMoveKeysAndLinkKeys i keyMovedOffset
-					)
-					else fnMoveBipedScaleKeys i keyMovedOffset
-				)
-				fnMoveBipedKeys keyMovedOffset
-			)
-			if fnRange == on then
-			(
-				if keyMovedOffset > 0 then 
-				(
-					rangEnd = animationrange.end + keyMovedOffset
-					animationrange = interval animationrange.start rangEnd
-				)
-				else if keyMovedOffset < 0 then 
-				(
-					rangeStart = animationrange.start + keyMovedOffset
-					animationrange = interval rangeStart animationrange.end
-				)
-			)
-			keySelFirst += keyMovedOffset
-			keySelEnd  += keyMovedOffset
-		)
-	)
+	-- mapped fn fnMoveBipedScaleKeys tempObj offsetFrame =  -------移动biped的缩放帧
+	-- (
+	-- 	ctrlBiped = tempObj.controller
+	-- 	if classof ctrlBiped == BipSlave_Control then  --------下面判定子动画是否为scaleXYZ
+	-- 	(
+	-- 		if ((ctrlBiped[1][1] != undefined) and ((getSubAnimName ctrlBiped[1][1] 1) == #ScaleXYZ)) then
+	-- 		(
+	-- 			movekeys ctrlBiped[1][1][1] offsetFrame #selection
+	-- 		)
+	-- 	)
+	-- )
+
+	-- fn fnMoveAllKeys keyMovedOffset fnRange:off =
+	-- (
+	-- 	local rangEnd = animationrange.end
+	-- 	local rangeStart = animationrange.start
+	-- 	local n = 0  --n来判定是否有选中biped
+
+	-- 	if keyMovedOffset != undefined then
+	-- 	(
+	-- 		if selection.count != 0 then
+	-- 		(
+	-- 			for i in selection where (i.ishidden == false) do
+	-- 			(
+	-- 				if classof i != Biped_Object then
+	-- 				(
+	-- 					fnMoveKeysAndLinkKeys i keyMovedOffset
+	-- 				)
+	-- 				else 
+	-- 				(
+	-- 					fnMoveBipedScaleKeys i keyMovedOffset
+	-- 					n += 1
+	-- 				)
+	-- 			)
+	-- 			if n != 0 then  ----------分开解决biped多移动的问题,傻瓜式方法
+	-- 			(
+	-- 				fnMoveBipedKeys keyMovedOffset
+	-- 			)
+	-- 		)
+	-- 		else  ---跟上面一样,只是对所有物体
+	-- 		(
+	-- 			for i in objects where (i.ishidden == false) do
+	-- 			(
+	-- 				if classof i != Biped_Object then
+	-- 				(
+	-- 					fnMoveKeysAndLinkKeys i keyMovedOffset
+	-- 				)
+	-- 				else fnMoveBipedScaleKeys i keyMovedOffset
+	-- 			)
+	-- 			fnMoveBipedKeys keyMovedOffset
+	-- 		)
+	-- 		if fnRange == on then
+	-- 		(
+	-- 			if keyMovedOffset > 0 then 
+	-- 			(
+	-- 				rangEnd = animationrange.end + keyMovedOffset
+	-- 				animationrange = interval animationrange.start rangEnd
+	-- 			)
+	-- 			else if keyMovedOffset < 0 then 
+	-- 			(
+	-- 				rangeStart = animationrange.start + keyMovedOffset
+	-- 				animationrange = interval rangeStart animationrange.end
+	-- 			)
+	-- 		)
+	-- 		keySelFirst += keyMovedOffset
+	-- 		keySelEnd  += keyMovedOffset
+	-- 	)
+	-- )
 
 	fn fnAddTrajLayer =
 	(
@@ -1446,18 +1475,94 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 	)
 
-	fn fnHelpPosRange btnPos btnSize:[75,32] =
+	fn fnGetPlaySpeedValue =
 	(
-		local mouseClientPos = mouse.screenPos - (getDialogPos rolloutBulletKeyTools) + uiClientOffsets
-		-- local btnPos = pos
-		-- local btnSize = [75,32]
-		local btnBox = (Box2 btnPos.x btnPos.y btnSize.x btnSize.y)
-
-		local dialogPos = getDialogPos rolloutBulletKeyTools
-		local dialogBox = (Box2 dialogPos.x dialogPos.y \
-			rolloutBulletKeyTools.width rolloutBulletKeyTools.height)
-		return (contains btnBox mouseClientPos)
+		case of
+		(
+			(timeConfiguration.playbackSpeed == 1):(return 0.25)
+			(timeConfiguration.playbackSpeed == 2):(return 0.5)
+			(timeConfiguration.playbackSpeed == 3):(return 1)
+			(timeConfiguration.playbackSpeed == 4):(return 2)
+			(timeConfiguration.playbackSpeed == 5):(return 4)
+		)
 	)
+
+	-- https://cafe.naver.com/pinksox/6131
+	-- 优化支持 bone
+
+	fn FramToMilisecond frame = 
+	(
+		return ((((frame - animationRange.start) as integer) * (10.0 / 48.0) * fnGetPlaySpeedValue()) as integer)
+    )
+
+	fn AppendKeyTimeArray m_PBKeyMiliSecArray keys = 
+	(
+        if keys.count == 0 do return()
+        for i = 1 to keys.count do (
+            if (keys[i] >= animationRange.start) AND (keys[i] <= animationRange.end) do (
+                appendifUnique m_PBKeyMiliSecArray (FramToMilisecond keys[i])
+                appendifUnique m_PBKeyTimeArray keys[i]
+            )
+        )
+        appendifUnique m_PBKeyMiliSecArray (FramToMilisecond animationRange.start)
+        appendifUnique m_PBKeyTimeArray animationRange.start
+        appendifUnique m_PBKeyMiliSecArray (FramToMilisecond animationRange.end)
+        appendifUnique m_PBKeyTimeArray animationRange.end
+	)
+
+	fn StopBlocking = 
+	(
+        clock.active = false
+        ckbPlayBlocking.state = false
+        ckbPlayBlocking.text = "Blocking"
+	)
+
+	fn PlayBlocking = 
+	(
+		fnCollectKeys ()
+		m_PBKeyTimeArray = #()
+		m_PBKeyMiliSecArray = #()
+		local nowTime = timeStamp()
+		AppendKeyTimeArray m_PBKeyMiliSecArray arrBlockingKeys
+		if m_PBKeyMiliSecArray.count == 0 do (
+			StopBlocking()
+			return()
+		)
+		
+		if (isAnimPlaying()) do (
+			stopAnimation()
+		)		
+		
+		sort m_PBKeyTimeArray
+		sort m_PBKeyMiliSecArray
+		m_PBPointer = 1
+		while (m_PBKeyTimeArray[m_PBPointer] < sliderTime) do (m_PBPointer += 1)
+
+		m_PBStartTime = timeStamp() - (FramToMilisecond sliderTime)
+		sliderTime = m_PBKeyTimeArray[m_PBPointer]
+		clock.active = true
+		ckbPlayBlocking.text = "Stop it !"
+	)
+
+	fn ReplayBlocking = 
+	(
+		m_PBPointer = 1
+		m_PBStartTime = timeStamp()
+		sliderTime = m_PBKeyTimeArray[m_PBPointer]
+	)
+
+	-- fn fnHelpPosRange btnPos btnSize:[75,32] =
+	-- (
+	-- 	local mouseClientPos = mouse.screenPos - (getDialogPos rolloutBulletKeyTools) + uiClientOffsets
+	-- 	-- local btnPos = pos
+	-- 	-- local btnSize = [75,32]
+	-- 	local btnBox = (Box2 btnPos.x btnPos.y btnSize.x btnSize.y)
+
+	-- 	local dialogPos = getDialogPos rolloutBulletKeyTools
+	-- 	local dialogBox = (Box2 dialogPos.x dialogPos.y \
+	-- 		rolloutBulletKeyTools.width rolloutBulletKeyTools.height)
+	-- 	return (contains btnBox mouseClientPos)
+	-- )
 
 	-- fn fnRefreshHelpText = 
 	-- (
@@ -1587,7 +1692,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		btnSelBeforeKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,3,3,3,3,true,true) 
 		btnSelAfterKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,11,11,11,11,true,true) 
 		btnSelAllKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,26,26,26,26,true,true)
-		btnMoveKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,21,21,21,21,true,true)
+		-- btnMoveKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,21,21,21,21,true,true)
 -- 		btnMoveAfterKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,13,13,13,13,true,true)
 		-- dotnet.AddEventHandler myTimer #elapsed fnRefreshHelpText
 		-- myTimer.Start()
@@ -1604,6 +1709,8 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		fnSwitchToolsBtn idBtn
 		fnSwitchToolBtnChecked idBtn
 		fnRefreshMyScripts ()
+		ckbPlayBlocking.state = false
+		clock.active = false
 	)
 	
 	on rolloutBulletKeyTools close do -- 关闭记忆浮动窗口位置
@@ -1715,6 +1822,50 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	-- 	)
 	-- 	-- else tick_tock.active = true
 	-- )
+
+	on ckbPlayBlocking changed state do (
+        -- if (selection.count == 0) do (
+        --     StopBlocking()
+        --     return()
+        -- )
+		if state then (
+            PlayBlocking()
+        )
+        else (
+            StopBlocking()
+        )
+    )
+    
+    -- Play Blocking용 틱 이벤트 처리
+    on clock tick do (
+        if (m_PBPointer > m_PBKeyMiliSecArray.count) do return()
+		local now = timeStamp()
+		local pointer
+		if (m_PBKeyMiliSecArray.count == m_PBPointer) then (
+			ReplayBlocking()
+			pointer = 1
+		)
+		else (
+			pointer = m_PBStartTime + m_PBKeyMiliSecArray[m_PBPointer + 1]
+		)
+        
+        if ( now > pointer ) do (
+            m_PBPointer += 1
+            sliderTime = m_PBKeyTimeArray[m_PBPointer]
+        )
+        
+        if (m_PBPointer >= m_PBKeyMiliSecArray.count) do (
+            ReplayBlocking()
+        )
+
+        if keyboard.escPressed do (
+            StopBlocking()
+		)
+		
+		if (sliderTime != m_PBKeyTimeArray[m_PBPointer]) do (
+			StopBlocking()
+		)
+    )
 
 	on btnCSTools pressed do 
 	(
@@ -2027,12 +2178,12 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		if state == false then
 		(
 			for o in objects as array where (classof o == BoneGeometry) do o.isHidden = false
-			rolloutBulletKeyTools.ckbHideButton.text = "⛅️ 隐藏骨骼"
+			rolloutBulletKeyTools.ckbHideButton.text = "隐藏骨骼"
 		)
 		else
 		(
 			for o in objects as array where (classof o == BoneGeometry) do o.isHidden = true
-			rolloutBulletKeyTools.ckbHideButton.text = "💫 显示骨骼"
+			rolloutBulletKeyTools.ckbHideButton.text = "显示骨骼"
 		)
 	)
 	
@@ -2069,7 +2220,6 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 				freeze o
 				o.showFrozenInGray = off
 			)
-			ckbFreezeMesh.text = "☀ 解冻模型"
 		)
 		else
 		(
@@ -2080,7 +2230,6 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 				unfreeze o
 				o.showFrozenInGray = off
 			)
-			ckbFreezeMesh.text = "✲ 冻结模型"
 		)
 	)
 
@@ -2113,7 +2262,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 			arrLastSelRange = #()
 		)
 	)
-	on btnCutFrameDisplay rightclick do with undo on  ---------------帧栏显示首尾帧范围
+	on btnAllFrameDisplay pressed do with undo on  ---------------帧栏显示首尾帧范围
 	(
 		if switchAllKeyRange == 0 then
 		(

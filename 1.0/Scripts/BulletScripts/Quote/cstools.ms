@@ -11,7 +11,7 @@ if doesFileExist ((getDir #maxData) + "\\cstool.ini") == false then
 	if pathdlg!=undefined then destroydialog pathdlg
 	if pathdata!=undifined then destroydialog pathdata
 	if setpara!=undefined then destroydialog setpara
-	-- if mergebip!=undefined then destroydialog mergebip
+	if mergebip!=undefined then destroydialog mergebip
 	if bipexp!=undefind then destroydialog bipexp
 	
 	
@@ -887,78 +887,78 @@ if doesFileExist ((getDir #maxData) + "\\cstool.ini") == false then
 	
 	
 	
-	-- rollout mergebip "MIX工具" width:294 height:157
-	-- (
-	-- 	button btn14 "..." pos:[12,34] width:27 height:25
-	-- 	button btn15 "按文件名顺序进行MIX合并" pos:[12,67] width:270 height:46 enabled:true toolTip:""
-	-- 	editText edt2 "" pos:[41,36] width:237 height:23
-	-- 	groupBox grp1 "MIX文件夹下所有的文件" pos:[6,9] width:284 height:121
+	rollout mergebip "MIX工具" width:294 height:157
+	(
+		button btn14 "..." pos:[12,34] width:27 height:25
+		button btn15 "按文件名顺序进行MIX合并" pos:[12,67] width:270 height:46 enabled:true toolTip:""
+		editText edt2 "" pos:[41,36] width:237 height:23
+		groupBox grp1 "MIX文件夹下所有的文件" pos:[6,9] width:284 height:121
 	
 	
-	-- on mergebip open do
-	-- (
-	-- edt2.text=filepath 
-	-- )
+	on mergebip open do
+	(
+	edt2.text=filepath 
+	)
 	
-	-- on btn14 pressed do
-	-- (
-	--   loadfilepath = getSavePath caption:"选择读取文件路径:"  initialDir:filepath
-	-- if loadfilepath!=undefined then edt2.text=loadfilepath 
-	-- )
+	on btn14 pressed do
+	(
+	  loadfilepath = getSavePath caption:"选择读取文件路径:"  initialDir:filepath
+	if loadfilepath!=undefined then edt2.text=loadfilepath 
+	)
 	
-	-- on btn15 pressed do
-	-- (
+	on btn15 pressed do
+	(
 	
-	-- loadfilepath=edt2.text
-	-- -- bip = biped.createNew 100 -90 [0,0,0] arms:true neckLinks:2 spineLinks:4 legLinks:4 \
-	-- -- tailLinks:1 ponyTail1Links:1 ponyTail2Links:1 fingers:5 fingerLinks:2 toes:4 toeLinks:2 ankleAttach:0.3 trianglePelvis:True  
+	loadfilepath=edt2.text
+	-- bip = biped.createNew 100 -90 [0,0,0] arms:true neckLinks:2 spineLinks:4 legLinks:4 \
+	-- tailLinks:1 ponyTail1Links:1 ponyTail2Links:1 fingers:5 fingerLinks:2 toes:4 toeLinks:2 ankleAttach:0.3 trianglePelvis:True  
 	 
 	
-	-- if $sangum070816_Bip01==undefind then
-	--       mergeMAXFile "$UI_ln\\ICONS\\cstoolIcons\\newbip.max"  #select
+	if $sangum070816_Bip01==undefind then
+	      mergeMAXFile "$UI_ln\\ICONS\\cstoolIcons\\newbip.max"  #select
 	
-	-- bip=$sangum070816_Bip01.controller
+	bip=$sangum070816_Bip01.controller
 	
-	-- themixer.addMixerToDisplay $sangum070816_Bip01.transform.controller
+	themixer.addMixerToDisplay $sangum070816_Bip01.transform.controller
 	
-	-- mymixer = $sangum070816_Bip01.transform.controller.mixer
+	mymixer = $sangum070816_Bip01.transform.controller.mixer
 	
-	-- if mymixer.numTrackgroups<1 then appendTrackgroup  mymixer
+	if mymixer.numTrackgroups<1 then appendTrackgroup  mymixer
 	
-	-- mx1=getTrackgroup mymixer 1
+	mx1=getTrackgroup mymixer 1
 	 
-	-- mx2=getTrack mx1 1
+	mx2=getTrack mx1 1
 	
-	-- theFiles = getFiles (loadfilepath+"\\*.bip") 
+	theFiles = getFiles (loadfilepath+"\\*.bip") 
 	
-	-- --对文件名进行排序--------------------------------------------
-	-- 		for  i=1 to theFiles.count  do
-	-- 		     for j=1 to theFiles.count do
-	-- 			 (
-	-- 			   if theFiles[i]< theFiles[j] then ( temp= theFiles[i]; theFiles[i]=theFiles[j];theFiles[j]=temp;)
-	-- 			 ) 
-	-- ---------------------------------------------------------------
+	--对文件名进行排序--------------------------------------------
+			for  i=1 to theFiles.count  do
+			     for j=1 to theFiles.count do
+				 (
+				   if theFiles[i]< theFiles[j] then ( temp= theFiles[i]; theFiles[i]=theFiles[j];theFiles[j]=temp;)
+				 ) 
+	---------------------------------------------------------------
 	
-	-- bip.figureMode= false
-	--         bip.mixerMode=true
-	-- 		for f in theFiles do
-	-- 			if f.count>18 then
-	-- 			(
-	-- 			  bipname=substring f (f.count-17) 18
-	-- 			   if bipname!="cstools_mixall.bip" then  mx3=appendClip mx2 f  false 1f 
-	-- 			   )
-	-- 			   else
-	-- 			   mx3=appendClip mx2 f  false 1f 
+	bip.figureMode= false
+	        bip.mixerMode=true
+			for f in theFiles do
+				if f.count>18 then
+				(
+				  bipname=substring f (f.count-17) 18
+				   if bipname!="cstools_mixall.bip" then  mx3=appendClip mx2 f  false 1f 
+				   )
+				   else
+				   mx3=appendClip mx2 f  false 1f 
 	
-	-- 	   mixdown mymixer true true 6 true 166.15
-	-- 	   copyMixdownToBiped  mymixer
-	-- 	   bip.mixerMode=false
-	-- 	   bipfile=loadfilepath+"\\"+"cstools_mixall.bip"
-	-- 	   biped.saveBipfile bip bipfile
-	-- 	   select  $sangum070816*
-	--         actionMan.executeAction 0 "40020"  -- Edit: Delete Objects
-	--    )
-	-- )
+		   mixdown mymixer true true 6 true 166.15
+		   copyMixdownToBiped  mymixer
+		   bip.mixerMode=false
+		   bipfile=loadfilepath+"\\"+"cstools_mixall.bip"
+		   biped.saveBipfile bip bipfile
+		   select  $sangum070816*
+	        actionMan.executeAction 0 "40020"  -- Edit: Delete Objects
+	   )
+	)
 	
 	rollout aboutme "about" width:200 height:241
 	(	GroupBox grp5 "" pos:[3,4] width:182 height:96
@@ -2651,17 +2651,17 @@ if doesFileExist ((getDir #maxData) + "\\cstool.ini") == false then
 	rollout cstoolroll "CSTools" width:120 height:515
 	(
 		bitmap Background    "Bitmap"    pos:[0, 24] width:117 height:240       transparent:(color 0 255 0)
-		-- imgtag leftfootA_btn  "leftfoota" pos:[leftx,lefty] width:22  height:18      bitmap:image_leftfootA  transparent:(color 0 255 0)
-		-- imgtag leftfootB_btn  "leftfootb" pos:[leftx,lefty+18] width:22  height:15  bitmap:image_leftfootB  transparent:(color 0 255 0)
-		-- imgtag leftfootC_btn  "leftfootc" pos:[leftx+22,lefty] width:21  height:33  bitmap:image_leftfootC  transparent:(color 0 255 0)
-		-- imgtag leftfootD_btn  "leftfootd" pos:[leftx+43,lefty] width:15  height:33  bitmap:image_leftfootD  transparent:(color 0 255 0)
+		imgtag leftfootA_btn  "leftfoota" pos:[leftx,lefty] width:22  height:18      bitmap:image_leftfootA  transparent:(color 0 255 0)
+		imgtag leftfootB_btn  "leftfootb" pos:[leftx,lefty+18] width:22  height:15  bitmap:image_leftfootB  transparent:(color 0 255 0)
+		imgtag leftfootC_btn  "leftfootc" pos:[leftx+22,lefty] width:21  height:33  bitmap:image_leftfootC  transparent:(color 0 255 0)
+		imgtag leftfootD_btn  "leftfootd" pos:[leftx+43,lefty] width:15  height:33  bitmap:image_leftfootD  transparent:(color 0 255 0)
 	
 		dropdownList bip_list "" pos:[0,1] width:55 height:22 items:#("Bip01")
 		-- button refresh_bips "R" pos:[54,1] width:25 height:20
 		-- button set_btn "设置" pos:[55,1] width:40 height:20
 		button help_btn " BIP\CS工具" pos:[55,1] width:60 height:20 tooltip:"左键BIP工具,\r\n右键CS工具合集"
-		-- button savefile_btn "save" pos:[2,331] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip2_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip2_a.bmp", 10, 3, 3, 4, 4)
-		-- button openfile_btn "open" pos:[2,310] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip2_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip2_a.bmp", 10, 1, 1, 2, 2)
+		button savefile_btn "save" pos:[2,331] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip2_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip2_a.bmp", 10, 3, 3, 4, 4)
+		button openfile_btn "open" pos:[2,310] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip2_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip2_a.bmp", 10, 1, 1, 2, 2)
 		button key_btn "key" pos:[9,266] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_a.bmp", 8, 1, 1, 2, 2)
 		button plantedkey_btn "planted key" pos:[34,266] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_a.bmp", 8, 3, 3, 4, 4)
 		button sliderkey_btn "slider key" pos:[59,266] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_a.bmp", 8, 5, 5, 6, 6)
@@ -2669,35 +2669,35 @@ if doesFileExist ((getDir #maxData) + "\\cstool.ini") == false then
 		checkbutton hori_btn "hoir" pos:[999,266] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip2_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip2_a.bmp", 10, 5, 5, 6, 6)
 		checkbutton vert_btn "vert" pos:[999,266] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip2_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip2_a.bmp", 10, 7, 7, 8, 8)
 		checkbutton rotate_btn "rotate" pos:[999,266] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip2_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip2_a.bmp", 10, 9, 9, 10, 10)
-		-- button modebtn1 "Mixer" pos:[25,331] width:30 height:20 
-		-- button modebtn2 "Layer" pos:[25,310] width:30 height:20
-		-- button newlayer_btn "newlayer" pos:[999,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_layer_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_layer_a.bmp", 24, 5, 5, 6, 6)
-		-- button deletelayer_btn "deletelayer" pos:[999,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_layer_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_layer_a.bmp", 24, 7, 7, 8, 8)
-		-- button collapselayer_btn "collapselayer" pos:[999,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_layer_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_layer_a.bmp", 24, 13, 13, 14, 14)
-		-- button layerkey_btn "layerkey" pos:[999,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_layer_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_layer_a.bmp", 24, 15, 15, 16, 16)
-		-- button copy_btn "copy" pos:[3,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_copypaste_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_copypaste_a.bmp", 22, 3, 3, 4, 4)
-		-- button paste_btn "paste" pos:[25,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_copypaste_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_copypaste_a.bmp", 22, 7, 7, 8, 8)
-		-- button mirrorpaste_btn "MirrorPaste" pos:[48,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_copypaste_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_copypaste_a.bmp", 22, 9, 9, 10, 10)
-		-- GroupBox modelabel "" pos:[73,281] width:45 height:26
-		-- label posemode ":posture" pos:[74,290] width:50 height:14
-		-- button MIX_btn "MIX" pos:[999,288] width:40 height:20
-		-- checkbutton mixdoor_btn "mixmode" pos:[999,288] width:22 height:20 images:#("$UI_ln\\Icons\\bip_modes_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_modes_a.bmp", 8, 7, 7, 8, 8)
-		-- button MtoB_btn "M>B" pos:[999,288] width:33 height:20
-		-- button MixFolder_btn "+" pos:[999,288] width:8 height:20
+		button modebtn1 "Mixer" pos:[25,331] width:30 height:20 
+		button modebtn2 "Layer" pos:[25,310] width:30 height:20
+		button newlayer_btn "newlayer" pos:[999,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_layer_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_layer_a.bmp", 24, 5, 5, 6, 6)
+		button deletelayer_btn "deletelayer" pos:[999,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_layer_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_layer_a.bmp", 24, 7, 7, 8, 8)
+		button collapselayer_btn "collapselayer" pos:[999,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_layer_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_layer_a.bmp", 24, 13, 13, 14, 14)
+		button layerkey_btn "layerkey" pos:[999,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_layer_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_layer_a.bmp", 24, 15, 15, 16, 16)
+		button copy_btn "copy" pos:[3,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_copypaste_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_copypaste_a.bmp", 22, 3, 3, 4, 4)
+		button paste_btn "paste" pos:[25,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_copypaste_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_copypaste_a.bmp", 22, 7, 7, 8, 8)
+		button mirrorpaste_btn "MirrorPaste" pos:[48,288] width:22 height:20 images:#("$UI_ln\\Icons\\cstoolIcons\\bip_copypaste_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_copypaste_a.bmp", 22, 9, 9, 10, 10)
+		GroupBox modelabel "" pos:[73,281] width:45 height:26
+		label posemode ":posture" pos:[74,290] width:50 height:14
+		button MIX_btn "MIX" pos:[999,288] width:40 height:20
+		checkbutton mixdoor_btn "mixmode" pos:[999,288] width:22 height:20 images:#("$UI_ln\\Icons\\bip_modes_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\bip_modes_a.bmp", 8, 7, 7, 8, 8)
+		button MtoB_btn "M>B" pos:[999,288] width:33 height:20
+		button MixFolder_btn "+" pos:[999,288] width:8 height:20
 		
 		Timer    tmr1   "Timer" pos:[-11,261] width:24 height:24 interval:100
 		
-		HyperLink lnkTips "转CGJoy,原作者未知" pos:[5,290] color:(color 255 20 100) \
-		hovercolor:(color 255 0 255) visitedcolor:(color 255 20 100) \
-		address:"https://www.cgjoy.com/forum.php?mod=viewthread&tid=150585"
+		-- HyperLink lnkTips "转CGJoy,原作者未知" pos:[5,395] color:(color 255 20 100) \
+		-- hovercolor:(color 255 0 255) visitedcolor:(color 255 20 100) \
+		-- address:"https://www.cgjoy.com/forum.php?mod=viewthread&tid=150585"
 		
-		-- edittext startnumtext ""  pos:[-5,374] width:35 height:16
-		-- button   time1_btn   "<<" pos:[28,374] width:20 height:18 images:#("$UI_ln\\Icons\\cstoolIcons\\VCR_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\VCR_a.bmp", 28, 3, 3, 4, 4)
-		-- button   time2_btn   "==" pos:[48,374] width:20 height:18 images:#("$UI_ln\\Icons\\cstoolIcons\\VCR_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\VCR_a.bmp", 28, 9, 9, 10, 10)
-		-- button   time3_btn   ">>" pos:[68,374] width:20 height:18 images:#("$UI_ln\\Icons\\cstoolIcons\\VCR_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\VCR_a.bmp", 28, 11, 11, 12, 12)
-		-- spinner  endnum      ""   pos:[86,374] width:47 height:16 type:#integer	 range:[0,9999,0]
+		edittext startnumtext ""  pos:[-5,374] width:35 height:16
+		button   time1_btn   "<<" pos:[30,374] width:20 height:18 images:#("$UI_ln\\Icons\\cstoolIcons\\VCR_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\VCR_a.bmp", 28, 3, 3, 4, 4)
+		button   time2_btn   "==" pos:[50,374] width:20 height:18 images:#("$UI_ln\\Icons\\cstoolIcons\\VCR_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\VCR_a.bmp", 28, 9, 9, 10, 10)
+		button   time3_btn   ">>" pos:[70,374] width:20 height:18 images:#("$UI_ln\\Icons\\cstoolIcons\\VCR_i.bmp", "$UI_ln\\Icons\\cstoolIcons\\VCR_a.bmp", 28, 11, 11, 12, 12)
+		spinner  endnum      ""   pos:[88,374] width:40 height:16 type:#integer	 range:[0,9999,0]
 		
-		-- radioButtons rdo1 "" pos:[1,354] width:168 height:16 labels:#("1/4", "1/2","1X") default:3 columns:3
+		radioButtons rdo1 "" pos:[1,354] width:168 height:16 labels:#("1/4", "1/2","1X") default:3 columns:3
 	
 	fn copybmp bcode=
 	(
@@ -2827,47 +2827,47 @@ if doesFileExist ((getDir #maxData) + "\\cstool.ini") == false then
 	
 	
 	
-	-- fn setmode tmode=
-	-- (
-	--     copy_btn.pos.x=999
-	--     paste_btn.pos.x=999
-	--     mirrorpaste_btn.pos.x=999
-	--     modelabel.pos.x=999
-	--     posemode.pos.x=999
-	-- 	MIX_btn.pos.x=999
-	-- 	mixdoor_btn.pos.x=999
-	-- 	MtoB_btn.pos.x=999
-	-- 	MixFolder_btn.pos.x=999
-	-- 	newlayer_btn.pos.x=999
-	-- 	deletelayer_btn.pos.x=999
-	-- 	collapselayer_btn.pos.x=999
-	-- 	layerkey_btn.pos.x=999
+	fn setmode tmode=
+	(
+	    copy_btn.pos.x=999
+	    paste_btn.pos.x=999
+	    mirrorpaste_btn.pos.x=999
+	    modelabel.pos.x=999
+	    posemode.pos.x=999
+		MIX_btn.pos.x=999
+		mixdoor_btn.pos.x=999
+		MtoB_btn.pos.x=999
+		MixFolder_btn.pos.x=999
+		newlayer_btn.pos.x=999
+		deletelayer_btn.pos.x=999
+		collapselayer_btn.pos.x=999
+		layerkey_btn.pos.x=999
 	
-	--   if tmode==1 then
-	--    (
-	--    copy_btn.pos.x=3
-	--    paste_btn.pos.x=25
-	--    mirrorpaste_btn.pos.x=48
-	--    modelabel.pos.x=73
-	--    posemode.pos.x=74
-	--    )
+	  if tmode==1 then
+	   (
+	   copy_btn.pos.x=3
+	   paste_btn.pos.x=25
+	   mirrorpaste_btn.pos.x=48
+	   modelabel.pos.x=73
+	   posemode.pos.x=74
+	   )
 	   
-	--   if tmode==2 then
-	--    (
-	--     MIX_btn.pos.x=5
-	-- 	mixdoor_btn.pos.x=47
-	-- 	MtoB_btn.pos.x=71
-	-- 	MixFolder_btn.pos.x=105
-	-- 	)
+	  if tmode==2 then
+	   (
+	    MIX_btn.pos.x=5
+		mixdoor_btn.pos.x=47
+		MtoB_btn.pos.x=71
+		MixFolder_btn.pos.x=105
+		)
 		
-	--   if tmode==3 then
-	--    (
-	-- 	newlayer_btn.pos.x=9
-	-- 	deletelayer_btn.pos.x=34
-	-- 	collapselayer_btn.pos.x=59
-	-- 	layerkey_btn.pos.x=84
-	--     )	
-	-- )
+	  if tmode==3 then
+	   (
+		newlayer_btn.pos.x=9
+		deletelayer_btn.pos.x=34
+		collapselayer_btn.pos.x=59
+		layerkey_btn.pos.x=84
+	    )	
+	)
 		
 		
 	fn selectallchild index linkmode =
@@ -3164,10 +3164,10 @@ if doesFileExist ((getDir #maxData) + "\\cstool.ini") == false then
 		)
 		
 	
-	-- 	on rdo1 changed stat do
-	-- (
-	-- timeConfiguration.playbackSpeed=stat
-	-- )
+		on rdo1 changed stat do
+	(
+	timeConfiguration.playbackSpeed=stat
+	)
 		
 		on cstoolroll lbuttondown pos do
 		(
@@ -3436,229 +3436,229 @@ if doesFileExist ((getDir #maxData) + "\\cstool.ini") == false then
 		-- )
 		
 		
-	-- on savefile_btn rightclick do
-	-- (
-	-- autosavepath=getdir #maxroot+"AutoBip"
-	-- try(makedir autosavepath )catch();
+	on savefile_btn rightclick do
+	(
+	autosavepath=getdir #maxroot+"AutoBip"
+	try(makedir autosavepath )catch();
 	
-	-- try
-	-- (
-	-- bipfile=autosavepath+"\\"+"autobip1.bip"
-	-- deleteFile bipfile
-	-- for i=2 to 10 do 
-	-- (
-	-- index=i as string;
-	-- index1=(i-1) as string;
-	-- bipfile=autosavepath+"\\"+"autobip"+index+".bip"
-	-- bipfile01=autosavepath+"\\"+"autobip"+index1+".bip"
-	-- renameFile bipfile bipfile01
-	-- )
+	try
+	(
+	bipfile=autosavepath+"\\"+"autobip1.bip"
+	deleteFile bipfile
+	for i=2 to 10 do 
+	(
+	index=i as string;
+	index1=(i-1) as string;
+	bipfile=autosavepath+"\\"+"autobip"+index+".bip"
+	bipfile01=autosavepath+"\\"+"autobip"+index1+".bip"
+	renameFile bipfile bipfile01
+	)
 	
-	-- bip=bipname[24].controller
-	-- bipfile=autosavepath+"\\"+"newbip.bip"
-	-- biped.saveBipfile bip bipfile
+	bip=bipname[24].controller
+	bipfile=autosavepath+"\\"+"newbip.bip"
+	biped.saveBipfile bip bipfile
 	
-	-- i=10;index=i as string;
-	-- bipfile=autosavepath+"\\"+"newbip.bip"
-	-- bipfile01=autosavepath+"\\"+"autobip"+index+".bip"
-	-- renameFile bipfile bipfile01
-	--  )catch()
+	i=10;index=i as string;
+	bipfile=autosavepath+"\\"+"newbip.bip"
+	bipfile01=autosavepath+"\\"+"autobip"+index+".bip"
+	renameFile bipfile bipfile01
+	 )catch()
 	   
-	-- )
+	)
 		
 		
-	-- 	on savefile_btn pressed do
-	-- 	  if havebip==1 then 
-	-- 	 ( bip=bipname[24].controller
+		on savefile_btn pressed do
+		  if havebip==1 then 
+		 ( bip=bipname[24].controller
 	
-	-- 	  if  keyboard.controlpressed==true then
-	-- 		try (timescan=0;tmr1.active=false;bip=bipname[24].controller; biped.saveBipfiledlg  bip	"c:\\a.bip";tmr1.active=true;timescan=1;)catch()	else
+		  if  keyboard.controlpressed==true then
+			try (timescan=0;tmr1.active=false;bip=bipname[24].controller; biped.saveBipfiledlg  bip	"c:\\a.bip";tmr1.active=true;timescan=1;)catch()	else
 	 
 	
-	-- 		 if bip.figureMode== true	  then
-	-- 			 (
-	--        		if querybox "BIP处于编辑状态，要切换成运动模式并保存BIP文件么？" title:"提示" beep:false then
-	--                try (    local bipfile
-	-- 	          pathfilename=filepath+"\\"+bipfilename;
-	-- 		     bipfile = getsavefileName caption:"保存BIP文件" filename:pathfilename  types:"Bip file(*.Bip)|*.bip|All files(*.*)|*.*"
-	-- 		     if bipfile!=undefined then 
-	-- 			          bip.figureMode= false
-	-- 			  biped.saveBipfile bip bipfile
-	-- 		      lastfilepath=filepath;
-	-- 	     	 zz=#()
-	-- 		      filepath=""
-	-- 		      zz=filterString bipfile "\\"
-	-- 		      for i=1 to zz.count-1 do
-	-- 		      if i!=zz.count-1 then filepath =filepath +zz[i]+"\\" else filepath =filepath+zz[i]
-	-- 	      	 if lastfilepath!=filepath then 
-	-- 			  savedate();
-	-- 			 )catch()
-	-- 			 )
+			 if bip.figureMode== true	  then
+				 (
+	       		if querybox "BIP处于编辑状态，要切换成运动模式并保存BIP文件么？" title:"提示" beep:false then
+	               try (    local bipfile
+		          pathfilename=filepath+"\\"+bipfilename;
+			     bipfile = getsavefileName caption:"保存BIP文件" filename:pathfilename  types:"Bip file(*.Bip)|*.bip|All files(*.*)|*.*"
+			     if bipfile!=undefined then 
+				          bip.figureMode= false
+				  biped.saveBipfile bip bipfile
+			      lastfilepath=filepath;
+		     	 zz=#()
+			      filepath=""
+			      zz=filterString bipfile "\\"
+			      for i=1 to zz.count-1 do
+			      if i!=zz.count-1 then filepath =filepath +zz[i]+"\\" else filepath =filepath+zz[i]
+		      	 if lastfilepath!=filepath then 
+				  savedate();
+				 )catch()
+				 )
 				 
-	-- 			 else 
-	-- 		 (	    local bipfile
-	-- 	     	pathfilename=filepath+"\\"+bipfilename;
-	-- 		    bipfile = getsavefileName caption:"保存BIP文件" filename:pathfilename  types:"Bip file(*.Bip)|*.bip|All files(*.*)|*.*"
-	-- 		   if bipfile!=undefined then 
-	-- 		     try (
-	-- 		      bip=bipname[24].controller
-	-- 			  biped.saveBipfile bip bipfile
-	-- 		      lastfilepath=filepath;
-	-- 	 zz=#()
-	-- 	 filepath=""
-	-- 	 zz=filterString bipfile "\\"
-	-- 	 vv=zz.count 
-	-- 	 bipfilename=zz[vv]
-	-- 	 showfile=replace bipfilename (bipfilename.count-3) 4 ""
+				 else 
+			 (	    local bipfile
+		     	pathfilename=filepath+"\\"+bipfilename;
+			    bipfile = getsavefileName caption:"保存BIP文件" filename:pathfilename  types:"Bip file(*.Bip)|*.bip|All files(*.*)|*.*"
+			   if bipfile!=undefined then 
+			     try (
+			      bip=bipname[24].controller
+				  biped.saveBipfile bip bipfile
+			      lastfilepath=filepath;
+		 zz=#()
+		 filepath=""
+		 zz=filterString bipfile "\\"
+		 vv=zz.count 
+		 bipfilename=zz[vv]
+		 showfile=replace bipfilename (bipfilename.count-3) 4 ""
 	
 		  
-	-- 		      for i=1 to zz.count-1 do
-	-- 		      if i!=zz.count-1 then filepath =filepath +zz[i]+"\\" else filepath =filepath+zz[i]
-	-- 	      	 if lastfilepath!=filepath then 
-	-- 			  savedate();
-	--      opf=1;
-	-- 	 pathdlg.pathtext.text=filepath
+			      for i=1 to zz.count-1 do
+			      if i!=zz.count-1 then filepath =filepath +zz[i]+"\\" else filepath =filepath+zz[i]
+		      	 if lastfilepath!=filepath then 
+				  savedate();
+	     opf=1;
+		 pathdlg.pathtext.text=filepath
 				 
 				 
-	-- 		theFiles = getFiles (filepath+"\\*.bip") 
-	-- 		bipfileitems=#()
-	-- 		for f in theFiles do
-	-- 			(
-	-- 				zz=#()
-	-- 				zz=filterString f  "\\"
-	-- 				filename=replace zz[zz.count] (zz[zz.count].count-3) 4 ""
-	--                    append bipfileitems (filename+".bip")
-	--                 ) 			
-	--          pathdlg.bipfilelist.items=bipfileitems 
-	-- 		for i=1 to bipfileitems.count do 
-	-- 		 if bipfileitems[i]==bipfilename then  pathdlg.bipfilelist.selection=i
+			theFiles = getFiles (filepath+"\\*.bip") 
+			bipfileitems=#()
+			for f in theFiles do
+				(
+					zz=#()
+					zz=filterString f  "\\"
+					filename=replace zz[zz.count] (zz[zz.count].count-3) 4 ""
+	                   append bipfileitems (filename+".bip")
+	                ) 			
+	         pathdlg.bipfilelist.items=bipfileitems 
+			for i=1 to bipfileitems.count do 
+			 if bipfileitems[i]==bipfilename then  pathdlg.bipfilelist.selection=i
 	
 	
 			
-	-- 	 -- pathdlg.lbl2.text=bipfilename
-	-- 	 cstoolroll.title=showfile;
-	--                      )catch()
+		 -- pathdlg.lbl2.text=bipfilename
+		 cstoolroll.title=showfile;
+	                     )catch()
 	 
-	--           )
-	--    )
+	          )
+	   )
 		
-	-- on openfile_btn rightclick do
-	-- (
+	on openfile_btn rightclick do
+	(
 	 
-	--  autobippath=getdir #maxroot+"AutoBip"
-	--  autobipfile = getOpenFileName caption:"打开BIP文件" filename:(autobippath+"\\*.*") types:"Bip file(*.Bip)|*.bip|All files(*.*)|*.*"
-	--  bip=bipname[24].controller;
-	--  try(
-	--  biped.loadBipfile bip autobipfile
-	--  )catch(); 
+	 autobippath=getdir #maxroot+"AutoBip"
+	 autobipfile = getOpenFileName caption:"打开BIP文件" filename:(autobippath+"\\*.*") types:"Bip file(*.Bip)|*.bip|All files(*.*)|*.*"
+	 bip=bipname[24].controller;
+	 try(
+	 biped.loadBipfile bip autobipfile
+	 )catch(); 
 	 
-	-- )
+	)
 	
-	-- 	on openfile_btn pressed do
-	-- 	if havebip==1 then 
-	-- 		 if  keyboard.controlpressed==true then
-	-- 		 (  
-	--            bip=bipname[24].controller; biped.loadbipfiledlg  bip 
-	-- 		 ) 
-	-- 		 else
-	-- 		(	
-	-- 		 local bipfile
-	-- 	     pathfilename=filepath+"\*.bip";
-	-- 	    bipfile = getOpenFileName caption:"打开BIP文件" filename:pathfilename types:"Bip file(*.BIP)|*.bip|Bip file(*.BVH)|*.bvh|All files(*.*)|*.*"
+		on openfile_btn pressed do
+		if havebip==1 then 
+			 if  keyboard.controlpressed==true then
+			 (  
+	           bip=bipname[24].controller; biped.loadbipfiledlg  bip 
+			 ) 
+			 else
+			(	
+			 local bipfile
+		     pathfilename=filepath+"\*.bip";
+		    bipfile = getOpenFileName caption:"打开BIP文件" filename:pathfilename types:"Bip file(*.BIP)|*.bip|Bip file(*.BVH)|*.bvh|All files(*.*)|*.*"
 		  
-	--       bip=bipname[24].controller; 
-	-- 	 try( biped.deleteLayer bip  1)catch();    
-	-- 	 if bipfile!=undefined then 
-	-- 	 try(	
-	-- 	     t1=animationRange.start;	 t2=animationRange.end; 
-	-- 	     animationRange = Interval 0 1
-	--       bip.figureMode= false;
-	--       bip.mixerMode = false;
+	      bip=bipname[24].controller; 
+		 try( biped.deleteLayer bip  1)catch();    
+		 if bipfile!=undefined then 
+		 try(	
+		     t1=animationRange.start;	 t2=animationRange.end; 
+		     animationRange = Interval 0 1
+	      bip.figureMode= false;
+	      bip.mixerMode = false;
 		  
-	-- 	 filelx=substring bipfile (bipfile.count-2) 3
-	-- 	 if filelx=="bip" then  biped.loadBipfile bip bipfile
-	-- 	 lastfilepath=filepath;
-	-- 	 zz=#()
-	-- 	 filepath=""
-	-- 	 zz=filterString bipfile "\\"
+		 filelx=substring bipfile (bipfile.count-2) 3
+		 if filelx=="bip" then  biped.loadBipfile bip bipfile
+		 lastfilepath=filepath;
+		 zz=#()
+		 filepath=""
+		 zz=filterString bipfile "\\"
 		 
-	-- 	 vv=zz.count 
-	-- 	 bipfilename=zz[vv]
+		 vv=zz.count 
+		 bipfilename=zz[vv]
 		 
 	
 		  
-	-- 	 showfile=replace bipfilename (bipfilename.count-3) 4 ""
+		 showfile=replace bipfilename (bipfilename.count-3) 4 ""
 		
-	--        if filelx=="bvh" then  
-	-- 	   (
+	       if filelx=="bvh" then  
+		   (
 		   
 		   
-	-- 	   if $sangum070816_Bip01==undefind then
-	-- 	   (
-	--         mergeMAXFile "$UI_ln\\ICONS\\cstoolIcons\\newbip.max"  
-	-- 	 rollout  explain "Untitled" width:318 height:27
-	--       (
-	-- 	  label lbl1 "BVH文件读取相对较慢.请稍候...." pos:[13,4] width:282 height:21
-	--       )		
-	-- 	   bipx=$sangum070816_Bip01.controller
-	-- 	   bipx.figureMode= false
-	-- 	   createdialog explain 318 27
-	-- 	   biped.loadMocapFile bipx bipfile #noRedraw
+		   if $sangum070816_Bip01==undefind then
+		   (
+	        mergeMAXFile "$UI_ln\\ICONS\\cstoolIcons\\newbip.max"  
+		 rollout  explain "Untitled" width:318 height:27
+	      (
+		  label lbl1 "BVH文件读取相对较慢.请稍候...." pos:[13,4] width:282 height:21
+	      )		
+		   bipx=$sangum070816_Bip01.controller
+		   bipx.figureMode= false
+		   createdialog explain 318 27
+		   biped.loadMocapFile bipx bipfile #noRedraw
 		   
-	-- 	   biped.saveBipfile bipx (getdir #maxroot+"temp.bip")
-	-- 	   select  $sangum070816*
-	--         actionMan.executeAction 0 "40020"  -- Edit: Delete Objects
-	--           biped.loadBipfile bip  (getdir #maxroot+"temp.bip")
-	--      	destroydialog explain  
-	-- 		  )
-	-- 		select bipname[24]
+		   biped.saveBipfile bipx (getdir #maxroot+"temp.bip")
+		   select  $sangum070816*
+	        actionMan.executeAction 0 "40020"  -- Edit: Delete Objects
+	          biped.loadBipfile bip  (getdir #maxroot+"temp.bip")
+	     	destroydialog explain  
+			  )
+			select bipname[24]
 	
 		   
-	-- 	   --,,,
-	-- 	   )
-	--       pathdlg.bipfilelist.items=bipfileitems 
+		   --,,,
+		   )
+	      pathdlg.bipfilelist.items=bipfileitems 
 		  
-	-- 	 for i=1 to zz.count-1 do
-	-- 	 if i!=zz.count-1 then filepath =filepath+zz[i]+"\\" else filepath=filepath+zz[i]
-	-- 	 if lastfilepath!=filepath then 
-	--       savedate();	
-	--      opf=1;
+		 for i=1 to zz.count-1 do
+		 if i!=zz.count-1 then filepath =filepath+zz[i]+"\\" else filepath=filepath+zz[i]
+		 if lastfilepath!=filepath then 
+	      savedate();	
+	     opf=1;
 		 
-	-- 	 pathdlg.pathtext.text=filepath
+		 pathdlg.pathtext.text=filepath
 				 
-	-- 		theFiles = getFiles (filepath+"\\*.bip") 
-	-- 		bipfileitems=#()
-	-- 		for f in theFiles do
-	-- 			(
-	-- 				zz=#()
-	-- 				zz=filterString f  "\\"
-	-- 				filename=replace zz[zz.count] (zz[zz.count].count-3) 4 ""
-	--                    append bipfileitems (filename+".bip")
-	--                 ) 			
+			theFiles = getFiles (filepath+"\\*.bip") 
+			bipfileitems=#()
+			for f in theFiles do
+				(
+					zz=#()
+					zz=filterString f  "\\"
+					filename=replace zz[zz.count] (zz[zz.count].count-3) 4 ""
+	                   append bipfileitems (filename+".bip")
+	                ) 			
 				
-	-- 			for  i=1 to bipfileitems.count  do
-	-- 		     for j=1 to bipfileitems.count do
-	-- 			 (
-	-- 			   if bipfileitems[i]< bipfileitems[j] then ( temp= bipfileitems[i]; bipfileitems[i]=bipfileitems[j];bipfileitems[j]=temp;)
-	-- 			 ) 
+				for  i=1 to bipfileitems.count  do
+			     for j=1 to bipfileitems.count do
+				 (
+				   if bipfileitems[i]< bipfileitems[j] then ( temp= bipfileitems[i]; bipfileitems[i]=bipfileitems[j];bipfileitems[j]=temp;)
+				 ) 
 				 
 			 
 			 
-	-- 		for i =1 to bipfileitems.count do 
-	-- 		 if bipfileitems[i]==bipfilename then  pathdlg.bipfilelist.selection=i
+			for i =1 to bipfileitems.count do 
+			 if bipfileitems[i]==bipfilename then  pathdlg.bipfilelist.selection=i
 	
 		
-	--      pathdlg.lbl_bip.caption=bipfilename 
-	-- 	 cstoolroll.title=showfile;
-	-- 	) catch()
+	     pathdlg.lbl_bip.caption=bipfilename 
+		 cstoolroll.title=showfile;
+		) catch()
 		
-	-- 	st1=animationRange.start;
-	-- 	 st2=animationRange.end; 
-	-- 	  if ( st1==0 and st2==1) then animationRange = Interval t1 t2 
+		st1=animationRange.start;
+		 st2=animationRange.end; 
+		  if ( st1==0 and st2==1) then animationRange = Interval t1 t2 
 	
-	-- 	--max create mode
+		--max create mode
 	
-	-- 	)
+		)
 			
 			
 		on key_btn pressed do
@@ -3755,304 +3755,310 @@ if doesFileExist ((getDir #maxData) + "\\cstool.ini") == false then
 				if havebip==1 then(max move;max tool z;pivotmode=2)
 		on rotate_btn changed state do
 				if havebip==1 then(max rotate;pivotmode=3)
-		-- on modebtn1 pressed do
-		-- 	if havebip==1 then
-		-- (
-		--        if modebtn1.caption=="Mixer" then 
-		--      (
-		-- 	 if mode==1 then modebtn1.Caption="Pose"
-		--      if mode==3 then modebtn1.caption="Layer" 
-		-- 	 setmode 2
-		-- 	 mode=2
-		-- 	 --themixer.hideMixer();   themixer.showMixer()
-		-- 	 ) else      
-		--    if modebtn1.caption=="Layer"  then 
-		--      (
-		-- 	 if mode==1 then modebtn1.Caption="Pose"
-		--      if mode==2 then modebtn1.caption="Mixer" 
-		-- 	 setmode 3
-		-- 	 mode=3
-		-- 	 ) else
-		--    if modebtn1.caption=="Pose" then 
-		--      (
-		-- 	 if mode==2 then modebtn1.Caption="Mixer"
-		--      if mode==3 then modebtn1.caption="Layer" 
-		-- 	 setmode 1
-		-- 	 mode=1
-		--      readpose 0 
-		-- 	) 
-		-- )
-		-- on modebtn2 pressed do
-		-- 	if havebip==1 then
-		-- 	(
-		--        if modebtn2.caption=="Mixer"  then 
-		--      (
-		-- 	 if mode==1 then modebtn2.Caption="Pose"
-		--      if mode==3 then modebtn2.caption="Layer" 
-		-- 	 setmode 2
-		-- 	 mode=2
-		-- 	 --themixer.hideMixer();   themixer.showMixer()
-		-- 	 )   else    
-		--    if modebtn2.caption=="Layer"  then 
-		--      (
-		-- 	 if mode==1 then modebtn2.Caption="Pose"
-		--      if mode==2 then modebtn2.caption="Mixer" 
-		-- 	 setmode 3
-		-- 	 mode=3
-		-- 	 )   else
-		--    if modebtn2.caption=="Pose"  then 
-		--      (
-		-- 	 if mode==2 then modebtn2.Caption="Mixer"
-		--      if mode==3 then modebtn2.caption="Layer" 
-		-- 	 setmode 1
-		--      mode=1
-		-- 	 readpose 0
-		-- 	 ) 
+		on modebtn1 pressed do
+		(
+			if havebip==1 then
+			(
+		       if modebtn1.caption=="Mixer" then 
+				(
+					if mode==1 then modebtn1.Caption="Pose"
+					if mode==3 then modebtn1.caption="Layer" 
+					setmode 2
+					mode=2
+					--themixer.hideMixer();   themixer.showMixer()
+				) else      
+				if modebtn1.caption=="Layer"  then 
+				(
+					if mode==1 then modebtn1.Caption="Pose"
+					if mode==2 then modebtn1.caption="Mixer" 
+					setmode 3
+					mode=3
+				) else
+				if modebtn1.caption=="Pose" then 
+				(
+					if mode==2 then modebtn1.Caption="Mixer"
+					if mode==3 then modebtn1.caption="Layer" 
+					setmode 1
+					mode=1
+					readpose 0 
+				) 
+			)
+		)
 			
-		-- )
+		on  modebtn2 pressed do
+		(
+			if havebip==1 then
+			(
+		       if modebtn2.caption=="Mixer"  then 
+		     (
+			 if mode==1 then modebtn2.Caption="Pose"
+		     if mode==3 then modebtn2.caption="Layer" 
+			 setmode 2
+			 mode=2
+			 --themixer.hideMixer();   themixer.showMixer()
+			 )   else    
+		   if modebtn2.caption=="Layer"  then 
+		     (
+			 if mode==1 then modebtn2.Caption="Pose"
+		     if mode==2 then modebtn2.caption="Mixer" 
+			 setmode 3
+			 mode=3
+			 )   else
+		   if modebtn2.caption=="Pose"  then 
+		     (
+			 if mode==2 then modebtn2.Caption="Mixer"
+		     if mode==3 then modebtn2.caption="Layer" 
+			 setmode 1
+		     mode=1
+			 readpose 0
+			 ) 
+			
+			)
+		)
+			
 		
 		
-		-- on newlayer_btn pressed do
-		-- (
-		--    -- max motion mode
-		--     bip=bipname[24].controller;
-		-- 		if havebip==1 then 
-		-- 		 if biped.numLayers bip >= 1 then
-		--        	 messagebox("当前已存在层,无法再增加了")
-		--            else
-		--          undo on( biped.createLayer bip 1 "Layer 2" )
-		--        slidertime=currenttime
+		on newlayer_btn pressed do
+		(
+		   -- max motion mode
+		    bip=bipname[24].controller;
+				if havebip==1 then 
+				 if biped.numLayers bip >= 1 then
+		       	 messagebox("当前已存在层,无法再增加了")
+		           else
+		         undo on( biped.createLayer bip 1 "Layer 2" )
+		       slidertime=currenttime
 					
-		-- )
+		)
 				 
 			
 				
 		
 				
 				
-		-- on deletelayer_btn pressed do
-		-- 		if havebip==1 then undo on(bip=bipname[24].controller; if biped.numLayers bip >= 1 then   biped.deleteLayer bip  1 )
-		-- on collapselayer_btn pressed do
-		-- 		if havebip==1 then undo on(bip=bipname[24].controller; if biped.numLayers bip >= 1 then   biped.collapseAtLayer bip  0 )
-		-- on layerkey_btn pressed do
-		-- 		if havebip==1 then  undo on(biped.setSnapKey bipname[24])
+		on deletelayer_btn pressed do
+				if havebip==1 then undo on(bip=bipname[24].controller; if biped.numLayers bip >= 1 then   biped.deleteLayer bip  1 )
+		on collapselayer_btn pressed do
+				if havebip==1 then undo on(bip=bipname[24].controller; if biped.numLayers bip >= 1 then   biped.collapseAtLayer bip  0 )
+		on layerkey_btn pressed do
+				if havebip==1 then  undo on(biped.setSnapKey bipname[24])
 		
-		-- on copy_btn pressed  do
-		--   	if havebip==1 then
-		-- 	try(        
-		--           bip=bipname[24].controller	
-		-- 	       biped.deleteAllCopies  bip  #pose
-		-- 		  biped.deleteAllCopies bip #posture
-		-- 	     cos=biped.numCopyCollections bip
-		--           if cos==0 then  biped.createcopyCollection bip "zsj"
-		-- 		  biped.copyPosture bip #posture on on on
-		-- 	       biped.setCopyName bip #posture 1 "posture_good"
-		-- 	       posturenum=biped.numCopies bip #posture 
-		-- 	       posenum=biped.numCopies bip #pose 
+		on copy_btn pressed  do
+		  	if havebip==1 then
+			try(        
+		          bip=bipname[24].controller	
+			       biped.deleteAllCopies  bip  #pose
+				  biped.deleteAllCopies bip #posture
+			     cos=biped.numCopyCollections bip
+		          if cos==0 then  biped.createcopyCollection bip "zsj"
+				  biped.copyPosture bip #posture on on on
+			       biped.setCopyName bip #posture 1 "posture_good"
+			       posturenum=biped.numCopies bip #posture 
+			       posenum=biped.numCopies bip #pose 
 				   
-		-- 	        if posturenum==0 then 
-		-- 	        (biped.deleteAllCopies  bip  #pose
-		-- 		  biped.deleteAllCopies bip #posture
-		-- 		  biped.copyPosture  bip #pose on on on 
-		-- 		  biped.setCopyName bip #pose 1 "pose_good"		
-		-- 	  	  posturenum=biped.numCopies bip #posture 
-		-- 	       posenum=biped.numCopies bip #pose
-		-- 		   )
-		-- 		)   catch()
+			        if posturenum==0 then 
+			        (biped.deleteAllCopies  bip  #pose
+				  biped.deleteAllCopies bip #posture
+				  biped.copyPosture  bip #pose on on on 
+				  biped.setCopyName bip #pose 1 "pose_good"		
+			  	  posturenum=biped.numCopies bip #posture 
+			       posenum=biped.numCopies bip #pose
+				   )
+				)   catch()
 				
-		-- on paste_btn pressed do
-		-- 	if havebip==1 then
+		on paste_btn pressed do
+			if havebip==1 then
 			
-		-- 	undo on (
-		--       bip=bipname[24].controller
-		-- 	 posturenum=biped.numCopies bip #posture 
+			undo on (
+		      bip=bipname[24].controller
+			 posturenum=biped.numCopies bip #posture 
 		
-		-- 	if posturenum==1  then 
-		-- 	   biped.pastePosture  bip #posture false "posture_good"
-		-- 	else
-		-- 	   biped.pastePosture  bip #pose false "pose_good"	
+			if posturenum==1  then 
+			   biped.pastePosture  bip #posture false "posture_good"
+			else
+			   biped.pastePosture  bip #pose false "pose_good"	
 	
-		-- )
+		)
 		
-		-- on mirrorpaste_btn pressed do
-		-- 		if havebip==1 then
+		on mirrorpaste_btn pressed do
+				if havebip==1 then
 				
-		-- 		undo on (
-		-- 	bip=bipname[24].controller
-		-- 	posturenum=biped.numCopies bip #posture 
-		-- 	if posturenum==1  then 
-		-- 	   biped.pastePosture  bip #posture true "posture_good"
-		-- 	else
-		-- 	   biped.pastePosture  bip #pose true "pose_good"		
-		-- )
+				undo on (
+			bip=bipname[24].controller
+			posturenum=biped.numCopies bip #posture 
+			if posturenum==1  then 
+			   biped.pastePosture  bip #posture true "posture_good"
+			else
+			   biped.pastePosture  bip #pose true "pose_good"		
+		)
 		
 			
-		-- on MIX_btn pressed do
-		-- 		if havebip==1 then( themixer.hideMixer();	themixer.showMixer();   )
+		on MIX_btn pressed do
+				if havebip==1 then( themixer.hideMixer();	themixer.showMixer();   )
 			
-		-- on mixdoor_btn changed state do
-		-- 		if havebip==1 then(bip=bipname[24].controller; if mixdoor_btn.checked==true then  bip.mixerMode=true else bip.mixerMode = false; )
+		on mixdoor_btn changed state do
+				if havebip==1 then(bip=bipname[24].controller; if mixdoor_btn.checked==true then  bip.mixerMode=true else bip.mixerMode = false; )
 		
-		-- on MtoB_btn pressed do
-		-- 	if havebip==1 then
-		-- 	undo on (	
-		--  bip=bipname[24].controller;
-		--  if mixdoor_btn.checked==true  and  bip.mixerMode==true then 
-		--   (
-		--    mymixer = bipname[24].transform.controller.mixer
-		--    mixdown mymixer true true 6 true 166.15
-		--    copyMixdownToBiped  mymixer
-		--    bip.mixerMode=false
-		--    mixdoor_btn.checked=false
-		--   )
-		-- )
+		on MtoB_btn pressed do
+			if havebip==1 then
+			undo on (	
+		 bip=bipname[24].controller;
+		 if mixdoor_btn.checked==true  and  bip.mixerMode==true then 
+		  (
+		   mymixer = bipname[24].transform.controller.mixer
+		   mixdown mymixer true true 6 true 166.15
+		   copyMixdownToBiped  mymixer
+		   bip.mixerMode=false
+		   mixdoor_btn.checked=false
+		  )
+		)
 		
-		-- on  MixFolder_btn pressed do
-		-- (
-		--   if mergebip.open==false then createdialog mergebip 294 157
-		--      else DestroyDialog mergebip  
-		-- )
-		
-		
-		-- on startnumtext entered text do
-		-- (
-		-- start=startnumtext.text as integer
-		-- if start==undefind then start=animationRange.start
-		--   if start>=endnum.value then   endnum.value=start+1;
-		-- animationRange = Interval start endnum.value
-		-- )
+		on  MixFolder_btn pressed do
+		(
+		  if mergebip.open==false then createdialog mergebip 294 157
+		     else DestroyDialog mergebip  
+		)
 		
 		
-		-- on endnum entered  do
-		-- (
-		-- animationRange = Interval animationRange.start endnum.value
-		-- )
+		on startnumtext entered text do
+		(
+		start=startnumtext.text as integer
+		if start==undefind then start=animationRange.start
+		  if start>=endnum.value then   endnum.value=start+1;
+		animationRange = Interval start endnum.value
+		)
 		
-	-- 	on time1_btn pressed do
-	-- 	/*
-	-- 		if keyboard.controlpressed==true then
-	-- 		(
-	--         start=animationRange.start-myaddtime;end=animationRange.end
-	-- 	    animationRange = Interval  start end   
-	-- 		)
+		
+		on endnum entered  do
+		(
+		animationRange = Interval animationRange.start endnum.value
+		)
+		
+		on time1_btn pressed do
+		/*
+			if keyboard.controlpressed==true then
+			(
+	        start=animationRange.start-myaddtime;end=animationRange.end
+		    animationRange = Interval  start end   
+			)
 	
-	-- 		 else
-	-- 		 */
-	--     	(
-	-- 		newtime=slidertime-mymovetime;
-	-- 		if newtime-mymovetime<animationRange.start then
-	-- 		(
-	--           start=animationRange.start-mymovetime;end=animationRange.end-mymovetime
-	-- 	      animationRange = Interval  start end
-	-- 		  )
-	-- 		  slidertime=newtime;
-	-- 	    )	
+			 else
+			 */
+	    	(
+			newtime=slidertime-mymovetime;
+			if newtime-mymovetime<animationRange.start then
+			(
+	          start=animationRange.start-mymovetime;end=animationRange.end-mymovetime
+		      animationRange = Interval  start end
+			  )
+			  slidertime=newtime;
+		    )	
 		
 		
-	-- 	on time2_btn pressed do
-	-- 	(
-	-- 	    start=currentTime-myrangetime/2;end=currentTime+myrangetime/2
-	-- 	    animationRange = Interval  start end
-	-- 	)
+		on time2_btn pressed do
+		(
+		    start=currentTime-myrangetime/2;end=currentTime+myrangetime/2
+		    animationRange = Interval  start end
+		)
 			
-	-- 	on time3_btn pressed do
-	-- 	/*
-	-- 		if keyboard.controlpressed==true then
-	-- 		 (
-	--           start=animationRange.start;end=animationRange.end+myaddtime
-	-- 	      animationRange = Interval  start end	  	     
-	-- 	     )
-	-- 	    	else
-	-- */
-	--     	(
-	-- 		newtime=slidertime+mymovetime;
-	-- 		if newtime+mymovetime>animationRange.end then
-	-- 		(
-	--           start=animationRange.start+mymovetime;end=animationRange.end+mymovetime
-	-- 	      animationRange = Interval  start end
-	-- 		  )
-	-- 		  slidertime=newtime;
-	-- 	    )	
+		on time3_btn pressed do
+		/*
+			if keyboard.controlpressed==true then
+			 (
+	          start=animationRange.start;end=animationRange.end+myaddtime
+		      animationRange = Interval  start end	  	     
+		     )
+		    	else
+	*/
+	    	(
+			newtime=slidertime+mymovetime;
+			if newtime+mymovetime>animationRange.end then
+			(
+	          start=animationRange.start+mymovetime;end=animationRange.end+mymovetime
+		      animationRange = Interval  start end
+			  )
+			  slidertime=newtime;
+		    )	
 		
-	-- 	on time1_btn rightclick do 
-	-- 		if keyboard.controlpressed==true then
-	-- 		(
-	--         start=animationRange.start+myaddtime;end=animationRange.end
-	-- 		if end-start<=0 then start=end-1;
-	-- 	    animationRange = Interval  start end   
-	-- 		)
-	--          else
-	-- 		(
-	-- 		start=mystarttime;end=mystarttime+myrangetime
-	-- 	    animationRange = Interval  start end
-	-- 		)
+		on time1_btn rightclick do 
+			if keyboard.controlpressed==true then
+			(
+	        start=animationRange.start+myaddtime;end=animationRange.end
+			if end-start<=0 then start=end-1;
+		    animationRange = Interval  start end   
+			)
+	         else
+			(
+			start=mystarttime;end=mystarttime+myrangetime
+		    animationRange = Interval  start end
+			)
 	
-	-- 	on time2_btn rightclick do 
-	-- if havebip==1 then
-	-- 	(
-	-- 	  	 range_begin=99999;
-	-- range_end=-99999;
-	-- for i =1 to 23 do
-	-- (
-	-- thiskey=bipname[i].controller.keys
-	-- kn=thiskey.count
-	-- if kn>0 then
-	-- (
-	-- rb=thiskey[1].time ;re=thiskey[kn].time ;
+		on time2_btn rightclick do 
+	if havebip==1 then
+		(
+		  	 range_begin=99999;
+	range_end=-99999;
+	for i =1 to 23 do
+	(
+	thiskey=bipname[i].controller.keys
+	kn=thiskey.count
+	if kn>0 then
+	(
+	rb=thiskey[1].time ;re=thiskey[kn].time ;
 	
-	-- if range_begin>rb then range_begin=rb
-	-- if range_end<re then range_end=re
-	-- )
+	if range_begin>rb then range_begin=rb
+	if range_end<re then range_end=re
+	)
 	
 	
-	-- )
+	)
 	
 	 
-	-- thiskey=bipname[24].controller.vertical.controller.keys
-	-- kn=thiskey.count;
-	-- if kn>0 then
-	-- (
-	-- rb=thiskey[1].time ;re=thiskey[kn].time ;
-	-- if range_begin>rb then range_begin=rb
-	-- if range_end<re then range_begin=re
-	-- )
+	thiskey=bipname[24].controller.vertical.controller.keys
+	kn=thiskey.count;
+	if kn>0 then
+	(
+	rb=thiskey[1].time ;re=thiskey[kn].time ;
+	if range_begin>rb then range_begin=rb
+	if range_end<re then range_begin=re
+	)
 	
 	
-	-- thiskey=bipname[24].controller.horizontal.controller.keys
-	-- kn=thiskey.count;
-	-- if kn>0 then
-	-- (
-	-- rb=thiskey[1].time ;re=thiskey[kn].time ;
-	-- if range_begin>rb then range_begin=rb
-	-- if range_end<re then range_begin=re
-	-- )
+	thiskey=bipname[24].controller.horizontal.controller.keys
+	kn=thiskey.count;
+	if kn>0 then
+	(
+	rb=thiskey[1].time ;re=thiskey[kn].time ;
+	if range_begin>rb then range_begin=rb
+	if range_end<re then range_begin=re
+	)
 	
-	-- thiskey=bipname[24].controller.turning.controller.keys
-	-- kn=thiskey.count;
-	-- if kn>0 then
-	-- (
-	-- rb=thiskey[1].time ;re=thiskey[kn].time ;
-	-- if range_begin>rb then range_begin=rb
-	-- if range_end<re then range_begin=re
-	-- )
+	thiskey=bipname[24].controller.turning.controller.keys
+	kn=thiskey.count;
+	if kn>0 then
+	(
+	rb=thiskey[1].time ;re=thiskey[kn].time ;
+	if range_begin>rb then range_begin=rb
+	if range_end<re then range_begin=re
+	)
 	
-	-- animationRange = Interval  rb  re  
-	-- )	
-	-- 	else
-	-- 	 animationRange = Interval  mystarttime myendtime
+	animationRange = Interval  rb  re  
+	)	
+		else
+		 animationRange = Interval  mystarttime myendtime
 	
-	-- 	on time3_btn rightclick do 
-	-- 		if keyboard.controlpressed==true then
-	-- 		 (
-	--           start=animationRange.start;end=animationRange.end-myaddtime
-	-- 		  if end-start<=0 then end=start+1
-	-- 	      animationRange = Interval  start end	  	     
-	-- 	     )
-	-- 		 else
-	-- 	     (
-	-- 	      start=myendtime-myrangetime;end=myendtime
-	-- 	      animationRange = Interval  start end
-	-- 	     )	
+		on time3_btn rightclick do 
+			if keyboard.controlpressed==true then
+			 (
+	          start=animationRange.start;end=animationRange.end-myaddtime
+			  if end-start<=0 then end=start+1
+		      animationRange = Interval  start end	  	     
+		     )
+			 else
+		     (
+		      start=myendtime-myrangetime;end=myendtime
+		      animationRange = Interval  start end
+		     )	
 			 
 		on cstoolroll moved pos do
 	   (
@@ -4062,41 +4068,41 @@ if doesFileExist ((getDir #maxData) + "\\cstool.ini") == false then
 		dialog_y=tpos.y
 	   ) 
 		
-		-- on LeftFootA_btn mouseover do (LeftFootA_btn.bitmap = image_LeftFootA2)
-		-- on LeftFootA_btn mouseout  do (LeftFootA_btn.bitmap = image_LeftFootA)
+		on LeftFootA_btn mouseover do (LeftFootA_btn.bitmap = image_LeftFootA2)
+		on LeftFootA_btn mouseout  do (LeftFootA_btn.bitmap = image_LeftFootA)
 	
 		
-		-- on LeftFootB_btn mouseover do (LeftFootB_btn.bitmap = image_LeftFootB2)
-		-- on LeftFootB_btn mouseout  do (LeftFootB_btn.bitmap = image_LeftFootB)
+		on LeftFootB_btn mouseover do (LeftFootB_btn.bitmap = image_LeftFootB2)
+		on LeftFootB_btn mouseout  do (LeftFootB_btn.bitmap = image_LeftFootB)
 		
-		-- on LeftFootC_btn mouseover do (LeftFootC_btn.bitmap = image_LeftFootC2)
-		-- on LeftFootC_btn mouseout  do (LeftFootC_btn.bitmap = image_LeftFootC)
+		on LeftFootC_btn mouseover do (LeftFootC_btn.bitmap = image_LeftFootC2)
+		on LeftFootC_btn mouseout  do (LeftFootC_btn.bitmap = image_LeftFootC)
 	
 		
-		-- on LeftFootD_btn mouseover do (LeftFootD_btn.bitmap = image_LeftFootD2)
-		-- on LeftFootD_btn mouseout  do (LeftFootD_btn.bitmap = image_LeftFootD)
+		on LeftFootD_btn mouseover do (LeftFootD_btn.bitmap = image_LeftFootD2)
+		on LeftFootD_btn mouseout  do (LeftFootD_btn.bitmap = image_LeftFootD)
 		
 	
-		-- on LeftFootA_btn  click do if $==bipname[16] or $==bipname[15] then try( BipedPivot 1;)catch()
-		-- on LeftFootB_btn  click do if $==bipname[16] or $==bipname[15] then try( BipedPivot 3;)catch()
-		-- on LeftFootC_btn  click do if $==bipname[16] or $==bipname[15] then try( BipedPivot 6;)catch()
-		-- on LeftFootD_btn  click do if $==bipname[16] or $==bipname[15] then try( BipedPivot 8;)catch()
+		on LeftFootA_btn  click do if $==bipname[16] or $==bipname[15] then try( BipedPivot 1;)catch()
+		on LeftFootB_btn  click do if $==bipname[16] or $==bipname[15] then try( BipedPivot 3;)catch()
+		on LeftFootC_btn  click do if $==bipname[16] or $==bipname[15] then try( BipedPivot 6;)catch()
+		on LeftFootD_btn  click do if $==bipname[16] or $==bipname[15] then try( BipedPivot 8;)catch()
 	
-		on set_btn pressed do
-		(
+		-- on set_btn pressed do
+		-- (
 		
-		 if paraflag==1 then 
-			   ( 
-				paraflag=0;
-				savedate();
-				destroydialog setpara
-				)
-				else
-				(
-					createdialog setpara 120 310 (dialog_x-124) (dialog_y)
-				  paraflag=1;
-				  )
-		)
+		--  if paraflag==1 then 
+		-- 	   ( 
+		-- 		paraflag=0;
+		-- 		savedate();
+		-- 		destroydialog setpara
+		-- 		)
+		-- 		else
+		-- 		(
+		-- 			createdialog setpara 120 310 (dialog_x-124) (dialog_y)
+		-- 		  paraflag=1;
+		-- 		  )
+		-- )
 		
 		on help_btn rightclick do
 		(
@@ -4409,7 +4415,7 @@ if doesFileExist ((getDir #maxData) + "\\cstool.ini") == false then
 	--
 	--
 	--
-	createdialog cstoolroll 115 305  dialog_x dialog_y 
+	createdialog cstoolroll 115 395  dialog_x dialog_y 
 	
 	
 	--addrollout cstoolroll cstool
