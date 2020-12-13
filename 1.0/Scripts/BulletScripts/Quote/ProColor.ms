@@ -77,13 +77,13 @@ rollout ProColorDialog "ProColor v0.8.1"
 		button convertBtn "颜色转换到材质球" tooltip:"调节选中，否则全部。" width:150 height:20
 	)
 
-	on btnClearMat pressed do
+	on btnClearMat pressed do with undo on
 	(
 		if selection.count > 0 then $.material = undefined
 		else messagebox "请至少选择一个物体！    "
 	)
 
-	on rtcp changed new_col do
+	on rtcp changed new_col do with undo on
 	(
 		if selection.count > 0 then for obj in selection do selection.wirecolor = new_col
 		else for obj in geometry do geometry.wirecolor = new_col
@@ -115,7 +115,7 @@ rollout ProColorDialog "ProColor v0.8.1"
 		)
 	)
 
-	on convertBtn pressed do
+	on convertBtn pressed do with undo on
 	(
 		if selection.count > 0 then
 		(
