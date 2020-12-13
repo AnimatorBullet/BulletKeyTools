@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-13 19:57:57
+ * @LastEditTime: 2020-12-13 23:16:01
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1795,7 +1795,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		-- dotnet.AddEventHandler myTimer #elapsed fnRefreshHelpText
 		-- myTimer.Start()
 		-- ckbHelpBtn.checked = iniHelpBtn
-		timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
+		-- timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
 		-- iniPos = (GetDialogPos rolloutBulletKeyTools) 
 		fnSaveConfig ()  ---------------脚本位置赋值
 		fnSetConfig ()  ----------------保存位置信息到ini文件
