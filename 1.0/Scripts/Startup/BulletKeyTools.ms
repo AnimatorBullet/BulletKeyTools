@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-13 03:06:58
+ * @LastEditTime: 2020-12-13 19:57:57
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -58,6 +58,9 @@ Global uiClientOffsets    = undefined
 Global rolloutBulletKeyTools
 Global menuSetFps
 Global menuSetSpeed
+global myfgColor
+global myClickColor
+Global SIOFile = dotNetClass "System.IO.File"
 -- Global myTimer = dotnetobject "System.Timers.Timer" 500 autoreset:true
 ------------------全局变量-------------------------------------------------------------------
 
@@ -88,6 +91,68 @@ fn fnSetConfig =  --保存参数,脚本位置
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "HelpBtn" (iniHelpBtn as string)
 )
 ---------------配合BulletTools工具的ini文件保存位置信息-----------------
+
+fn fnGetColorTheme =
+(
+	local curColorThemeFile = colorMan.getFileName()
+	if (matchpattern curColorThemeFile pattern:"*light*") then
+	(
+		myfgColor    = (color 65 105 225)
+		myClickColor = (color 0 139 139)
+	)
+	else
+	(
+		myfgColor    = (color 255 255 0)
+		myClickColor = (color 0 255 127)
+	)
+)
+fnGetColorTheme() ----获取当前主题是深色还是浅色,来更改文字颜色
+
+-------------------右键面板空白处设置---------------------------------------------------------
+fn fnDelFileDir targetDel =  --删除文件
+(
+	if (SIOFile.Exists targetDel == true) then ---判断是否存在文件
+	(
+		if getFileAttribute targetDel #readOnly == true or \
+		getFileAttribute targetDel #hidden == true do --修改只读或者隐藏属性
+		(
+			setFileAttribute targetDel #readOnly false ; \
+			setFileAttribute targetDel #hidden false
+		)
+		try (SIOFile.Delete(targetDel);(print ("已清除自启: "+ filenameFromPath targetDel)))
+		catch (print ("删除失败: "+ filenameFromPath targetDel + ". 请尝试手动删除.");print "删除失败")
+	)
+)
+
+rcmenu menuConfig
+(
+	menuItem mItemIsStartup "本工具是否自启" checked:true
+
+	on menuConfig open do
+	(
+		myMs = (getDir #Scripts)+ "\\BulletScripts\\" + "BulletKeyTools.ms"
+		startupPath = (getDir #StartupScripts)+ "\\" + "BulletKeyTools.ms"
+		if(SIOFile.Exists startupPath) then (mItemIsStartup.checked = true)
+		else (mItemIsStartup.checked = false)
+	)
+	on mItemIsStartup picked do 
+	(
+		if (mItemIsStartup.checked == true) then 
+		(
+			fnDelFileDir startupPath
+			mItemIsStartup.checked == false
+		)
+		else 
+		(
+			if (not (SIOFile.Exists startupPath)) do
+			(
+				SIOFile.Copy myMs startupPath
+				print ("已打开自启: " + filenameFromPath startupPath)
+				mItemIsStartup.checked == true
+			)
+		)
+	)
+)
 
 -------------------帧率,播放速度--------------------------------------------------------------
 Global valueFps
@@ -540,7 +605,7 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 rollout rolloutBulletKeyTools "" width:200 height:235
 (
 	---------------------------------UI--------------------------------------
-	groupbox gbxMainUI "[ BsKeyTools v0.9.0 ] - 中键关闭" pos:[5,5] width:190 height:197
+	groupbox gbxMainUI "[ BsKeyTools v0.9.0 ] - 中键关闭" pos:[5,5] width:190 height:195
 	
 		label lblRangeTimeText "| 起始帧 |      | 结束帧 |" pos:[10,25] width:180
 		spinner spiStartTime "" pos:[10,45] width:50 type:#integer \
@@ -602,12 +667,10 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		pos:[280,15] toolTip:""
 		checkbutton ckbC4 "爱" width:38 height:26 \
 		pos:[317,15] toolTip:""
-		-- checkbutton ckbC5 "乱" width:30 height:25 \
-		-- pos:[325,15] toolTip:""
 
-		button btnBoneTraj "显示 | 清除 Bone轨迹" width:150 height:30   visible:false \
+		button btnBoneTraj "显示 | 清除Bone轨迹 " width:150 height:30   visible:false \
 		toolTip:"左：切换显示Bone轨迹,\r\n右：清除所有Bone轨迹"
-		button btnBipedTraj "单加 | 清除 Biped轨迹" width:150 height:30   visible:false \
+		button btnBipedTraj "单加 | 清除Biped轨迹 " width:150 height:30   visible:false \
 		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除添加的所有Biped轨迹~"
 		button btnFnFrame "整数小数帧切换        " width:150 height:30   visible:false \
 		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿"
@@ -615,45 +678,47 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		tooltip:"选择同颜色物体"
 		button btnFnTCB "Euler  |  TCB 互转" width:150 height:30   visible:false \
 		tooltip:"欧拉和TCB互转"
-		button btnEulerFilter "欧拉曲线过滤    " width:150 height:30   visible:false \
+		button btnEulerFilter "欧拉曲线过滤     " width:150 height:30   visible:false \
 		tooltip:"Bone骨骼过滤欧拉旋转"
 		button btnBoneTool "BoneOn 开关切换" width:150 height:30   visible:false \
 		tooltip:"骨骼BoneOn切换"
-		button btnNull1 "待添加" width:150 height:30   visible:false \
-		tooltip:""
+		button btnColorTools "颜色渐变          " width:150 height:30   visible:false \
+		tooltip:"做 Demo 素模或特效方便~"
 		-- button btnClearSelKeys "▲ 取消选择帧" width:150 height:30   visible:false \
 		-- tooltip:"取消关键帧选择 (非删除帧)"
-		button btnDelOutKeys "删选中 | 所有帧" width:150 height:30   visible:false \
-		toolTip:"左：清除选择\r\n右：清除所有帧\r\nLink帧请手动删~"
+		button btnDelOutKeys "清空所有关键帧  " width:150 height:30   visible:false \
+		toolTip:"清除所有帧\r\nLink帧请手动删"
 		button btnCleanOutKeys "清范围外关键帧 " width:150 height:30   visible:false \
 		toolTip:"清范围外帧(无限帧)"
 		button btnHideUnSel "隐藏当前未选中物体" width:150 height:30   visible:false \
-		toolTip:"隐藏当前显示的未选中物体，可再重新显示"
+		toolTip:"隐藏当前显示的未选中物体，右键可重新显示"
 		button btnSelBoneBiped "Biped | Bone 选择" width:150 height:30   visible:false \
 		toolTip:"左：选择所有biped\r\n右：选择所有bone"
 		button btnEndBone "清除 | 添加  末端" width:150 height:30   visible:false \
 		toolTip:"清除添加Bone末端"
 		button btnQuickPrev "快速拍屏 | 打开目录 " width:150 height:30   visible:false \
 		toolTip:"左：快速拍屏预览\r\n右：打开预览文件夹"
-		button btnFastAlign "快速对齐工具  " width:150 height:30   visible:false \
+		button btnFastAlign "快速对齐          " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
 		button btnFnKeyType "批量改滑动帧  " width:150 height:30   visible:false \
 		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置"
-		button btnCopyKeyTools "暴力粘贴工具  " width:150 height:30   visible:false \
+		button btnCopyKeyTools "暴力粘贴          " width:150 height:30   visible:false \
 		toolTip:"目前引用吇鱼大佬的插件\r\n后面随缘新写或优化"
-		button btnAnimMirror "动画镜像工具  " width:150 height:30   visible:false \
+		button btnAnimMirror "动画镜像          " width:150 height:30   visible:false \
 		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化"
 		checkbutton ckbFnMtlDisplay "白模 | 红模材质切换 " width:150 height:30   visible:false \
 		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:Clay显示开关\r\n注意：暂不支持子材质和Vray材质..."
 		
 		button btnCutSequence "动画片断记录    " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
-		button btnPoseTool "ose 库存取       " width:150 height:30   visible:false \
+		button btnPoseTool "Pose 库存取       " width:150 height:30   visible:false \
 		toolTip:"功能待添加"
 		button btnMopherSlider "表情滑条             " width:150 height:30   visible:false \
 		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~"
-		button btnNull2 "待添加" width:150 height:30   visible:false \
-		toolTip:"CS缩放添加清除（项目慎用）"
+		button btnBipedScale "Biped缩放           " width:150 height:30   visible:false \
+		toolTip:"效果展示可用，导入引擎别用\r\n再次点击可解除"
+		button btnCleanVirus "病毒解决方案  " width:150 height:30   visible:false \
+		toolTip:"点击跳转"
 	
 	-- groupbox gbxMyScripts "" pos:[5,230] width:335 height:45
 
@@ -666,7 +731,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	groupbox gbxTips "" pos:[5,200] width:190 height:30
 	
 		HyperLink lnkLink "---  | 2019.9  miHoYo_Bullet.S |  - ？ --"
-		color:(color 255 20 100) hovercolor:(color 255 0 255) visitedcolor:(color 255 20 100) \
+		color:myfgColor hovercolor:myClickColor visitedcolor:myClickColor \
 		pos:[7,210] address:"https://www.anibullet.com/post/6271.html"
 		-- label labmiHoYo "--- TECH OTAKUS SAVE THE WORLD --" \
 		-- pos:[7,210]
@@ -734,12 +799,12 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 
 	fn fnSwitchToolsBtn idBtn =
 	(
-		arrToolC1 = #(rolloutBulletKeyTools.btnDelOutKeys,\
+		arrToolC1 = #(rolloutBulletKeyTools.btnColorTools,\
 						rolloutBulletKeyTools.btnFastAlign,\
 						rolloutBulletKeyTools.btnCopyKeyTools,\
 						rolloutBulletKeyTools.btnAnimMirror,\
 						rolloutBulletKeyTools.btnFnKeyType,\
-						rolloutBulletKeyTools.btnNull1)
+						rolloutBulletKeyTools.btnCleanVirus)
 		arrToolC2 = #(rolloutBulletKeyTools.btnBoneTraj,\
 						rolloutBulletKeyTools.btnBipedTraj,\
 						rolloutBulletKeyTools.btnHideUnSel,\
@@ -750,20 +815,14 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 						rolloutBulletKeyTools.btnSelBoneBiped,\
 						rolloutBulletKeyTools.btnCutSequence,\
 						rolloutBulletKeyTools.btnMopherSlider,\
-						rolloutBulletKeyTools.btnPoseTool,\
+						rolloutBulletKeyTools.btnBipedScale,\
 						rolloutBulletKeyTools.btnPoseTool)
 		arrToolC4 = #(rolloutBulletKeyTools.btnFnTCB,\
 						rolloutBulletKeyTools.btnEulerFilter,\
 						rolloutBulletKeyTools.btnEndBone,\
 						rolloutBulletKeyTools.btnCleanOutKeys,\
-						rolloutBulletKeyTools.btnNull2,\
+						rolloutBulletKeyTools.btnDelOutKeys,\
 						rolloutBulletKeyTools.btnBoneTool)
-		-- arrToolC5 = #(rolloutBulletKeyTools.btnPoseTool,\
-		-- 				rolloutBulletKeyTools.btnMopherSlider,\
-		-- 				rolloutBulletKeyTools.btnCutSequence,\
-		-- 				rolloutBulletKeyTools.btnImportOut,\
-		-- 				rolloutBulletKeyTools.btnNull13,\
-		-- 				rolloutBulletKeyTools.btnNiceSet)
 
 		local arrBtnAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4
 		
@@ -798,6 +857,44 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 				arrBtnTemp[idBtn].checked = true
 			)
 		)
+	)
+
+	fn fnIsBipRoot obj = 
+	(
+		if ((classof obj.baseobject) == Biped_Object) do 
+		(
+			if (obj.controller.rootNode == obj) do (return true)
+		)
+		return false
+	)
+
+	fn fnBipedScale =
+	(
+		if (selection.count != 0) then 
+		(
+			for i in selection as Array do
+			(
+				if ((fnIsBipRoot i) == false) then 
+				(
+					subAnimSelected = getSubAnimName (i.transform.controller[1][1]) 1
+					undo "addDelBipedScale" on
+					(
+						if (subAnimSelected == #ScaleXYZ) then 
+						try (i.transform.controller[1][1].delete 1)catch()
+						else if (subAnimSelected == #available) then 
+						(
+							try
+							(
+								rootnodeSelected = i.transform.controller.rootnode
+								rootnodeSelected.transform.controller.enableSubAnims = true
+								i.transform.controller[1][1][1].controller = ScaleXYZ ()
+							)catch()
+						)
+					)
+				)
+			)
+		)
+	else (messagebox "请选择一根或多根 Biped 骨骼!    \r\n" beep:false title:"选择有误！")
 	)
 
 	Fn fnCleanOutRangeKeys inputObject =  ---清理无限帧,以前收集的,找不到来源了,大概是遍历子动画
@@ -1688,7 +1785,8 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	)
 
 	on rolloutBulletKeyTools open do  ----打开脚本时操作
-	(------刷新图标, 图标是max自带的,主要是懒得做
+	(
+		------刷新图标, 图标是max自带的,主要是懒得做
 		btnSelBeforeKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,3,3,3,3,true,true) 
 		btnSelAfterKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,11,11,11,11,true,true) 
 		btnSelAllKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,26,26,26,26,true,true)
@@ -1719,6 +1817,11 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		fnSetConfig ()
 	)
 	-----------------------------------------------------------------------------------------
+	on rolloutBulletKeyTools rbuttondown pos do 
+	(
+		popupMenu menuConfig pos:[mouse.screenpos.x + 20,mouse.screenpos.y]
+	)
+
 	on rolloutBulletKeyTools mbuttondown pos do 
 	(
 		try (destroydialog rolloutBulletKeyTools) catch ()
@@ -2146,30 +2249,33 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 
 	on btnCleanOutKeys pressed do with undo on-----------清理范围外帧(无限帧)
 	(
-		if (selection as array).count == 0 then 
+		if (queryBox "是否清除范围外关键帧？\r\n( Link 帧请手动删除 )    " \
+		title:"是否清除范围外关键帧？" beep:false) then
 		(
-			for tempObject in (objects as Array) do fnCleanOutRangeKeys tempObject
-		)
-		else
-		(
-			for tempObject in (selection as Array) do fnCleanOutRangeKeys tempObject
+			if (selection as array).count == 0 then 
+			(
+				for tempObject in (objects as Array) do fnCleanOutRangeKeys tempObject
+			)
+			else
+			(
+				for tempObject in (selection as Array) do fnCleanOutRangeKeys tempObject
+			)
+			messagebox "清理成功！    " beep:false
 		)
 	)
 
 	on btnDelOutKeys pressed do with undo on-----------清理选择帧
 	(
-		fnDelSelKeys ()
-	)
-
-	on btnDelOutKeys rightclick do with undo on-----------清理选择帧
-	(
-		actionMan.executeAction 0 "40021"  -- Selection: Select All
-		fnCollectKeys ()
-		fnSelKeys keyFirst keyEnd 2
-		fnDelSelKeys ()
-		if arrLinkKeys.count != 0 then
+		if (queryBox "是否清除所有帧？\r\n( Link 帧请手动删除 )    " \
+		title:"是否清除所有帧" beep:false) then
 		(
-			fnSelLinkKeys arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time 2
+			actionMan.executeAction 0 "40021"  -- Selection: Select All
+			fnCollectKeys ()
+			fnSelKeys keyFirst keyEnd 2
+			fnDelSelKeys ()
+			if arrLinkKeys.count != 0 then (
+				fnSelLinkKeys arrLinkKeys[1].time arrLinkKeys[arrLinkKeys.count].time 2
+			)
 		)
 	)
 
@@ -2316,15 +2422,6 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		)
 		else ckbC4.checked = true
 	)
-	-- on ckbC5 changed state do 
-	-- (
-	-- 	if state == true then 
-	-- 	(
-	-- 		fnSwitchToolBtnChecked 5
-	-- 		fnSwitchToolsBtn 5
-	-- 	)
-	-- 	else ckbC5.checked = true
-	-- )
 	--------------------------------------------------------------------
 
 	on btnFnTCB pressed do 
@@ -2535,8 +2632,29 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 			)
 		)
 	)
+
+	on btnBipedScale pressed do 
+	(
+		fnBipedScale ()
+	)
+
+	on btnCleanVirus pressed do 
+	(
+		if (queryBox "是否跳转网页查看Max和Maya病毒解决方案合集?    " \
+		title:"是否跳转网页" beep:false) then
+		(
+			shellLaunch "https://www.anibullet.com/post/6569.html" ""
+		)
+		else return ()
+	)
+
+	on btnColorTools pressed do 
+	(
+		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\ProColor.ms")
+	)
+
 )
-Createdialog rolloutBulletKeyTools fgcolor:(color 255 20 100) pos:iniPos style:#()
+Createdialog rolloutBulletKeyTools fgcolor:myfgColor pos:iniPos style:#()
 clearListener()  ---------清除侦听器
 
 
