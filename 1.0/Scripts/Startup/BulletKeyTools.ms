@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-13 19:57:57
+ * @LastEditTime: 2020-12-14 10:55:11
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -95,10 +95,18 @@ fn fnSetConfig =  --保存参数,脚本位置
 fn fnGetColorTheme =
 (
 	local curColorThemeFile = colorMan.getFileName()
-	if (matchpattern curColorThemeFile pattern:"*light*") then
+	if (curColorThemeFile != undefined) then
 	(
-		myfgColor    = (color 65 105 225)
-		myClickColor = (color 0 139 139)
+		if (matchpattern curColorThemeFile pattern:"*light*") then
+		(
+			myfgColor    = (color 65 105 225)
+			myClickColor = (color 0 139 139)
+		)
+		else
+		(
+			myfgColor    = (color 255 255 0)
+			myClickColor = (color 0 255 127)
+		)
 	)
 	else
 	(
