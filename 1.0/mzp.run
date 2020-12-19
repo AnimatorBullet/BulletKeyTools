@@ -1,0 +1,9 @@
+  name "BulletKeyTools"
+  version 0.9.2
+  
+  treeMove "BulletKeyTools" to "$temp"
+  
+  run "installBulletScripts.ms"
+  drop "installBulletScripts.ms"
+  
+  clear temp

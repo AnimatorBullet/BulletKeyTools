@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-14 10:55:51
+ * @LastEditTime: 2020-12-19 04:37:14
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -15,25 +15,26 @@ struct myScript (id,msName,dir)
 
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPos  	--位置保存记录
-Global iniHelpBtn         = off--记录是否打开帮助模式
-Global iniArrMyScripts    = #()
-Global idBtn              = 1
-Global posMouX            = mouse.screenpos.x
-Global posMouY            = mouse.screenpos.y  --获取鼠标位置
-Global posMouMoved        = [0,0]
-Global posToolBtn         = [205,45]
-Global switchMouseState   = false
-Global switchSelKeyRange  = 0
-Global switchHideBones    = 0
-Global switchHideBiped    = 0
-Global switchToolPanel    = 0
-Global arrLastSelRange    = #()
-Global switchAllKeyRange  = 0
-Global arrLastAllRange    = #()
-Global arrKeysTime        = #()  -----------biped和bone的首尾帧
-Global arrLinkKeys        = #()  -----------存link帧
-Global arrKeysSelected    = #()  -----------存选中的帧
-global arrBlockingKeys    = #()  -----------选中或者所有物体的所有关键帧
+Global iniHelpBtn        = off--记录是否打开帮助模式
+Global iniArrMyScripts   = #()
+Global idBtn             = 1
+Global posMouX           = mouse.screenpos.x
+Global posMouY           = mouse.screenpos.y  --获取鼠标位置
+Global posMouMoved       = [0,0]
+Global posToolBtn        = [205,45]
+Global switchMouseState  = false
+Global switchSelKeyRange = 0
+Global switchHideBones   = 0
+Global switchHideBiped   = 0
+Global switchToolPanel   = 0
+Global arrLastSelRange   = #()
+Global switchAllKeyRange = 0
+Global iniAddToolbars    = 0
+Global arrLastAllRange   = #()
+Global arrKeysTime       = #()  -----------biped和bone的首尾帧
+Global arrLinkKeys       = #()  -----------存link帧
+Global arrKeysSelected   = #()  -----------存选中的帧
+global arrBlockingKeys   = #()  -----------选中或者所有物体的所有关键帧
 Global keyFirst
 Global keyEnd
 Global keySelFirst
@@ -61,6 +62,7 @@ Global menuSetSpeed
 global myfgColor
 global myClickColor
 Global SIOFile = dotNetClass "System.IO.File"
+Global SIODir = dotNetClass "System.IO.Directory"
 -- Global myTimer = dotnetobject "System.Timers.Timer" 500 autoreset:true
 ------------------全局变量-------------------------------------------------------------------
 
@@ -131,24 +133,120 @@ fn fnDelFileDir targetDel =  --删除文件
 		catch (print ("删除失败: "+ filenameFromPath targetDel + ". 请尝试手动删除.");print "删除失败")
 	)
 )
+fn fnDelDir dirDel =
+(
+	if (SIODir.Exists dirDel) == true do
+	(
+		if getFileAttribute dirDel #readOnly == true or getFileAttribute dirDel #hidden == true do
+		(
+			setFileAttribute dirDel #readOnly false ; setFileAttribute dirDel #hidden false
+		)
+		try (SIODir.Delete(dirDel) true;(print ("已删除: "+ pathConfig.stripPathToLeaf dirDel + " 文件夹")))
+		catch (print ("删除失败: "+ pathConfig.stripPathToLeaf dirDel + " 文件夹. 请尝试手动删除.");print "删除失败")
+	)
+)
+
+------------------添加toolbar-----------------------------------------------
+iniAddToolbars  = fnGetConfig iniAddToolbars "BulletKeyToolsSet"  "ToolBarBtn" (iniAddToolbars as string)
+fn addToolBarButton macro cat txt remove: false =
+(
+	fn insertContent f data: "" find: "" rewrite: false =
+	(						
+		file = MemStreamMgr.openFile f
+		size = file.size()
+		MemStreamMgr.close file
+				
+		stream = openFile f mode:"r+"
+
+		seek stream 0 
+			
+		mt = "\"Main Toolbar\""			
+		skipToString stream mt
+				
+		exist = (skipToString stream find) == undefined
+		
+		previousContent = ""
+		
+		findPos = filePos stream
+		
+		if(not exist) do
+		(							
+			if(rewrite) do 
+			(
+				pos = findPos - find.count
+				seek stream	0
+				previousContent += readChars stream (pos)					
+			)
+			
+			pos = findPos - (if(rewrite) then 0 else find.count)
+		
+			seek stream pos
+			
+			previousContent += readChars stream (size - pos)
+									
+			if(rewrite) do pos = 0
+			
+			seek stream pos
+				
+						
+			format data to: stream
+			format previousContent to: stream
+		)
+		
+		close stream
+		
+		return not exist
+	)
+	
+	try
+	(
+		f = cui.getConfigFile() 
+		
+		cui.loadConfig f
+		cui.saveConfigAs f
+		cui.loadConfig f
+		
+		l = "<Item typeID=\"2\" type=\"CTB_MACROBUTTON\" width=\"0\" height=\"0\" controlID=\"0\" macroTypeID=\"3\" macroType=\"MB_TYPE_ACTION\" actionTableID=\"647394\" imageID=\"-1\" imageName=\"\" actionID=\"" + macro + "`_[" + cat + "]\" tip=\"" + txt + "\" label=\"" + txt + "\" />"
+		delBtnLine = "<Item typeID=\"2\" type=\"CTB_MACROBUTTON\" width=\"62\" height=\"0\" controlID=\"0\" macroTypeID=\"3\" macroType=\"MB_TYPE_ACTION\" actionTableID=\"647394\" imageID=\"-1\" imageName=\"\" actionID=\"" + macro + "`_[" + cat + "]\" tip=\"" + txt + "\" label=\"" + txt + "\" />"
+		if(remove) then
+		(			
+			insertContent f find: delBtnLine rewrite: true
+		)
+		else
+		(		
+			insertContent f find: "</Items>" data: ("\t\t" + l + "\n")			
+		)
+				
+		cui.loadConfig f
+		--cui.setConfigFile f
+		cui.saveConfigAs f
+		--cui.loadConfig f
+			
+	) catch(messageBox "请手动处理Toolbar!             \r\n" title: "错误!")
+)
 
 rcmenu menuConfig
 (
-	menuItem mItemIsStartup "本工具是否自启" checked:true
+	local myMs = (getDir #Scripts)+ "\\BulletScripts\\" + "BulletKeyTools.ms"
+	local startupPath = (getDir #StartupScripts)+ "\\" + "BulletKeyTools.ms"
+	menuItem mItemIsStartup "是否自启"
+	menuItem mItemAddToolBarBtn "Toolbar按钮"
+	separator menuSepUninstall
+	menuItem mItemUninstall "彻底卸载(慎点!)"
 
 	on menuConfig open do
 	(
-		myMs = (getDir #Scripts)+ "\\BulletScripts\\" + "BulletKeyTools.ms"
-		startupPath = (getDir #StartupScripts)+ "\\" + "BulletKeyTools.ms"
 		if(SIOFile.Exists startupPath) then (mItemIsStartup.checked = true)
 		else (mItemIsStartup.checked = false)
+		if (iniAddToolbars == 1) then (mItemAddToolBarBtn.checked = true)
+		else (mItemAddToolBarBtn.checked = false)
 	)
 	on mItemIsStartup picked do 
 	(
 		if (mItemIsStartup.checked == true) then 
 		(
 			fnDelFileDir startupPath
-			mItemIsStartup.checked == false
+			mItemIsStartup.checked = false
 		)
 		else 
 		(
@@ -156,8 +254,41 @@ rcmenu menuConfig
 			(
 				SIOFile.Copy myMs startupPath
 				print ("已打开自启: " + filenameFromPath startupPath)
-				mItemIsStartup.checked == true
+				mItemIsStartup.checked = true
 			)
+		)
+	)
+
+	on mItemAddToolBarBtn picked do
+	(
+		if (mItemAddToolBarBtn.checked == false) then 
+		(
+			addToolBarButton "BulletKeyTools" "BulletTools" "BsKeyTools" remove: true
+			addToolBarButton "BulletKeyTools" "BulletTools" "BsKeyTools"
+			mItemAddToolBarBtn.checked = true
+			iniAddToolbars = 1
+		)
+		else
+		(
+			addToolBarButton "BulletKeyTools" "BulletTools" "BsKeyTools" remove: true
+			mItemAddToolBarBtn.checked = false
+			iniAddToolbars = 0
+		)
+		SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolBarBtn" (iniAddToolbars as string)
+	)
+
+	on mItemUninstall picked do
+	(
+		if (queryBox "是否彻底清除 BsKeyTools？          \r\n( 配置文件默认保留 )" \
+		title:"有缘再会" beep:false) then
+		(
+			if (SIOFile.Exists startupPath) do (fnDelFileDir startupPath)
+			arrDelPath = #(((getDir #Scripts)+ "\\BulletScripts"),((getDir #maxroot) + "\\UI_ln\\Icons\\cstoolIcons"))
+			for d in arrDelPath do (fnDelDir d)
+			try(destroydialog rolloutBulletKeyTools)catch()
+			try(destroydialog rolFnKeys)catch()
+			try(destroydialog rolAddMyScripts)catch()
+			(messagebox "已清理干净，保留配置文件备用...    \r\n" beep:false title:"卸载成功！")
 		)
 	)
 )
@@ -613,7 +744,7 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 rollout rolloutBulletKeyTools "" width:200 height:235
 (
 	---------------------------------UI--------------------------------------
-	groupbox gbxMainUI "[ BsKeyTools v0.9.1 ] - 中键关闭" pos:[5,5] width:190 height:195
+	groupbox gbxMainUI "[ BsKeyTools v0.9.2 ] - 中键关闭" pos:[5,5] width:190 height:195
 	
 		label lblRangeTimeText "| 起始帧 |      | 结束帧 |" pos:[10,25] width:180
 		spinner spiStartTime "" pos:[10,45] width:50 type:#integer \
@@ -1803,7 +1934,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		-- dotnet.AddEventHandler myTimer #elapsed fnRefreshHelpText
 		-- myTimer.Start()
 		-- ckbHelpBtn.checked = iniHelpBtn
-		timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
+		-- timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
 		-- iniPos = (GetDialogPos rolloutBulletKeyTools) 
 		fnSaveConfig ()  ---------------脚本位置赋值
 		fnSetConfig ()  ----------------保存位置信息到ini文件
@@ -2669,8 +2800,8 @@ clearListener()  ---------清除侦听器
 ------------------------toolbar----------------------------------------------------
 macroScript BulletKeyTools
 category:"_[BulletTools]"
-buttonText:"K帧工具"
-toolTip:"K帧工具"
+buttonText:"BsKeyTools"
+toolTip:"BsKeyTools"
 -- Icon:#("Systems",2)
 (
 	on execute do
