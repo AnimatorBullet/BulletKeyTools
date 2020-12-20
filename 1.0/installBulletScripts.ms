@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2020-12-20 00:51:15
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-20 22:02:23
+ * @LastEditTime: 2020-12-21 01:40:41
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -299,6 +299,6 @@ rollout rolBsInstall " BulletScripts 通用安装工具 " width:380 height:185
 
 	on btnJoinGroup pressed do (shellLaunch "https://jq.qq.com/?_wv=1027&k=hmeHhTwu" "")
 
-	on btnUpdateLink pressed do (shellLaunch "https://space.bilibili.com/2031113" "")
+	on btnUpdateLink pressed do (shellLaunch "https://github.com/AnimatorBullet/BulletKeyTools/releases/latest" "")
 )
 createDialog rolBsInstall fgcolor:myfgColor style:#()
