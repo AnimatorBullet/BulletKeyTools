@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2020-12-20 00:51:15
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-20 21:48:49
+ * @LastEditTime: 2020-12-20 22:02:23
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -202,7 +202,7 @@ rollout rolBsInstall " BulletScripts 通用安装工具 " width:380 height:185
 		tbxResult.BackColor = (dotNetClass "System.Drawing.Color").fromARGB 240 248 255
 		btnInstall.text = (nameBsScript + " 安装")
 		rolBsInstall.grbTips.caption = textUpdateLink as string
-		local logTips = "动画师定制脚本工具\r\n仅供业余时间学习交流\r\n活到老, K到老, 坚持热爱\r\n\r\n-... ..- .-.. .-.. . - .-.-.- ...\r\n作者: Bullet.S          2019.08\r\nanimator.bullet@foxmail.com"
+		local logTips = "动画师定制脚本工具\r\n仅供学习交流, 禁止售卖\r\n活到老, K到老, 坚持热爱\r\n\r\n-... ..- .-.. .-.. . - .-.-.- ...\r\n作者: Bullet.S          2019.08\r\nanimator.bullet@foxmail.com"
 		fn_updateInterface tbxResult logTips
 	)
 	
@@ -279,6 +279,7 @@ rollout rolBsInstall " BulletScripts 通用安装工具 " width:380 height:185
 			if (queryBox "是否添加工具栏按钮？              \r\n(可能要等待约二十秒时间)\r\n        " \
 			title:"添加工具栏按钮" beep:false) then
 			(
+				fn_updateInterface tbxResult ("工具栏按钮添加成功...\r\n\r\n安装已完成可退出。\r\n\r\n-... ..- .-.. .-.. . - .-.-.- ...\r\n作者: Bullet.S          2019.08\r\nanimator.bullet@foxmail.com")
 				addToolBarButton "BulletKeyTools" "BulletTools" "BulletKeyTools" remove: true
 				addToolBarButton "BulletKeyTools" "BulletTools" "BulletKeyTools"
 				iniAddToolbars = 1
