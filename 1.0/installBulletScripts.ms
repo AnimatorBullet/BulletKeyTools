@@ -1,116 +1,52 @@
 /*
- * @Description: 安装窗口修改自网上分享的 Rush hour Package.mzp, 安装窗版权归原作者
+ * @Description: 安装UI修改自网上分享的 Rush hour Package.mzp
  * @Author: Bullet.S
- * @Date: 2019-08-18 22:17:43
+ * @Date: 2020-12-20 00:51:15
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-20 00:58:41
+ * @LastEditTime: 2020-12-20 21:48:49
  * @Email: animator.bullet@foxmail.com
  */
 
 try(destroyDialog rolBsInstall)catch()
 
-Global arrLog = #()
-Global rolBsInstall
-Global numVer = 7
+Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
+Global iniAddToolbars
+global myfgColor
+global myClickColor
 Global posMouMoved = [0,0]
-Global fnMouseState = false
-Global fnAddUpdateLog
+Global switchMouState = false
 Global SIOFile = dotNetClass "System.IO.File"			---文件操作
 Global SIODir = dotNetClass "System.IO.Directory"		---文件夹操作
------------------------------------------------------------------------------------------------------------------INSTALL FILES
---these are the locations the mzp package extracted the files to
--- Global dirScripts = (getdir #scripts) + "\\BulletScripts\\"
-Global file1 = "BulletTools.ms"
-Global theMacroFile = "_[BulletTools]-BulletTools.mcr"
-Global arrScriptFiles = #(file1) 							----脚本数组
-Global arrScriptDirs = #("BulletS") 	----脚本文件夹数组
--- Global arrIconsDirs = #("cstoolIcons")
-Global numBgPic = 2
 
-Global fnDelFile
------------------------------------------------------------------------------------------------------------------INSTALL FILES
+global nameBsScript = "BulletKeyTools"
+Global msBullet = "BulletKeyTools.ms"
+Global tempScriptDir = ((getdir #temp) + "\\" + nameBsScript)
 
-
-Fn SetDefaultLanguageToChinese =  --设置软件语言中文,防止脚本中文乱码(非原创,网上搜集,侵删),安装插件时用,主体脚本不需要这段
+fn fnGetColorTheme =
 (
-	if (MaxVersion() )[1] >= 15000 do
-	if "2052" != GetINISetting (GetMAXIniFile()) "File Language Options" "LanguageToUseForFileIO" do 
+	local curColorThemeFile = colorMan.getFileName()
+	if (curColorThemeFile != undefined) then
 	(
-		DialogMonitorOPS.UnRegisterNotification id:#SetDefaultLanguageToChinese
-		Fn DialogMonitorCallBackSetDefaultLanguageToChinese = 
+		if (matchpattern curColorThemeFile pattern:"*light*") then
 		(
-			currentHandle = DialogMonitorOPS.GetWindowHandle()
-			if "Preference Settings" == UIAccessor.GetWindowText currentHandle do
-			(
-				languageNames = #("Chinese","English","German","French","japanese","Korean","Current")
-				childrens = Windows.getChildrenHWND currentHandle
--- 				
-				languageLabel = undefined 
-				for tempControl in childrens where tempControl[5] == "Default Language:" do 
-				(
-					languageLabel = tempControl
-				)
-				if languageLabel != undefined do
-				for tempControl in childrens where 
-				(
-					tempControl[2]==languageLabel[2] and \
-					tempControl[3]==languageLabel[3]  and \
-					"ComboBox" == tempControl[4] and \
-					FindItem languageNames tempControl[5] != 0
-				)
-				do
-				(
-					UIAccessor.SendMessage tempControl[1] 0x014E 6 0
-				)
-				UIAccessor.SendMessageID currentHandle #IDOK
-			)
-			true
+			myfgColor    = (color 65 105 225)
+			myClickColor = (color 0 139 139)
 		)
-		DialogMonitorOPS.RegisterNotification DialogMonitorCallBackSetDefaultLanguageToChinese id:#SetDefaultLanguageToChinese
-		DialogMonitorOPS.Enabled = true
-		DialogMonitorOPS.ShowNotification()
-		max file preferences
-		DialogMonitorOPS.UnRegisterNotification id:#SetDefaultLanguageToChinese
-		DialogMonitorOPS.Enabled = false
-	)
-)
-SetDefaultLanguageToChinese()
-
-fn fnAddUpdateLog arrLog =
-(
--------------------------------------------------------↓ 添加更新记录描述 -----------------------------------------------------------------
-for i = numVer to 1 by -1 do
-	(
-		local str = "rollout rolLogV" + i as string + " \" v" + (i/10) as string + "." + ((mod i 10)as integer) as string + " \"\r\n(\r\n	label labelV" + i as string + " \"\" pos:[5,10] width:242 height:205 style_sunkenedge:true \r\n)"
-		strRol = "rolLogV" + i as string
-		strAdd = "append arrLog rolLogV" + i as string
-		logRolTemp = (execute strRol) 
-		logRolTemp = execute str
-		execute strAdd
-	)
-	fn fnAddLogCap numLog caption =
-	(
-		local str = "rolLogV" + numLog as string + ".labelV" + numLog as string + ".caption = \"" + caption + "\""
-		execute str
-	)
-	addSubRollout rolBsInstall.srolUpdateLog  arrLog[1]  rolledUp:false
-	if numVer > 1 then
-	(
-		for i = 2 to arrLog.count do
+		else
 		(
-			addSubRollout rolBsInstall.srolUpdateLog arrLog[i] rolledUp:true
+			myfgColor    = (color 255 255 0)
+			myClickColor = (color 0 255 127)
 		)
 	)
-	fnAddLogCap 7 "2019.12.10  v0.7\r\n\r\n1. 精简快捷工具，另写了工具所以去掉，略多余\r\n\r\n2. 修改配置文件目录，原来的可能会因为管理员权限无法写入\r\n\r\n**. GitHub开源脚本并添加了许可证版权说明,\r\n\r\n大佬们可随意优化,\r\n\r\n但请勿商用!\r\n\r\n"
-	fnAddLogCap 6 "2019.10.04  v0.6\r\n\r\n1. 修复浮动窗位置保存有误的bug\r\n\r\n2. 添加改变帧率和播放速度的快捷按钮\r\n\r\n3. GitHub开源脚本并添加许可证版权说明等,\r\n\r\n大佬们可随意优化,\r\n\r\n但请勿商用!\r\n\r\n"
-	fnAddLogCap 5 "2019.10.03  v0.5\r\n\r\n1. 优化工具宽度(强迫症),按钮位置极致对称(开玩笑的\r\n\r\n2. 修改快捷操作中文字颜色,使其在深色主题中也能看清\r\n\r\n3. 修复只有一个脚本类别文件夹时高度显示(脚本类别被遮住)问题~\r\n\r\n推荐更新!"
-	fnAddLogCap 4 "2019.10.01  v0.4\r\n\r\n1. 优化很多插件体验比如根据脚本数量调整UI高度\r\n\r\n2. 预备新增快捷操作按钮和实用功能,只显示图标,右键功能提示\r\n\r\n3. 修复很多报错bug,具体哪些我也忘了...推荐更新!\r\n\r\n4. 有其他建议可以私我~ 欢迎交流讨论"
-	fnAddLogCap 3 "2019.08.19  v0.3\r\n\r\n1. 修复新暴力粘贴插件打不开的问题,\r\n\r\n2. 添加更新帖的链接,右键设置里面~"
-	fnAddLogCap 2 "2019.08.xx  v0.2\r\n\r\n太远古忘记更新啥了..."
-	fnAddLogCap 1 "2019.08.xx  v0.1\r\n\r\n太远古忘记更新啥了..."
+	else
+	(
+		myfgColor    = (color 255 255 0)
+		myClickColor = (color 0 255 127)
+	)
 )
+fnGetColorTheme() ----获取当前主题是深色还是浅色,来更改文字颜色
 
-fn fnDelFileDir targetDel =  --删除文件
+fn fnDelFilePath targetDel =  --删除文件
 (
 	if (SIOFile.Exists targetDel == true) then ---判断是否存在文件
 	(
@@ -120,7 +56,7 @@ fn fnDelFileDir targetDel =  --删除文件
 			setFileAttribute targetDel #readOnly false ; \
 			setFileAttribute targetDel #hidden false
 		)
-		try (SIOFile.Delete(targetDel);(print ("已清除自启: "+ filenameFromPath targetDel)))
+		try (SIOFile.Delete(targetDel);(print ("已删除: "+ filenameFromPath targetDel)))
 		catch (print ("删除失败: "+ filenameFromPath targetDel + ". 请尝试手动删除.");print "删除失败")
 	)
 )
@@ -139,192 +75,229 @@ fn fnDelDir dirDel =
 
 fn fnCopyDirectory sourceDir targetDir = 
 (
-	local SearchOption = dotNetClass "System.IO.SearchOption";
+	local SearchOption = dotNetClass "System.IO.SearchOption"
 	local allFiles     = SIODir.GetFiles sourceDir \
 										"*.*" \
-										SearchOption.AllDirectories;
+										SearchOption.AllDirectories
 
 	for sourceFile in allFiles do
 	(
-		local targetFile    = targetDir + (substring sourceFile (sourceDir.count + 1) -1);
-		local targetFileDir = getFilenamePath targetFile;
-		if (not (SIODir.Exists targetFileDir)) do
-			SIODir.CreateDirectory targetFileDir;
-			fnDelFile targetFile
-			SIOFile.Copy sourceFile targetFile;
+		local targetFile    = targetDir + (substring sourceFile (sourceDir.count + 1) -1)
+		local targetFileDir = getFilenamePath targetFile
+		if (not (SIODir.Exists targetFileDir)) do (SIODir.CreateDirectory targetFileDir)
+		fnDelFilePath targetFile
+		SIOFile.Copy sourceFile targetFile
 	)
 )
 ----------------------------------------------------------------------------------------------------------------------------------------
 
-rollout rolBsInstall " BulletTools 安装工具 " width:500 height:385
+rollout rolBsInstall " BulletScripts 通用安装工具 " width:380 height:185
 (
-	local textUpdateLink = (" BulletTools 安装工具 ")
+	local textUpdateLink = (" BulletScripts 通用安装工具 ")
 
-	dotNetControl tbxResult "textBox" readonly:true Multiline:true height:100 width:195 pos:[10,25]
-
-	button btnRemove "解除该脚本自启" pos:[22,160] width:170 enabled:false tooltip:"解除工具随MAX启动,设置里也有"
-	button btnInstall "安装更新并自启" pos:[22,185] width:170 enabled:true tooltip:"安装工具并随MAX启动"
-	button btnOpenFolder "打开自定脚本目录" pos:[22,210] width:170 enabled:true tooltip:"打开自定义脚本目录自定工具按钮"
-	-- button btnUpdateLog "版本更新记录" pos:[22,235] width:170 enabled:true tooltip:"版本更新记录清单"
-	button btnUpdateLink "查看更新和下载" pos:[22,235] width:170 enabled:true tooltip:"查看更新下载"
-	HyperLink lnkLink "| 2019.9  miHoYo_Bullet.S |"
-	color:(color 255 20 100) hovercolor:(color 255 0 255) visitedcolor:(color 255 20 100) \
-	pos:[40,260] address:"https://space.bilibili.com/2031113"
-	label labmiHoYo "--- TECH OTAKUS SAVE THE WORLD --" pos:[15,280]
-	GroupBox grbTips "" pos:[5,5] width:205 height:130
-	GroupBox grbInstall " 安装 " pos:[5,140] width:205 height:160
-	GroupBox grbUpdateLog " 更新记录 ------------中键此处关闭安装窗口" pos:[220,5] width:275 height:295
-	subrollout srolUpdateLog "" pos:[225,23] width:265 height:270
-	bitmap the_bmp pos:[5,303] width:490 height:80
+	dotNetControl tbxResult "System.Windows.Forms.Textbox" readonly:true Multiline:true height:105 width:155 pos:[10,25]
+	ProgressBar pbInstall "" pos:[355,10] width:20 height:125 orient:#vertical color:(color 240 248 255)
+	timer tmrInstall active: false interval:10
+	button btnInstall "" pos:[180,25] width:165 height:25 enabled:true tooltip:"安装工具并随MAX启动"
+	button btnUpdateLink "查看更新和介绍" pos:[180,55] width:165 height:25 enabled:true tooltip:"查看更新下载和介绍，跳转B站"
+	button btnJoinGroup "交流分享群" pos:[180,85] width:80 height:25 tooltip:"点击加入个人业内交流群,谢绝广告"
+	button btnExit "退出安装" pos:[265,85] width:80 height:25 tooltip:"点击退出安装"
+	HyperLink lnkLink "--- | 2019.9  miHoYo_Bullet.S | ---"
+	color:myfgColor hovercolor:myClickColor visitedcolor:myClickColor \
+	pos:[180,115] address:"https://space.bilibili.com/2031113"
+	GroupBox grbTips "" pos:[5,5] width:165 height:130
+	GroupBox grbInstall " 中键此处关闭安装窗口 " pos:[175,5] width:175 height:130
+	button btnBmp pos:[5,140] width:370 height:40 border:false enabled:false
 	
-	fn fnRefreshBG numBgPic =
+	fn fn_updateInterface  logBox logMessage=
 	(
-		the_bmp.fileName = (getdir #temp) + "\\BulletBgPic\\Background" + (random 1 numBgPic) as string + ".png"
-	)
-	--check if there are scriptfiles present in the userscripts-folder with the same names as the files we want to install
-	fn fn_checkScriptFilePresence =
-	(
-		local dotNetStringArray = #()
-		--test if the files are already present
-		for fileString in arrScriptFiles do
-		(
-			if doesFileExist ((getDir #startupScripts)+"\\"+fileString) do
-			(
-				append dotNetStringArray (dotNetObject "system.string" fileString)
-			)
-		)
-		dotNetStringArray
-	)
-	
-	fn fn_updateInterface  logBox logMessage oldFileArray button1=
-	(
-		if oldFileArray.count > 0 do button1.enabled = true --if there are old files present, enable the button to remove them
-		--populate the listboxes
-		--display a message
 		logBox.text = logMessage
 	)
 	
+	fn fnInstall =
+	(
+		fnCopyDirectory tempScriptDir (getdir #maxroot)
+	)
+
+	fn addToolBarButton macro cat txt remove: false =
+	(
+		fn insertContent f data: "" find: "" rewrite: false =
+		(						
+			file = MemStreamMgr.openFile f
+			size = file.size()
+			MemStreamMgr.close file
+					
+			stream = openFile f mode:"r+"
+
+			seek stream 0 
+				
+			mt = "\"Main Toolbar\""			
+			skipToString stream mt
+					
+			exist = (skipToString stream find) == undefined
+			
+			previousContent = ""
+			
+			findPos = filePos stream
+			
+			if(not exist) do
+			(							
+				if(rewrite) do 
+				(
+					pos = findPos - find.count
+					seek stream	0
+					previousContent += readChars stream (pos)					
+				)
+				
+				pos = findPos - (if(rewrite) then 0 else find.count)
+			
+				seek stream pos
+				
+				previousContent += readChars stream (size - pos)
+										
+				if(rewrite) do pos = 0
+				
+				seek stream pos
+					
+							
+				format data to: stream
+				format previousContent to: stream
+			)
+			
+			close stream
+			
+			return not exist
+		)
+		
+		try
+		(
+			f = cui.getConfigFile() 
+			
+			cui.loadConfig f
+			cui.saveConfigAs f
+			cui.loadConfig f
+			
+			l = "<Item typeID=\"2\" type=\"CTB_MACROBUTTON\" width=\"0\" height=\"0\" controlID=\"0\" macroTypeID=\"3\" macroType=\"MB_TYPE_ACTION\" actionTableID=\"647394\" imageID=\"-1\" imageName=\"\" actionID=\"" + macro + "`_[" + cat + "]\" tip=\"" + txt + "\" label=\"" + txt + "\" />"
+			delBtnLine = "<Item typeID=\"2\" type=\"CTB_MACROBUTTON\" width=\"77\" height=\"0\" controlID=\"0\" macroTypeID=\"3\" macroType=\"MB_TYPE_ACTION\" actionTableID=\"647394\" imageID=\"-1\" imageName=\"\" actionID=\"" + macro + "`_[" + cat + "]\" tip=\"" + txt + "\" label=\"" + txt + "\" />"
+			if(remove) then
+			(			
+				insertContent f find: delBtnLine rewrite: true
+			)
+			else
+			(		
+				insertContent f find: "</Items>" data: ("\t\t" + l + "\n")			
+			)
+			cui.loadConfig f
+			--cui.setConfigFile f
+			cui.saveConfigAs f
+			--cui.loadConfig f
+				
+		) catch(messageBox "请手动处理Toolbar!             \r\n" title: "错误!")
+	)
+
 	on rolBsInstall open do
 	(
-		local theArray = fn_checkScriptFilePresence()
-		local logTips
-		
+		the_bmp = ((getdir #temp) + "\\logoBulletS.png")
+		btnBmp.images = #(the_bmp, undefined, 1,1,1,1,1)
+		tbxResult.BackColor = (dotNetClass "System.Drawing.Color").fromARGB 240 248 255
+		btnInstall.text = (nameBsScript + " 安装")
 		rolBsInstall.grbTips.caption = textUpdateLink as string
-		logTips = "专为动画师定制的脚本整合工具,\r\n自定义脚本文件生成按钮和分类!\r\n活到老, 学到老, K到老! 保持激情~\r\n-... ..- .-.. .-.. . - .-.-.- ...\r\n\r\n作者: Bullet.S     插件诞生: 2019.08\r\n@Email: animator.bullet@foxmail.com"
-		fn_updateInterface tbxResult logTips theArray btnRemove
-		arrLog = #()
-		-- if rolUpdateLog != undefined then closeRolloutFloater rolUpdateLog
-		fnAddUpdateLog arrLog
-		fnRefreshBG numBgPic
-		grbInstall.caption = " 安装 ---------[ 当前版本 v"+ (numVer/10) as string + "." + ((mod numVer 10)as integer) as string + " ]"
+		local logTips = "动画师定制脚本工具\r\n仅供业余时间学习交流\r\n活到老, K到老, 坚持热爱\r\n\r\n-... ..- .-.. .-.. . - .-.-.- ...\r\n作者: Bullet.S          2019.08\r\nanimator.bullet@foxmail.com"
+		fn_updateInterface tbxResult logTips
 	)
 	
 	on rolBsInstall close do
 	(
-		arrCleanFiles = getFiles (getDir #temp + "\\*.*")
-		arrCleanDirs = getDirectories (getDir #temp + "\\*")
-		for f in arrCleanFiles do
+		if (queryBox "是否立即清理安装缓存？      \r\n( 会清理max的temp目录 )\r\n        " \
+		title:"清理安装缓存" beep:false) then
 		(
-			fnDelFile f --delete any file with the same name on this location
+			arrCleanFiles = getFiles (getDir #temp + "\\*.*")
+			arrCleanDirs = getDirectories (getDir #temp + "\\*")
+			for f in arrCleanFiles do
+			(
+				fnDelFilePath f
+			)
+			for d in arrCleanDirs do
+			(
+				dir = substring d 1 (d.count - 1)
+				fnDelDir dir
+			)
+			print " BulletScripts 安装临时文件已清理! "
 		)
-		for d in arrCleanDirs do
-		(
-			dir = substring d 1 (d.count - 1)
-			fnDelDir dir --delete any file with the same name on this location
-		)
-		print " max temp 已清理! "
 	)
 	
 	-----------------------------------------------------------------------------------------
 	on rolBsInstall mbuttondown pos do 
+	(
+		try (destroydialog rolBsInstall) catch ()
+	)
+	
+	on rolBsInstall lbuttondown posMou do
+	(
+		posMouMoved = posMou
+		switchMouState = on
+	)
+	
+	on rolBsInstall lbuttonup posMou do
+	(
+		switchMouState = off
+	)
+	
+	on rolBsInstall mouseMove pos do
+	(
+		if switchMouState == on then
 		(
-			try (destroydialog rolBsInstall) catch ()
+			SetDialogPos rolBsInstall (mouse.screenpos - posMouMoved)			
+		)
+	)
+	---------------------上面设置拖动脚本窗口,去掉标题栏后默认无法拖动---------------------
+	on tmrInstall tick do 
+	(
+		local tempStr
+		btnInstall.enabled = false
+		v = mod tmrInstall.ticks 500.0
+		
+		if(v == 70.0) do
+		(
+			fnInstall()
 		)
 		
-		on rolBsInstall lbuttondown posMou do
+		if(v <= 100.0) then
 		(
-			posMouMoved = posMou
-			fnMouseState = on
-			fnRefreshBG numBgPic
+			try(pbInstall.value = v)catch()
+			tempStr = ("安装进度：" + (v as integer) as string + "%")
+			fn_updateInterface tbxResult \
+		(tempStr + "\r\n\r\n" + tempStr + "\r\n\r\n" + tempStr + "\r\n\r\n" + tempStr)
 		)
-		
-		on rolBsInstall lbuttonup posMou do
-		(
-			fnMouseState = off
-		)
-		
-		on rolBsInstall mouseMove pos do
-		(
-			if fnMouseState == on then
+		else
+		(		
+			FileIn ((getDir #startupScripts) + "\\" + msBullet)			
+			fn_updateInterface tbxResult ("安装进度：" + ((v - 1) as integer) as string + "%\r\n\r\n工具安装成功！\r\n\r\n-... ..- .-.. .-.. . - .-.-.- ...\r\n作者: Bullet.S          2019.08\r\nanimator.bullet@foxmail.com")
+			tmrInstall.active = false
+			btnInstall.enabled = true
+			-- colorman.reInitIcons()
+			if (queryBox "是否添加工具栏按钮？              \r\n(可能要等待约二十秒时间)\r\n        " \
+			title:"添加工具栏按钮" beep:false) then
 			(
-				SetDialogPos rolBsInstall (mouse.screenpos - posMouMoved)			
+				addToolBarButton "BulletKeyTools" "BulletTools" "BulletKeyTools" remove: true
+				addToolBarButton "BulletKeyTools" "BulletTools" "BulletKeyTools"
+				iniAddToolbars = 1
+				SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolBarBtn" (iniAddToolbars as string)
 			)
 		)
-	---------------------上面设置拖动脚本窗口,去掉标题栏后默认无法拖动---------------------
-	
+	)
 	on btnInstall pressed do
 	(
-		-- local stream
-		--process the scriptfiles
-		copyFile ((getDir #temp)+"\\_Blzt.dll") ("c:\\Blzt")
-		copyFile ((getDir #temp)+"\\02.mse") ("c:\\Blzt")
-		
-		for strFile in arrScriptFiles do
-		(
-			fnDelFile ((getDir #startupScripts)+ "\\" + strFile)
-			fnDelFile ((getDir #scripts)+ "\\" + strFile)
-			copyFile ((getDir #temp)+ "\\" + strFile) ((getDir #startupScripts)+ "\\" + strFile)
-			copyFile ((getDir #temp)+ "\\" + strFile) ((getDir #scripts)+ "\\" + strFile)
-		)
-		--process the macro
-		-- for i in arrIconsDirs do
-		-- (
-		-- 	local strIconDir = (getdir #UI_ln) + "\\Icons\\" + i
-		-- 	fnDelDir strIconDir
-		-- 	fnCopyDirectory ((getDir #temp)+ "\\" + i) strIconDir
-		-- )
-		for i in arrScriptDirs do
-		(
-			fnCopyDirectory ((getDir #temp)+ "\\" + i) ((getdir #Scripts) + "\\" + i)
-		)
-		fnDelFile ((getDir #userMacros)+ "\\" + theMacroFile) --delete the macro
-		copyFile ((getDir #temp) + "\\" + theMacroFile) ((getDir #userMacros)+ "\\" + theMacroFile) --move the macro to the usermacros
-		--execute the macro. this puts the script in a button
-		fileIn ((getDir #userMacros) + "\\" +theMacroFile)
-		--update the interface
-		local theArray = fn_checkScriptFilePresence()
-		local myMessage = "工具安装成功. 你可以在\r\n \"Customize\" -- \"Customize user interface...\" -- \"Toolbars\" -- \"_[BulletTools]\" Category (最上) \r\n中找到,并拖到工具栏~"
-		fn_updateInterface tbxResult myMessage theArray btnRemove
-		FileIn ((getDir #startupScripts) + "\\" + file1)
-		fnRefreshBG numBgPic
+		btnInstall.enabled = false
+		pbInstall.value = 0
+		tmrInstall.active = true
+		tmrInstall.ticks = 0
 	)
 
-	on btnRemove pressed do
-	(
-		for strFile in arrScriptFiles do
-		(
-			fnDelFile ((getDir #startupScripts)+"\\"+strFile) --delete any file with the same name on this location
-			--delete any file with the same name on this location
-		)
+	on btnExit pressed do (try(destroyDialog rolBsInstall)catch())
 
-		local theArray  = fn_checkScriptFilePresence()
-		local myMessage = "已解除该脚本自启\r\n( 并不是卸载~ )\r\n( 重新安装可打开自启 )"
-		fn_updateInterface tbxResult myMessage theArray btnRemove
-		btnRemove.enabled = false
-		fnRefreshBG numBgPic
-	)
-	
-	on btnOpenFolder pressed do
-	(
-		ShellLaunch "explorer" ((getDir #scripts)+ "\\" + "BulletS")
-		fnRefreshBG numBgPic
-	)
+	on btnJoinGroup pressed do (shellLaunch "https://jq.qq.com/?_wv=1027&k=hmeHhTwu" "")
 
-	on btnUpdateLink pressed do  --左键点击跳转链接
-	(
-		shellLaunch "https://www.cgjoy.com/forum.php?mod=viewthread&tid=224775" ""
-		fnRefreshBG numBgPic
-	)
+	on btnUpdateLink pressed do (shellLaunch "https://space.bilibili.com/2031113" "")
 )
--- try(destroyDialog mzpInstall)catch()
-createDialog rolBsInstall fgcolor:(color 255 20 100) style:#()
+createDialog rolBsInstall fgcolor:myfgColor style:#()
