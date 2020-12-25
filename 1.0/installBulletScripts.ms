@@ -3,14 +3,14 @@
  * @Author: Bullet.S
  * @Date: 2020-12-20 00:51:15
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-21 01:40:41
+ * @LastEditTime: 2020-12-25 17:24:20
  * @Email: animator.bullet@foxmail.com
  */
 
 try(destroyDialog rolBsInstall)catch()
 
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
-Global iniAddToolbars
+Global iniAddToolbars = 0
 global myfgColor
 global myClickColor
 Global posMouMoved = [0,0]
@@ -34,13 +34,13 @@ fn fnGetColorTheme =
 		)
 		else
 		(
-			myfgColor    = (color 255 255 0)
+			myfgColor    = (color 219 209 72)
 			myClickColor = (color 0 255 127)
 		)
 	)
 	else
 	(
-		myfgColor    = (color 255 255 0)
+		myfgColor    = (color 219 209 72)
 		myClickColor = (color 0 255 127)
 	)
 )
@@ -91,10 +91,8 @@ fn fnCopyDirectory sourceDir targetDir =
 )
 ----------------------------------------------------------------------------------------------------------------------------------------
 
-rollout rolBsInstall " BulletScripts 通用安装工具 " width:380 height:185
+rollout rolBsInstall " BulletScripts 安装工具 " width:380 height:185
 (
-	local textUpdateLink = (" BulletScripts 通用安装工具 ")
-
 	dotNetControl tbxResult "System.Windows.Forms.Textbox" readonly:true Multiline:true height:105 width:155 pos:[10,25]
 	ProgressBar pbInstall "" pos:[355,10] width:20 height:125 orient:#vertical color:(color 240 248 255)
 	timer tmrInstall active: false interval:10
@@ -102,10 +100,10 @@ rollout rolBsInstall " BulletScripts 通用安装工具 " width:380 height:185
 	button btnUpdateLink "查看更新和介绍" pos:[180,55] width:165 height:25 enabled:true tooltip:"查看更新下载和介绍，跳转B站"
 	button btnJoinGroup "交流分享群" pos:[180,85] width:80 height:25 tooltip:"点击加入个人业内交流群,谢绝广告"
 	button btnExit "退出安装" pos:[265,85] width:80 height:25 tooltip:"点击退出安装"
-	HyperLink lnkLink "--- | 2019.9  miHoYo_Bullet.S | ---"
+	HyperLink lnkLink "2019.9  miHoYo_Bullet.S         "
 	color:myfgColor hovercolor:myClickColor visitedcolor:myClickColor \
-	pos:[180,115] address:"https://space.bilibili.com/2031113"
-	GroupBox grbTips "" pos:[5,5] width:165 height:130
+	pos:[190,115] address:"https://space.bilibili.com/2031113"
+	GroupBox grbTips " BulletScripts 安装工具 " pos:[5,5] width:165 height:130
 	GroupBox grbInstall " 中键此处关闭安装窗口 " pos:[175,5] width:175 height:130
 	button btnBmp pos:[5,140] width:370 height:40 border:false enabled:false
 	
@@ -201,7 +199,6 @@ rollout rolBsInstall " BulletScripts 通用安装工具 " width:380 height:185
 		btnBmp.images = #(the_bmp, undefined, 1,1,1,1,1)
 		tbxResult.BackColor = (dotNetClass "System.Drawing.Color").fromARGB 240 248 255
 		btnInstall.text = (nameBsScript + " 安装")
-		rolBsInstall.grbTips.caption = textUpdateLink as string
 		local logTips = "动画师定制脚本工具\r\n仅供学习交流, 禁止售卖\r\n活到老, K到老, 坚持热爱\r\n\r\n-... ..- .-.. .-.. . - .-.-.- ...\r\n作者: Bullet.S          2019.08\r\nanimator.bullet@foxmail.com"
 		fn_updateInterface tbxResult logTips
 	)
@@ -253,7 +250,7 @@ rollout rolBsInstall " BulletScripts 通用安装工具 " width:380 height:185
 	---------------------上面设置拖动脚本窗口,去掉标题栏后默认无法拖动---------------------
 	on tmrInstall tick do 
 	(
-		local tempStr
+		local tempStr = ""
 		btnInstall.enabled = false
 		v = mod tmrInstall.ticks 500.0
 		
@@ -267,7 +264,7 @@ rollout rolBsInstall " BulletScripts 通用安装工具 " width:380 height:185
 			try(pbInstall.value = v)catch()
 			tempStr = ("安装进度：" + (v as integer) as string + "%")
 			fn_updateInterface tbxResult \
-		(tempStr + "\r\n\r\n" + tempStr + "\r\n\r\n" + tempStr + "\r\n\r\n" + tempStr)
+			(tempStr + "\r\n\r\n" + tempStr + "\r\n\r\n" + tempStr + "\r\n\r\n" + tempStr)
 		)
 		else
 		(		

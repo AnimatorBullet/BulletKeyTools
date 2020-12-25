@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-20 21:38:05
+ * @LastEditTime: 2020-12-25 17:25:01
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -106,13 +106,13 @@ fn fnGetColorTheme =
 		)
 		else
 		(
-			myfgColor    = (color 255 255 0)
+			myfgColor    = (color 219 209 72)
 			myClickColor = (color 0 255 127)
 		)
 	)
 	else
 	(
-		myfgColor    = (color 255 255 0)
+		myfgColor    = (color 219 209 72)
 		myClickColor = (color 0 255 127)
 	)
 )
@@ -875,9 +875,9 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 
 	groupbox gbxTips "" pos:[5,200] width:190 height:30
 	
-		HyperLink lnkLink "---  | 2019.9  miHoYo_Bullet.S |  - ？ --"
+		HyperLink lnkLink "2019.9  miHoYo_Bullet.S               "
 		color:myfgColor hovercolor:myClickColor visitedcolor:myClickColor \
-		pos:[7,210] address:"https://www.anibullet.com/post/6271.html"
+		pos:[20,210] address:"https://www.anibullet.com/post/6271.html"
 		-- label labmiHoYo "--- TECH OTAKUS SAVE THE WORLD --" \
 		-- pos:[7,210]
 
