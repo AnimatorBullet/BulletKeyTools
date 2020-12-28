@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-25 18:33:39
+ * @LastEditTime: 2020-12-28 20:08:54
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -35,7 +35,7 @@ Global iniLikedFolder     = #()
 Global iniFilterPrefix    = #()
 Global arrRecentFiles     = #()
 Global arrRecentFilesName = #()
-Global arrFileType        = #(".max",".fbx",".bip",".ms*","jpg","png")
+Global arrFileType        = #(".max",".fbx",".bip",".ms*",".pic")
 Global rolBsOpenTools
 Global fnRefreshList
 Global tempLastFolder
@@ -96,6 +96,53 @@ fn fnSetConfig =  --保存参数,脚本位置
 	SetINISetting BulletConfig "BsOpenToolsSet"  "Desktop" (iniDesktop as string)
 	SetINISetting BulletConfig "BsOpenToolsSet"  "RefPicDir" (iniRefPicDir as string)
 )
+
+-- 修改自:https://forums.cgsociety.org/t/can-i-show-an-animated-gif-in-a-mxs-window/2050210/5
+-- 添加获取图片大小
+rollout rolPreviewRef ""
+(
+	-- local splashscreenGIF = @"D:\Rec\1.gif"
+	
+	dotNetControl dn_flp "flowlayoutpanel" pos:[0,0]
+	dotNetControl btn_LengthDistance "System.Windows.Forms.button" pos:[0,0]
+	
+	on rolPreviewRef open do
+	(
+		btn_LengthDistance.margin =  dotnetobject "padding" 0
+		btn_LengthDistance.FlatAppearance.BorderSize = 1
+		btn_LengthDistance.flatstyle = (dotNetclass "FlatStyle").flat
+		-- btn_LengthDistance.image = (dotNetclass "System.Drawing.Image").fromfile splashscreenGIF
+		
+		dn_flp.Controls.Clear()
+		dn_flp.SuspendLayout()
+		dn_flp.controls.addrange #(btn_LengthDistance)
+		dn_flp.resumelayout()
+		-- rol_.width = btn_LengthDistance.image.width
+		-- rol_.height = btn_LengthDistance.image.height
+		-- btn_LengthDistance.width = btn_LengthDistance.image.width
+		-- btn_LengthDistance.height = btn_LengthDistance.image.height
+		-- dn_flp.width = btn_LengthDistance.image.width
+		-- dn_flp.height = btn_LengthDistance.image.height
+	)
+)
+
+fn fnOpenPic strPicPath =
+(
+	try (destroydialog rolPreviewRef) catch ()
+	createdialog rolPreviewRef
+	rolPreviewRef.btn_LengthDistance.image = \
+	(dotNetclass "System.Drawing.Image").fromfile strPicPath
+	
+	rolPreviewRef.title = getfilenamefile  strPicPath
+	rolPreviewRef.width = rolPreviewRef.btn_LengthDistance.image.width
+	rolPreviewRef.height = rolPreviewRef.btn_LengthDistance.image.height
+	rolPreviewRef.btn_LengthDistance.width = rolPreviewRef.btn_LengthDistance.image.width
+	rolPreviewRef.btn_LengthDistance.height = rolPreviewRef.btn_LengthDistance.image.height
+	rolPreviewRef.dn_flp.width = rolPreviewRef.btn_LengthDistance.image.width
+	rolPreviewRef.dn_flp.height = rolPreviewRef.btn_LengthDistance.image.height
+
+)
+
 ---------------配合BulletTools工具的ini文件保存位置信息----------------------------------
 
 rollout rolAddItem "添加" width:340 height:80
@@ -210,8 +257,8 @@ rollout rolBsOpenTools "" width:360 height:345
 	radioButtons rdoFileType "" columns:5 offsets:#([7,0],[7,0],[7,0],[7,0],[7,0]) \
 	pos:[82,48] labels:#(".max",".fbx",".bip",".ms","pic") 
 
-	button   btnRefPicDir "图片参考" border:false \
-	height:25 width:70 pos:[10,182] tooltip:"参考图目录"
+	button btnRefPicDir "图片参考" border:false \
+	height:25 width:70 pos:[10,182] tooltip:"左：打开参考，右：创建Plane"
 	button btnRecentFileDir "最近打开" border:false \
 	height:25 width:70 pos:[10,208] tooltip:"最近打开文件"
 	button btnDesktopDir "桌面自定" border:false \
@@ -323,7 +370,14 @@ rollout rolBsOpenTools "" width:360 height:345
 					append arrFolders (substring i 1 (i.count-1))
 				)
 				qsort arrFolders fnPseudoNaturalSort
-				arrFilesBeforeFilter = getFiles (strFilesDir + "\\*" + type)
+				if (type == ".pic") then 
+				(
+					arrFilesBeforeFilter = getFiles (strFilesDir + "\\*" + ".gif")
+					arrFilesBeforeFilter += getFiles (strFilesDir + "\\*" + ".jpg")
+					arrFilesBeforeFilter += (getFiles (strFilesDir + "\\*" + ".png"))
+					arrFilesBeforeFilter += (getFiles (strFilesDir + "\\*" + ".bmp"))
+				)
+				else (arrFilesBeforeFilter = getFiles (strFilesDir + "\\*" + type))
 				qsort arrFilesBeforeFilter fnPseudoNaturalSort
 				if (rolBsOpenTools.ltbFilterPrefix.selected != undefined) then
 				(
@@ -347,7 +401,22 @@ rollout rolBsOpenTools "" width:360 height:345
 				(
 					for c in arrFiles do  --获取文件名字,后面切换脚本类别和列表会用到
 					(
-						append arrFilesName ("📄 " + (getFilenameFile c) + type)
+						if (type == ".pic") then 
+						(
+							if (doesFileExist (strFilesDir + "\\"  + ((getFilenameFile c) + ".gif"))) then
+							append arrFilesName ("📄 " + (getFilenameFile c) + ".gif")
+							if (doesFileExist (strFilesDir + "\\"  + ((getFilenameFile c) + ".jpg"))) then
+							append arrFilesName ("📄 " + (getFilenameFile c) + ".jpg")
+							if (doesFileExist (strFilesDir + "\\"  + ((getFilenameFile c) + ".png"))) then
+							append arrFilesName ("📄 " + (getFilenameFile c) + ".png")
+							if (doesFileExist (strFilesDir + "\\"  + ((getFilenameFile c) + ".bmp"))) then
+							append arrFilesName ("📄 " + (getFilenameFile c) + ".bmp")
+						)
+						else 
+						(
+							if (doesFileExist (rolBsOpenTools.edtBrowseFolder.text + ((getFilenameFile c) + type))) then
+							(append arrFilesName ("📄 " + (getFilenameFile c) + type))
+						)
 					)
 				)
 				rolBsOpenTools.ltbFilesList.items = arrFoldersName + arrFilesName
@@ -549,7 +618,11 @@ rollout rolBsOpenTools "" width:360 height:345
 
 	on rdoFileType changed state do
 	(
-		fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[state]
+		if (state == 4) then
+		(
+			fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[4]
+		)
+		else (fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[state])
 	)
 
 	-- on ckbLockWidth changed state do 
@@ -589,7 +662,7 @@ rollout rolBsOpenTools "" width:360 height:345
 	on btnFilterPrefix pressed do 
 	(
 		try(destroydialog rolAddItem)catch()
-		createdialog rolAddItem fgcolor:(color 255 20 100) pos:mouse.screenpos
+		createdialog rolAddItem fgcolor:myfgColor pos:mouse.screenpos
 		rolAddItem.gbxAddPre.visible  = true
 		rolAddItem.edtPrefix.visible  = true
 		rolAddItem.gbxAddDir.visible  = false
@@ -667,6 +740,7 @@ rollout rolBsOpenTools "" width:360 height:345
 							(rdoFileType.state == 2):(importFile arrFiles[idFile] #noPrompt using:FBXIMP)
 							(rdoFileType.state == 3):(fnLoadBip arrFiles[idFile])
 							(rdoFileType.state == 4):(fileIn arrFiles[idFile])
+							(rdoFileType.state == 5):(fnOpenPic arrFiles[idFile])
 						)
 					)
 				)
@@ -708,27 +782,29 @@ rollout rolBsOpenTools "" width:360 height:345
 
 	on   btnRefPicDir pressed do 
 	(
+		rdoFileType.state  = 5
 		local dirRefPic = ""
 		if iniRefPicDir.dir == "" then 
 		(
 			dirRefPic = getSavePath caption:"请设置参考图路径:" initialDir:(maxFilePath)
 			if (dirRefPic != undefined) then
 			(
-				iniRefPicDir.dir = dirOpened
-				fnRefreshList iniRefPicDir.dir type:".*"
+				iniRefPicDir.dir = dirRefPic
+				fnRefreshList iniRefPicDir.dir type:arrFileType[rdoFileType.state]
 			)
 		)
-	else (fnRefreshList iniRefPicDir.dir type:".*")
+	else (fnRefreshList iniRefPicDir.dir type:arrFileType[rdoFileType.state])
 	)
 
 	on   btnRefPicDir rightclick do 
 	(
+		rdoFileType.state  = 5
 		local dirRefPic = ""
 		dirRefPic = getSavePath caption:"请设置参考图路径:" initialDir:(maxFilePath)
 		if (dirRefPic != undefined) then
 		(
-			iniRefPicDir.dir = dirOpened
-			fnRefreshList iniRefPicDir.dir type:".*"
+			iniRefPicDir.dir = dirRefPic
+			fnRefreshList iniRefPicDir.dir type:arrFileType[rdoFileType.state]
 		)
 	)
 
