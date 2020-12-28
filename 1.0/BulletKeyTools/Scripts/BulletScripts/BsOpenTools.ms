@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-28 20:08:54
+ * @LastEditTime: 2020-12-28 20:20:04
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -129,7 +129,7 @@ rollout rolPreviewRef ""
 fn fnOpenPic strPicPath =
 (
 	try (destroydialog rolPreviewRef) catch ()
-	createdialog rolPreviewRef
+	createdialog rolPreviewRef style:#(#style_titlebar,#style_sysmenu ,#style_toolwindow)
 	rolPreviewRef.btn_LengthDistance.image = \
 	(dotNetclass "System.Drawing.Image").fromfile strPicPath
 	
@@ -618,11 +618,7 @@ rollout rolBsOpenTools "" width:360 height:345
 
 	on rdoFileType changed state do
 	(
-		if (state == 4) then
-		(
-			fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[4]
-		)
-		else (fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[state])
+		fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[state]
 	)
 
 	-- on ckbLockWidth changed state do 
