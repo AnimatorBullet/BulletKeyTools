@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-28 20:20:04
+ * @LastEditTime: 2020-12-29 01:05:39
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -16,9 +16,9 @@ global dateTime = (dotNetClass "System.DateTime").Now
 global dayWeek = #( "一", "二", "三", "四", "五", "六", "日")
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPosOpenTools
-Global iniWidthOpenTools  = 300
+-- Global iniWidthOpenTools  = 340
 Global iniDesktop         = (itemsFolder name:"Desktop" dir:"")
-Global iniRefPicDir			= (itemsFolder name:"RefPicDir" dir:"")
+-- Global iniRefPicDir			= (itemsFolder name:"RefPicDir" dir:"")
 Global posMouScreen       = mouse.screenpos
 Global posMouMove         = [0,0]
 Global switchMouState     = false
@@ -35,7 +35,7 @@ Global iniLikedFolder     = #()
 Global iniFilterPrefix    = #()
 Global arrRecentFiles     = #()
 Global arrRecentFilesName = #()
-Global arrFileType        = #(".max",".fbx",".bip",".ms*",".pic")
+Global arrFileType        = #(".max",".fbx",".bip",".ms*")
 Global rolBsOpenTools
 Global fnRefreshList
 Global tempLastFolder
@@ -81,9 +81,9 @@ fn fnSaveConfig =  --引用上面方法提出需要的参数
 	iniSelectedID     = fnGetConfig iniSelectedID "BsOpenToolsSet" "SelectedID" (iniSelectedID as string)
 	iniLikedFolder    = fnGetConfig iniLikedFolder "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
 	iniFilterPrefix   = fnGetConfig iniFilterPrefix "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)
-	iniWidthOpenTools = fnGetConfig iniWidthOpenTools "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
+	-- iniWidthOpenTools = fnGetConfig iniWidthOpenTools "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
 	iniDesktop        = fnGetConfig iniDesktop "BsOpenToolsSet"  "Desktop" (iniDesktop as string)
-	iniRefPicDir        = fnGetConfig iniRefPicDir "BsOpenToolsSet"  "RefPicDir" (iniRefPicDir as string)
+	-- iniRefPicDir        = fnGetConfig iniRefPicDir "BsOpenToolsSet"  "RefPicDir" (iniRefPicDir as string)
 )
 fnSaveConfig () --初始执行一遍
 fn fnSetConfig =  --保存参数,脚本位置
@@ -92,55 +92,9 @@ fn fnSetConfig =  --保存参数,脚本位置
 	SetINISetting BulletConfig "BsOpenToolsSet"  "SelectedID" (iniSelectedID as string)
 	SetINISetting BulletConfig "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
 	SetINISetting BulletConfig "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)
-	SetINISetting BulletConfig "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
+	-- SetINISetting BulletConfig "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
 	SetINISetting BulletConfig "BsOpenToolsSet"  "Desktop" (iniDesktop as string)
-	SetINISetting BulletConfig "BsOpenToolsSet"  "RefPicDir" (iniRefPicDir as string)
-)
-
--- 修改自:https://forums.cgsociety.org/t/can-i-show-an-animated-gif-in-a-mxs-window/2050210/5
--- 添加获取图片大小
-rollout rolPreviewRef ""
-(
-	-- local splashscreenGIF = @"D:\Rec\1.gif"
-	
-	dotNetControl dn_flp "flowlayoutpanel" pos:[0,0]
-	dotNetControl btn_LengthDistance "System.Windows.Forms.button" pos:[0,0]
-	
-	on rolPreviewRef open do
-	(
-		btn_LengthDistance.margin =  dotnetobject "padding" 0
-		btn_LengthDistance.FlatAppearance.BorderSize = 1
-		btn_LengthDistance.flatstyle = (dotNetclass "FlatStyle").flat
-		-- btn_LengthDistance.image = (dotNetclass "System.Drawing.Image").fromfile splashscreenGIF
-		
-		dn_flp.Controls.Clear()
-		dn_flp.SuspendLayout()
-		dn_flp.controls.addrange #(btn_LengthDistance)
-		dn_flp.resumelayout()
-		-- rol_.width = btn_LengthDistance.image.width
-		-- rol_.height = btn_LengthDistance.image.height
-		-- btn_LengthDistance.width = btn_LengthDistance.image.width
-		-- btn_LengthDistance.height = btn_LengthDistance.image.height
-		-- dn_flp.width = btn_LengthDistance.image.width
-		-- dn_flp.height = btn_LengthDistance.image.height
-	)
-)
-
-fn fnOpenPic strPicPath =
-(
-	try (destroydialog rolPreviewRef) catch ()
-	createdialog rolPreviewRef style:#(#style_titlebar,#style_sysmenu ,#style_toolwindow)
-	rolPreviewRef.btn_LengthDistance.image = \
-	(dotNetclass "System.Drawing.Image").fromfile strPicPath
-	
-	rolPreviewRef.title = getfilenamefile  strPicPath
-	rolPreviewRef.width = rolPreviewRef.btn_LengthDistance.image.width
-	rolPreviewRef.height = rolPreviewRef.btn_LengthDistance.image.height
-	rolPreviewRef.btn_LengthDistance.width = rolPreviewRef.btn_LengthDistance.image.width
-	rolPreviewRef.btn_LengthDistance.height = rolPreviewRef.btn_LengthDistance.image.height
-	rolPreviewRef.dn_flp.width = rolPreviewRef.btn_LengthDistance.image.width
-	rolPreviewRef.dn_flp.height = rolPreviewRef.btn_LengthDistance.image.height
-
+	-- SetINISetting BulletConfig "BsOpenToolsSet"  "RefPicDir" (iniRefPicDir as string)
 )
 
 ---------------配合BulletTools工具的ini文件保存位置信息----------------------------------
@@ -230,12 +184,12 @@ rollout rolAddItem "添加" width:340 height:80
 	)
 )
 
-rollout rolBsOpenTools "" width:360 height:345
+rollout rolBsOpenTools "" width:340 height:345
 (
-	groupbox grpMain " 时光机_v0.3 --------- 中键关闭,右击上层目录 " \
-	width:350 height:340 pos:[5,0]
+	groupbox grpMain "时光机_v0.3-----------------中键关闭,右击上层目录" \
+	width:330 height:340 pos:[5,0]
 	editText edtBrowseFolder "" text:"" labelOnTop:true align:#right \
-	height:20 fieldWidth:280 pos:[70,20] readOnly:true 
+	height:20 fieldWidth:260 pos:[70,20] readOnly:true 
 	button btnOpenAddress "..." align:#right tooltip:"左：选择打开目录\r\n右：打开右侧目录文件夹" \
 	height:20 width:30 pos:[37,20] 
 	-- button btnRemoveFolder "━" align:#left \
@@ -249,16 +203,16 @@ rollout rolBsOpenTools "" width:360 height:345
 	dropdownlist ddlLikedFolder "" align:#left selection:1 \
 	height:15 width:70 pos:[10,70]
 	listBox ltbFilesList "" align:#right selection:0 \
-	height:18 width:265 pos:[85,70]
+	height:18 width:245 pos:[85,70]
 	button btnFilterPrefix "✚过滤词缀✚" border:false \
 	height:23 width:70 pos:[10,95] tooltip:"左：添加过滤\r\n右：取消过滤\r\n选中过滤列表\r\n右击删除条目"
 	listBox ltbFilterPrefix "" align:#left selection:0 \
-	height:4 width:70 pos:[10,120]
-	radioButtons rdoFileType "" columns:5 offsets:#([7,0],[7,0],[7,0],[7,0],[7,0]) \
-	pos:[82,48] labels:#(".max",".fbx",".bip",".ms","pic") 
+	height:6 width:70 pos:[10,120]
+	radioButtons rdoFileType "" columns:5 offsets:#([14,0],[14,0],[14,0],[14,0]) \
+	pos:[82,48] labels:#(".max",".fbx",".bip",".ms") 
 
-	button btnRefPicDir "图片参考" border:false \
-	height:25 width:70 pos:[10,182] tooltip:"左：打开参考，右：创建Plane"
+	-- button btnRefPicDir "图片参考" border:false \
+	-- height:25 width:70 pos:[10,182] tooltip:"左：打开参考，右：创建Plane"
 	button btnRecentFileDir "最近打开" border:false \
 	height:25 width:70 pos:[10,208] tooltip:"最近打开文件"
 	button btnDesktopDir "桌面自定" border:false \
@@ -269,11 +223,11 @@ rollout rolBsOpenTools "" width:360 height:345
 	height:25 width:70 pos:[10,286] tooltip:"自动保存目录"
 	-- button btnPreviewDir "<轮回梦境>" border:false \
 	-- height:25 width:70 pos:[10,310] tooltip:"左：预览视频默认文件夹\r\n右：快速拍屏渲染预览动画"
-	groupBox grpDate "" width:350 height:30 pos:[5,310]
+	groupBox grpDate "" width:330 height:30 pos:[5,310]
 	label lblCountTips "" height:15 width:80 pos:[15,320]
-	label lblDateTime "" height:15 width:130 pos:[110,320] 
+	label lblDateTime "" height:15 width:130 pos:[100,320] 
 	HyperLink lnkLink "2019.9  miHoYo_Bullet.S" color:myfgColor hovercolor:myClickColor visitedcolor:myClickColor \
-	pos:[230,320] address:"https://space.bilibili.com/2031113"
+	pos:[210,320] address:"https://space.bilibili.com/2031113"
 	-- checkbutton ckbLockWidth "🔒" pos:[86,312] width:20 height:20 border:false \
 	-- toolTip:"是否解锁宽度调节\r\n右：重置宽度" checked:false
 	-- slider sldSetWidth "" pos:[113,312] range:[300,500,iniWidthOpenTools] ticks:0 \
@@ -370,14 +324,7 @@ rollout rolBsOpenTools "" width:360 height:345
 					append arrFolders (substring i 1 (i.count-1))
 				)
 				qsort arrFolders fnPseudoNaturalSort
-				if (type == ".pic") then 
-				(
-					arrFilesBeforeFilter = getFiles (strFilesDir + "\\*" + ".gif")
-					arrFilesBeforeFilter += getFiles (strFilesDir + "\\*" + ".jpg")
-					arrFilesBeforeFilter += (getFiles (strFilesDir + "\\*" + ".png"))
-					arrFilesBeforeFilter += (getFiles (strFilesDir + "\\*" + ".bmp"))
-				)
-				else (arrFilesBeforeFilter = getFiles (strFilesDir + "\\*" + type))
+				(arrFilesBeforeFilter = getFiles (strFilesDir + "\\*" + type))
 				qsort arrFilesBeforeFilter fnPseudoNaturalSort
 				if (rolBsOpenTools.ltbFilterPrefix.selected != undefined) then
 				(
@@ -401,22 +348,7 @@ rollout rolBsOpenTools "" width:360 height:345
 				(
 					for c in arrFiles do  --获取文件名字,后面切换脚本类别和列表会用到
 					(
-						if (type == ".pic") then 
-						(
-							if (doesFileExist (strFilesDir + "\\"  + ((getFilenameFile c) + ".gif"))) then
-							append arrFilesName ("📄 " + (getFilenameFile c) + ".gif")
-							if (doesFileExist (strFilesDir + "\\"  + ((getFilenameFile c) + ".jpg"))) then
-							append arrFilesName ("📄 " + (getFilenameFile c) + ".jpg")
-							if (doesFileExist (strFilesDir + "\\"  + ((getFilenameFile c) + ".png"))) then
-							append arrFilesName ("📄 " + (getFilenameFile c) + ".png")
-							if (doesFileExist (strFilesDir + "\\"  + ((getFilenameFile c) + ".bmp"))) then
-							append arrFilesName ("📄 " + (getFilenameFile c) + ".bmp")
-						)
-						else 
-						(
-							if (doesFileExist (rolBsOpenTools.edtBrowseFolder.text + ((getFilenameFile c) + type))) then
-							(append arrFilesName ("📄 " + (getFilenameFile c) + type))
-						)
+						(append arrFilesName ("📄 " + (getFilenameFile c) + type))
 					)
 				)
 				rolBsOpenTools.ltbFilesList.items = arrFoldersName + arrFilesName
@@ -520,7 +452,7 @@ rollout rolBsOpenTools "" width:360 height:345
 	on rolBsOpenTools open do 
 	(
 		-- sldSetWidth.value         = iniWidthOpenTools
-		rolBsOpenTools.width      = iniWidthOpenTools
+		-- rolBsOpenTools.width      = iniWidthOpenTools
 		btnRefreshFolder.images   = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,3,3,3,3,true,false)
 		-- ckbLockWidth.images       = #("LockButtonExt_i.bmp","LockButtonExt_i.bmp",2,1,1,2,2,true,false)
 		fnRefreshAddress ()
@@ -540,23 +472,9 @@ rollout rolBsOpenTools "" width:360 height:345
 	(
 		iniPosOpenTools   = (GetDialogPos rolBsOpenTools)
 		iniSelectedID     = rolBsOpenTools.ddlLikedFolder.selection
-		iniWidthOpenTools = rolBsOpenTools.width
+		-- iniWidthOpenTools = rolBsOpenTools.width
 		fnSetConfig ()
 	)
-
-	-- on sldSetWidth changed ticks do
-	-- (
-	-- 	rolBsOpenTools.width = ticks
-	-- )
-	------------------------------------------------------------------------------
-
-	-- on rolBsOpenTools resized pos do
-	-- (
-	-- 	if(rolBsOpenTools.width < 360)then(rolBsOpenTools.width = 360)
-	-- 	grpMain.width         = rolBsOpenTools.width - 10
-	-- 	-- edtBrowseFolder.width = rolBsOpenTools.width - 80
-	-- 	ltbFilesList.width    = rolBsOpenTools.width - 95
-	-- )
 
 	on rolBsOpenTools mbuttondown pos do 
 	(
@@ -620,18 +538,6 @@ rollout rolBsOpenTools "" width:360 height:345
 	(
 		fnRefreshList rolBsOpenTools.edtBrowseFolder.text type:arrFileType[state]
 	)
-
-	-- on ckbLockWidth changed state do 
-	-- (
-	-- 	if state == on then sldSetWidth.enabled = true 
-	-- 	else sldSetWidth.enabled = false
-	-- )
-
-	-- on ckbLockWidth rightclick do
-	-- (
-	-- 	rolBsOpenTools.width = 300
-	-- 	sldSetWidth.value    = 300
-	-- )
 
 	on btnOpenAddress pressed do 
 	(
@@ -776,34 +682,6 @@ rollout rolBsOpenTools "" width:360 height:345
 		)
 	)
 
-	on   btnRefPicDir pressed do 
-	(
-		rdoFileType.state  = 5
-		local dirRefPic = ""
-		if iniRefPicDir.dir == "" then 
-		(
-			dirRefPic = getSavePath caption:"请设置参考图路径:" initialDir:(maxFilePath)
-			if (dirRefPic != undefined) then
-			(
-				iniRefPicDir.dir = dirRefPic
-				fnRefreshList iniRefPicDir.dir type:arrFileType[rdoFileType.state]
-			)
-		)
-	else (fnRefreshList iniRefPicDir.dir type:arrFileType[rdoFileType.state])
-	)
-
-	on   btnRefPicDir rightclick do 
-	(
-		rdoFileType.state  = 5
-		local dirRefPic = ""
-		dirRefPic = getSavePath caption:"请设置参考图路径:" initialDir:(maxFilePath)
-		if (dirRefPic != undefined) then
-		(
-			iniRefPicDir.dir = dirRefPic
-			fnRefreshList iniRefPicDir.dir type:arrFileType[rdoFileType.state]
-		)
-	)
-
 	on btnAutobackDir pressed do 
 	(
 		rdoFileType.state  = 1
@@ -821,20 +699,6 @@ rollout rolBsOpenTools "" width:360 height:345
 		rdoFileType.state  = 4
 		fnRefreshList (getdir #startupScripts) type:".ms*"
 	)
-
-	-- on btnPreviewDir pressed do 
-	-- (
-	-- 	fnRefreshList (getdir #preview) type:".avi"
-	-- )
-
-	-- on btnPreviewDir rightclick do 
-	-- (
-	-- 	createPreview percentSize:100 \
-	-- 	dspGeometry:true dspShapes:false dspLights:false \
-	-- 	dspCameras:false dspHelpers:false dspParticles:true dspBones:false \
-	-- 	dspGrid:true dspSafeFrame:false dspFrameNums:false dspBkg:true \
-	-- 	rndLevel:#smoothhighlights
-	-- )
 
 	on btnRecentFileDir pressed do 
 	(

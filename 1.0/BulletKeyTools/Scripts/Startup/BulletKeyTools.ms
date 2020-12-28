@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-28 18:33:06
+ * @LastEditTime: 2020-12-28 23:29:13
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -749,7 +749,7 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 rollout rolloutBulletKeyTools "" width:200 height:235
 (
 	---------------------------------UI--------------------------------------
-	groupbox gbxMainUI "[ BsKeyTools v0.9.2 ]----右键设置" pos:[5,5] width:190 height:195
+	groupbox gbxMainUI "[ BsKeyTools v0.9.3 ]----右键设置" pos:[5,5] width:190 height:195
 	
 		label lblRangeStartText "起始帧" pos:[15,25] width:80
 		label lblRangeEndText "结束帧" pos:[85,25] width:80
