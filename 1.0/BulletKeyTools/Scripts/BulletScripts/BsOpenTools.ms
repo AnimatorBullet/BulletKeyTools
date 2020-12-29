@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-29 01:05:39
+ * @LastEditTime: 2020-12-29 18:41:03
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -189,16 +189,18 @@ rollout rolBsOpenTools "" width:340 height:345
 	groupbox grpMain "时光机_v0.3-----------------中键关闭,右击上层目录" \
 	width:330 height:340 pos:[5,0]
 	editText edtBrowseFolder "" text:"" labelOnTop:true align:#right \
-	height:20 fieldWidth:260 pos:[70,20] readOnly:true 
-	button btnOpenAddress "..." align:#right tooltip:"左：选择打开目录\r\n右：打开右侧目录文件夹" \
+	height:20 fieldWidth:230 pos:[70,20] readOnly:true 
+	button btnOpenAddress "..." align:#right tooltip:"选择打开目录" \
 	height:20 width:30 pos:[37,20] 
+	button btnOpenCurrentDir "打开" tooltip:"打开当前文件夹" \
+	height:20 width:30 pos:[300,20] border:false
 	-- button btnRemoveFolder "━" align:#left \
 	-- height:20 width:25 pos:[10,20] tooltip:"删除选中的收藏目录"
 	-- button btnAddFolder "✚" align:#left border:false \
 	-- height:20 width:20 pos:[35,20] tooltip:"新增常用目录"
 	button btnRefreshFolder "R" align:#left \
 	height:20 width:25 pos:[10,20] tooltip:"左：刷新当前文件目录\r\n右：重置场景"
-	button btnLikedFolder "↓ 添加常用 ↓" border:false \
+	button btnLikedFolder "↓添加常用↓" border:false \
 	height:23 width:70 pos:[10,43] tooltip:"新增常用目录，右击选中条目删除"
 	dropdownlist ddlLikedFolder "" align:#left selection:1 \
 	height:15 width:70 pos:[10,70]
@@ -225,9 +227,9 @@ rollout rolBsOpenTools "" width:340 height:345
 	-- height:25 width:70 pos:[10,310] tooltip:"左：预览视频默认文件夹\r\n右：快速拍屏渲染预览动画"
 	groupBox grpDate "" width:330 height:30 pos:[5,310]
 	label lblCountTips "" height:15 width:80 pos:[15,320]
-	label lblDateTime "" height:15 width:130 pos:[100,320] 
-	HyperLink lnkLink "2019.9  miHoYo_Bullet.S" color:myfgColor hovercolor:myClickColor visitedcolor:myClickColor \
-	pos:[210,320] address:"https://space.bilibili.com/2031113"
+	label lblDateTime "" height:15 width:130 pos:[120,320] 
+	HyperLink lnkLink "miHoYo_Bullet.S" color:myfgColor hovercolor:myClickColor visitedcolor:myClickColor \
+	pos:[245,320] address:"https://space.bilibili.com/2031113"
 	-- checkbutton ckbLockWidth "🔒" pos:[86,312] width:20 height:20 border:false \
 	-- toolTip:"是否解锁宽度调节\r\n右：重置宽度" checked:false
 	-- slider sldSetWidth "" pos:[113,312] range:[300,500,iniWidthOpenTools] ticks:0 \
@@ -455,6 +457,8 @@ rollout rolBsOpenTools "" width:340 height:345
 		-- rolBsOpenTools.width      = iniWidthOpenTools
 		btnRefreshFolder.images   = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,3,3,3,3,true,false)
 		-- ckbLockWidth.images       = #("LockButtonExt_i.bmp","LockButtonExt_i.bmp",2,1,1,2,2,true,false)
+		btnOpenCurrentDir.images   = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,5,5,5,5,true,false)
+
 		fnRefreshAddress ()
 		fnRefreshList maxFilePath type: arrFileType[rdoFileType.state]
 		lblCountTips.text = "文件：" + arrFiles.count as string
@@ -521,7 +525,7 @@ rollout rolBsOpenTools "" width:340 height:345
 		max tool maximize
 	)
 
-	on btnOpenAddress rightclick do 
+	on btnOpenCurrentDir pressed do 
 	(
 		if (doesDirectoryExist edtBrowseFolder.text) then
 		(
