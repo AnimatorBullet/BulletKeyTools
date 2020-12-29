@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-28 23:29:13
+ * @LastEditTime: 2020-12-29 18:50:36
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -263,13 +263,16 @@ rcmenu menuConfig
 		if (mItemAddToolBarBtn.checked == false) then 
 		(
 			addToolBarButton "BulletKeyTools" "BulletTools" "BulletKeyTools" remove: true
+			addToolBarButton "BsOpenTools" "BulletTools" "时光机" remove: true
 			addToolBarButton "BulletKeyTools" "BulletTools" "BulletKeyTools"
+			addToolBarButton "BsOpenTools" "BulletTools" "时光机"
 			mItemAddToolBarBtn.checked = true
 			iniAddToolbars = 1
 		)
 		else
 		(
 			addToolBarButton "BulletKeyTools" "BulletTools" "BulletKeyTools" remove: true
+			addToolBarButton "BsOpenTools" "BulletTools" "时光机" remove: true
 			mItemAddToolBarBtn.checked = false
 			iniAddToolbars = 0
 		)
@@ -284,6 +287,7 @@ rcmenu menuConfig
 			if (iniAddToolbars == 1) then 
 			(
 				addToolBarButton "BulletKeyTools" "BulletTools" "BulletKeyTools" remove: true
+				addToolBarButton "BsOpenTools" "BulletTools" "时光机" remove: true
 				iniAddToolbars = 0
 				SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolBarBtn" (iniAddToolbars as string)
 			)

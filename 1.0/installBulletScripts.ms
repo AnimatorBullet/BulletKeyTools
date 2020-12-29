@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2020-12-20 00:51:15
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-25 17:24:20
+ * @LastEditTime: 2020-12-29 18:51:37
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -278,7 +278,9 @@ rollout rolBsInstall " BulletScripts 安装工具 " width:380 height:185
 			(
 				fn_updateInterface tbxResult ("工具栏按钮添加成功...\r\n\r\n安装已完成可退出。\r\n\r\n-... ..- .-.. .-.. . - .-.-.- ...\r\n作者: Bullet.S          2019.08\r\nanimator.bullet@foxmail.com")
 				addToolBarButton "BulletKeyTools" "BulletTools" "BulletKeyTools" remove: true
+				addToolBarButton "BsOpenTools" "BulletTools" "时光机" remove: true
 				addToolBarButton "BulletKeyTools" "BulletTools" "BulletKeyTools"
+				addToolBarButton "BsOpenTools" "BulletTools" "时光机"
 				iniAddToolbars = 1
 				SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolBarBtn" (iniAddToolbars as string)
 			)
