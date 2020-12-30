@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-30 15:41:57
+ * @LastEditTime: 2020-12-31 00:07:45
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -805,13 +805,13 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 	groupbox gbxMinTools "" pos:[200,5] width:150 height:225
 	
 		checkbutton ckbC1 "坚" width:35 height:26 \
-		pos:[205,15] toolTip:""
+		pos:[205,15] toolTip:"" border:false
 		checkbutton ckbC2 "持" width:35 height:26 \
-		pos:[240,15] toolTip:""
+		pos:[240,15] toolTip:"" border:false
 		checkbutton ckbC3 "热" width:35 height:26 \
-		pos:[275,15] toolTip:""
+		pos:[275,15] toolTip:"" border:false
 		checkbutton ckbC4 "爱" width:35 height:26 \
-		pos:[310,15] toolTip:""
+		pos:[310,15] toolTip:"" border:false
 
 		button btnColorTools "颜色渐变" width:70 height:30   visible:false \
 		tooltip:"做 Demo 素模或特效方便~"
