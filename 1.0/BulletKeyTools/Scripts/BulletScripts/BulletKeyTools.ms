@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-28 23:29:13
+ * @LastEditTime: 2020-12-30 15:41:57
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -945,20 +945,20 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 						rolloutBulletKeyTools.btnCopyKeyTools,\
 						rolloutBulletKeyTools.btnAnimMirror,\
 						rolloutBulletKeyTools.btnFnKeyType,\
-						rolloutBulletKeyTools.btnCleanVirus)
-		arrToolC2 = #(rolloutBulletKeyTools.btnBoneTraj,\
+						rolloutBulletKeyTools.btnCleanVirus,
+						rolloutBulletKeyTools.btnBoneTraj,\
 						rolloutBulletKeyTools.btnBipedTraj,\
 						rolloutBulletKeyTools.btnHideUnSel,\
 						rolloutBulletKeyTools.btnQuickPrev,\
 						rolloutBulletKeyTools.btnFnFrame,\
 						rolloutBulletKeyTools.ckbFnMtlDisplay)
-		arrToolC3 = #(rolloutBulletKeyTools.btnSelByColor,\
+		arrToolC2 = #(rolloutBulletKeyTools.btnSelByColor,\
 						rolloutBulletKeyTools.btnSelBoneBiped,\
 						rolloutBulletKeyTools.btnCutSequence,\
 						rolloutBulletKeyTools.btnMopherSlider,\
 						rolloutBulletKeyTools.btnBipedScale,\
-						rolloutBulletKeyTools.btnPoseTool)
-		arrToolC4 = #(rolloutBulletKeyTools.btnFnTCB,\
+						rolloutBulletKeyTools.btnPoseTool,\
+						rolloutBulletKeyTools.btnFnTCB,\
 						rolloutBulletKeyTools.btnEulerFilter,\
 						rolloutBulletKeyTools.btnDelOutKeys,\
 						rolloutBulletKeyTools.btnCleanOutKeys,\
