@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2020-12-29 01:12:45
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-30 21:46:15
+ * @LastEditTime: 2020-12-30 21:47:10
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -39,6 +39,12 @@ if dotNetClipboard.ContainsFileDropList() do
 
 if (queryBox "是否切换高分辨率贴图显示？      \r\n( 会改变显示贴图精度 )\r\n        " \
 		title:"切换高分辨率贴图显示" beep:false) then
+(
+    
+)
+
+if (queryBox "是否彻底清理参考图？      \r\n" \
+		title:"清理参考图" beep:false) then
 (
     
 )
