@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-12-24 12:39:55
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-31 01:12:26
+ * @LastEditTime: 2020-12-31 15:29:36
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -12,6 +12,7 @@ try(destroydialog rolHotBox2)catch()
 try(destroydialog rolHotBox3)catch()
 try(destroydialog rolHotBox4)catch()
 
+global switchRolHotBox = off
 Global posMouse = mouse.screenpos
 Global arrHotBox = #(rolHotBox1,rolHotBox2,rolHotBox3,rolHotBox4)
 
@@ -24,6 +25,14 @@ global pathTools3 = ""
 global strTools4 = "4"
 global pathTools4 = ""
 global posHot1   = [-100,-40]
+
+fn fnCloseHotBox =
+(
+	try(destroydialog rolHotBox1)catch()
+	try(destroydialog rolHotBox2)catch()
+	try(destroydialog rolHotBox3)catch()
+	try(destroydialog rolHotBox4)catch()
+)
 
 str = ""
 str += "rollout rolHotBoxConfig \"\" height:30 width:30"

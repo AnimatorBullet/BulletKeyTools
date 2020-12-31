@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-31 00:07:45
+ * @LastEditTime: 2020-12-31 15:59:58
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -231,7 +231,8 @@ rcmenu menuConfig
 	menuItem mItemIsStartup "是否自启"
 	menuItem mItemAddToolBarBtn "Toolbar按钮"
 	separator menuSepUninstall
-	menuItem mItemUninstall "再见"
+	menuItem mItemClose "关闭工具"
+	menuItem mItemUninstall "再也不见"
 
 	on menuConfig open do
 	(
@@ -274,6 +275,13 @@ rcmenu menuConfig
 			iniAddToolbars = 0
 		)
 		SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolBarBtn" (iniAddToolbars as string)
+	)
+
+	on mItemClose picked do 
+	(
+		try(destroydialog rolloutBulletKeyTools)catch()
+		try(destroydialog rolFnKeys)catch()
+		try(destroydialog rolAddMyScripts)catch()
 	)
 
 	on mItemUninstall picked do
@@ -365,11 +373,11 @@ fn fnRefPlaySpeedValue =
 		for i in arrMenuSetSpeed do i.checked = false
 	case of
 	(
-		(timeConfiguration.playbackSpeed == 1):(valuePlaySpeed = "--1/4x--";menuSetSpeed.menuSet14Speed.checked =true)
-		(timeConfiguration.playbackSpeed == 2):(valuePlaySpeed = "--1/2x--";menuSetSpeed.menuSet12Speed.checked =true)
-		(timeConfiguration.playbackSpeed == 3):(valuePlaySpeed = "-- 1x --";menuSetSpeed.menuSet1Speed.checked =true)
-		(timeConfiguration.playbackSpeed == 4):(valuePlaySpeed = "-- 2x --";menuSetSpeed.menuSet2Speed.checked =true)
-		(timeConfiguration.playbackSpeed == 5):(valuePlaySpeed = "-- 4x --";menuSetSpeed.menuSet4Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 1):(valuePlaySpeed = "-1/4x-";menuSetSpeed.menuSet14Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 2):(valuePlaySpeed = "-1/2x-";menuSetSpeed.menuSet12Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 3):(valuePlaySpeed = "- 1x -";menuSetSpeed.menuSet1Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 4):(valuePlaySpeed = "- 2x -";menuSetSpeed.menuSet2Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 5):(valuePlaySpeed = "- 4x -";menuSetSpeed.menuSet4Speed.checked =true)
 	)
 )
 
@@ -749,10 +757,10 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 rollout rolloutBulletKeyTools "" width:200 height:235
 (
 	---------------------------------UI--------------------------------------
-	groupbox gbxMainUI "[ BsKeyTools v0.9.3 ]----右键设置" pos:[5,5] width:190 height:195
+	groupbox gbxMainUI "[BsKeyTools v0.9.3]-右键设置⚙️" pos:[5,5] width:190 height:195
 	
-		label lblRangeStartText "起始帧" pos:[15,25] width:80
-		label lblRangeEndText "结束帧" pos:[85,25] width:80
+		label lblRangeStartText "起始帧" pos:[15,25] width:80 height:25
+		label lblRangeEndText "结束帧" pos:[85,25] width:80 height:25
 		spinner spiStartTime "" pos:[10,45] width:50 type:#integer \
 		range:[-999999999,999999999,animationrange.start] scale:1
 		label lblTo "--"  pos:[65,45] tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" \
@@ -875,9 +883,9 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 
 	groupbox gbxTips "" pos:[5,200] width:190 height:30
 	
-		HyperLink lnkLink "----[2019.9]----[miHoYo_Bullet.S]----"
+		HyperLink lnkLink "[2019.9][miHoYo_Bullet.S]📺📧💬💊"
 		color:myfgColor hovercolor:myClickColor visitedcolor:myClickColor \
-		pos:[10,210] address:"https://www.anibullet.com/post/6271.html"
+		pos:[10,210] address:"https://space.bilibili.com/2031113"
 
 	local m_PBKeyTimeArray
 	local m_PBKeyMiliSecArray
