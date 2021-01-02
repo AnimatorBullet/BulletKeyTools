@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-29 18:41:03
+ * @LastEditTime: 2021-01-02 12:00:05
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -19,7 +19,6 @@ Global iniPosOpenTools
 -- Global iniWidthOpenTools  = 340
 Global iniDesktop         = (itemsFolder name:"Desktop" dir:"")
 -- Global iniRefPicDir			= (itemsFolder name:"RefPicDir" dir:"")
-Global posMouScreen       = mouse.screenpos
 Global posMouMove         = [0,0]
 Global switchMouState     = false
 Global iniSelectedID      = 1
@@ -77,7 +76,7 @@ fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方�
 )
 fn fnSaveConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
-	iniPosOpenTools   = fnGetConfig iniPosOpenTools "BsOpenToolsSet" "PosOpenTools" (posMouScreen as string)
+	iniPosOpenTools   = fnGetConfig iniPosOpenTools "BsOpenToolsSet" "PosOpenTools" (mouse.screenpos as string)
 	iniSelectedID     = fnGetConfig iniSelectedID "BsOpenToolsSet" "SelectedID" (iniSelectedID as string)
 	iniLikedFolder    = fnGetConfig iniLikedFolder "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
 	iniFilterPrefix   = fnGetConfig iniFilterPrefix "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)

@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2020-12-20 00:51:15
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-29 18:51:37
+ * @LastEditTime: 2021-01-02 19:08:14
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -97,7 +97,7 @@ rollout rolBsInstall " BulletScripts 安装工具 " width:380 height:185
 	ProgressBar pbInstall "" pos:[355,10] width:20 height:125 orient:#vertical color:(color 240 248 255)
 	timer tmrInstall active: false interval:10
 	button btnInstall "" pos:[180,25] width:165 height:25 enabled:true tooltip:"安装工具并随MAX启动"
-	button btnUpdateLink "查看更新和介绍" pos:[180,55] width:165 height:25 enabled:true tooltip:"查看更新下载和介绍，跳转B站"
+	button btnUpdateLink "查看更新和介绍" pos:[180,55] width:165 height:25 enabled:true tooltip:"查看更新下载和介绍，跳转GitHub"
 	button btnJoinGroup "交流分享群" pos:[180,85] width:80 height:25 tooltip:"点击加入个人业内交流群,谢绝广告"
 	button btnExit "退出安装" pos:[265,85] width:80 height:25 tooltip:"点击退出安装"
 	HyperLink lnkLink "2019.9  miHoYo_Bullet.S         "
@@ -205,8 +205,8 @@ rollout rolBsInstall " BulletScripts 安装工具 " width:380 height:185
 	
 	on rolBsInstall close do
 	(
-		if (queryBox "是否立即清理安装缓存？      \r\n( 会清理max的temp目录 )\r\n        " \
-		title:"清理安装缓存" beep:false) then
+		if (queryBox "是否立即清理安装缓存？\r\n会清理max的temp目录\r\n建议不清理                \r\n" \
+		title:"清理安装缓存" beep:false defaultButton:2) then
 		(
 			arrCleanFiles = getFiles (getDir #temp + "\\*.*")
 			arrCleanDirs = getDirectories (getDir #temp + "\\*")
@@ -278,9 +278,7 @@ rollout rolBsInstall " BulletScripts 安装工具 " width:380 height:185
 			(
 				fn_updateInterface tbxResult ("工具栏按钮添加成功...\r\n\r\n安装已完成可退出。\r\n\r\n-... ..- .-.. .-.. . - .-.-.- ...\r\n作者: Bullet.S          2019.08\r\nanimator.bullet@foxmail.com")
 				addToolBarButton "BulletKeyTools" "BulletTools" "BulletKeyTools" remove: true
-				addToolBarButton "BsOpenTools" "BulletTools" "时光机" remove: true
 				addToolBarButton "BulletKeyTools" "BulletTools" "BulletKeyTools"
-				addToolBarButton "BsOpenTools" "BulletTools" "时光机"
 				iniAddToolbars = 1
 				SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolBarBtn" (iniAddToolbars as string)
 			)
