@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2020-12-31 15:59:58
+ * @LastEditTime: 2021-01-04 18:16:26
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -803,7 +803,7 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		timer clock "PlayClock" interval:1 active:false
 		button btnSpringMagic "飘带插件" pos:[70,147] width:60 height:25 \
 		tooltip:"左点新版,右点旧版" 
-		button btnCSTools "骨骼选择" pos:[130,147] width:60 height:25 \
+		button btnCSTools "CS选择" pos:[130,147] width:60 height:25 \
 		toolTip:"快速选择CS骨骼和调Biped等" 
 		button btnQuickSave "备份|另存" pos:[10,172] width:70 height:25 \
 		toolTip:"左：快速备份\r\n右：另存文件"  
