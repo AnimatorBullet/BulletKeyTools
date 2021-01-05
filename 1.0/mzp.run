@@ -1,9 +1,0 @@
-name "BulletKeyTools"
-version 0.9
-  
-extract to "$temp"
-  
-run "installBulletScripts.ms"
-drop "installBulletScripts.ms"
-  
-clear temp
