@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-04 18:16:26
+ * @LastEditTime: 2021-01-06 19:41:12
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -786,28 +786,30 @@ rollout rolloutBulletKeyTools "" width:200 height:235
 		pos:[150,65] width:40 height:30 toolTip:"选择滑条后面关键帧"  
 		-- button btnMoveKeys " " width:30 height:30 \
 		-- pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~"  
-		checkbutton ckbFnBoxDisplay "BOX 显示" width:60 height:25  \
+		checkbutton ckbFnBoxDisplay "BOX框" width:40 height:25  \
 		toolTip:"骨骼切换Box显示" pos:[10,97]
-		checkbutton ckbFreezeMesh "冻结模型" width:60 height:25   \
-		toolTip:"冻结解冻模型" pos:[70,97]
-		checkbutton ckbHideButton "隐藏骨骼" width:60 height:25   \
-		toolTip:"左：隐藏 bone\r\n右：隐藏所有骨骼" pos:[130,97]
-		button btnFileOpen "快速打开" pos:[10,122] width:60 height:25 \
+		checkbutton ckbFreezeMesh "冻模型" width:40 height:25   \
+		toolTip:"冻结解冻模型" pos:[50,97]
+		checkbutton ckbHideButton "隐Bone" width:40 height:25   \
+		toolTip:"左：隐藏 bone\r\n右：隐藏所有骨骼" pos:[90,97]
+		button btnFileOpen "时光机" pos:[10,122] width:40 height:25 \
 		tooltip:"快速打开max文件\r\n可收藏常用目录"  
-		button btnCutFrameDisplay "选帧预览" pos:[70,122] width:60 height:25 \
+		button btnCutFrameDisplay "选定帧" pos:[50,122] width:40 height:25 \
 		tooltip:"预览选择帧\r\n再点回到上次帧范围" 
-		button btnAllFrameDisplay "全帧预览" pos:[130,122] width:60 height:25 \
+		button btnAllFrameDisplay "首尾帧" pos:[90,122] width:40 height:25 \
 		tooltip:"预览全部帧\r\n再点回到上次帧范围" 
-		checkButton ckbPlayBlocking "跳帧播放" pos:[10,147] width:60 height:25 \
+		checkButton ckbPlayBlocking "跳帧播" pos:[10,147] width:40 height:25 \
 		tooltip:"点击预览关键帧 Blocking 动画\r\n若有 Link 帧需要按下上面按钮" checked:false
 		timer clock "PlayClock" interval:1 active:false
-		button btnSpringMagic "飘带插件" pos:[70,147] width:60 height:25 \
+		button btnSpringMagic "飘带" pos:[50,147] width:40 height:25 \
 		tooltip:"左点新版,右点旧版" 
-		button btnCSTools "CS选择" pos:[130,147] width:60 height:25 \
+		button btnCSTools "CS选择" pos:[90,147] width:40 height:25 \
 		toolTip:"快速选择CS骨骼和调Biped等" 
-		button btnQuickSave "备份|另存" pos:[10,172] width:70 height:25 \
-		toolTip:"左：快速备份\r\n右：另存文件"  
-		button btnSetFpsAndSpeed " " pos:[80,172] width:110 height:25 \
+		button btnQuickSave "备份" pos:[10,172] width:30 height:25 \
+		toolTip:"快速备份" 
+		button btnSaveAs "另存" pos:[40,172] width:30 height:25 \
+		toolTip:"另存文件"  
+		button btnSetFpsAndSpeed " " pos:[70,172] width:120 height:25 \
 		toolTip:"左：设置帧率\r\n右：播放速度" 
 	
 	groupbox gbxMinTools "" pos:[200,5] width:150 height:225
