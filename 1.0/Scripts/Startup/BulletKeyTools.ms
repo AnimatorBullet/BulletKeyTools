@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-08 16:46:10
+ * @LastEditTime: 2021-01-08 17:00:06
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -743,17 +743,17 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 	---------------------------------UI--------------------------------------
 	groupbox gbxMainUI "BsKeyTools v0.9.4" pos:[5,5] width:170 height:192
 	
-		label lblRangeStartText "起始帧" pos:[15,21] width:80 height:20
-		label lblRangeEndText "结束帧" pos:[65,21] width:80 height:20
-		spinner spiStartTime "" pos:[10,40] width:50 height:20 type:#integer \
+		-- label lblRangeStartText "起始帧" pos:[15,21] width:80 height:20
+		-- label lblRangeEndText "结束帧" pos:[65,21] width:80 height:20
+		spinner spiStartTime "" pos:[10,20] width:50 height:20 type:#integer \
 		range:[-999999999,999999999,animationrange.start] scale:1
-		spinner spiEndTime "" pos:[60,40] width:50 height:20 type:#integer \
+		spinner spiEndTime "" pos:[10,40] width:50 height:20 type:#integer \
 		range:[-999999999,999999999,animationrange.end] scale:1
 		-- checkbutton ckbHelpBtn "？觉醒" pos:[135,23] width:55 height:20   \
 		-- tooltip:"打开帮助模式！"
-		button btnAllConfig "⚙︎设置" pos:[115,16] width:55 height:20 \
+		button btnAllConfig "⚙︎设置" pos:[63,20] width:50 height:18 \
 		toolTip:"插件设置" border:false
-		button btnMagicBtn "✧(≖ ◡ ≖" pos:[115,36] width:55 height:20   \
+		button btnMagicBtn "✧(≖ ◡ ≖" pos:[115,21] width:55 height:35   \
 		tooltip:"点我点我点我~良心小工具" border:false
 		-- edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
 		-- pos:[10,70] labelOnTop:false text:"5f" bold:true readOnly:false 
