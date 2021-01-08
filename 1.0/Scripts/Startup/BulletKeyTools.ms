@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-08 14:03:47
+ * @LastEditTime: 2021-01-08 15:07:09
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -741,13 +741,13 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 rollout rolloutBulletKeyTools "" width:180 height:228
 (
 	---------------------------------UI--------------------------------------
-	groupbox gbxMainUI "BsKeyTools v0.9.3" pos:[5,5] width:170 height:192
+	groupbox gbxMainUI "BsKeyTools v0.9.4" pos:[5,5] width:170 height:192
 	
-		label lblRangeStartText "起始帧" pos:[15,21] width:80 height:25
-		label lblRangeEndText "结束帧" pos:[65,21] width:80 height:25
-		spinner spiStartTime "" pos:[10,40] width:50 type:#integer \
+		label lblRangeStartText "起始帧" pos:[15,21] width:80 height:20
+		label lblRangeEndText "结束帧" pos:[65,21] width:80 height:20
+		spinner spiStartTime "" pos:[10,40] width:50 height:20 type:#integer \
 		range:[-999999999,999999999,animationrange.start] scale:1
-		spinner spiEndTime "" pos:[60,40] width:50 type:#integer \
+		spinner spiEndTime "" pos:[60,40] width:50 height:20 type:#integer \
 		range:[-999999999,999999999,animationrange.end] scale:1
 		-- checkbutton ckbHelpBtn "？觉醒" pos:[135,23] width:55 height:20   \
 		-- tooltip:"打开帮助模式！"
