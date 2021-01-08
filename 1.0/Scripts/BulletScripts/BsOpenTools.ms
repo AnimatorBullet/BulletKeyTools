@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-02 12:00:05
+ * @LastEditTime: 2021-01-08 12:13:58
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -303,12 +303,12 @@ rollout rolBsOpenTools "" width:340 height:345
 			local strLastFolder = ""
 			for i = 1 to (arrFilterStr.count - 1) do 
 			(
-				strLastFolder = strLastFolder  + arrFilterStr[i] + "\\"
+				strLastFolder = strLastFolder  + arrFilterStr[i] + @"\\"
 			)
 		)
 		return strLastFolder
 	)
-	\
+	
 	fn fnRefreshList strFilesDir type:".max" =
 	(
 		arrFolders = #()
@@ -732,7 +732,7 @@ toolTip:"时光机"
 (
 	on execute do
 	(
-		fileIn ((getDir #Scripts)+ "\\BulletScripts\\" + "BsOpenTools.ms")
+		fileIn ((getDir #Scripts)+ @"\\BulletScripts\\BsOpenTools.ms")
 	)
 )
 -------------------------------------------------------------------------------------
