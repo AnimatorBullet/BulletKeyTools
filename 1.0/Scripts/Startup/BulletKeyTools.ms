@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-08 15:07:09
+ * @LastEditTime: 2021-01-08 16:46:10
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -751,7 +751,9 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		range:[-999999999,999999999,animationrange.end] scale:1
 		-- checkbutton ckbHelpBtn "？觉醒" pos:[135,23] width:55 height:20   \
 		-- tooltip:"打开帮助模式！"
-		button btnMagicBtn "✧(≖ ◡ ≖" pos:[115,21] width:55 height:35   \
+		button btnAllConfig "⚙︎设置" pos:[115,16] width:55 height:20 \
+		toolTip:"插件设置" border:false
+		button btnMagicBtn "✧(≖ ◡ ≖" pos:[115,36] width:55 height:20   \
 		tooltip:"点我点我点我~良心小工具" border:false
 		-- edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
 		-- pos:[10,70] labelOnTop:false text:"5f" bold:true readOnly:false 
@@ -801,8 +803,6 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		toolTip:"设置帧率" 
 		button btnSetSpeed " " pos:[110,167] width:40 height:25 \
 		toolTip:"设置播放速度" 
-		button btnAllConfig "⚙︎" pos:[150,167] width:20 height:25 \
-		toolTip:"插件设置" 
 	
 	groupbox gbxMinTools "" pos:[180,5] width:130 height:218
 	
@@ -2678,6 +2678,12 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 	(
 		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\ProColor.ms")
 	)
+
+	on btnAnimCopyPaste pressed do 
+	(messagebox "待补充优化版...        " beep:false)
+
+	on btnMyScriptsAll pressed do 
+	(messagebox "待补充...        " beep:false)
 
 )
 Createdialog rolloutBulletKeyTools fgcolor:myfgColor pos:iniPos style:#()
