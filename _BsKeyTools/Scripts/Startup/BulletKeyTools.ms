@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-10 01:55:48
+ * @LastEditTime: 2021-01-10 02:11:50
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -2065,7 +2065,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		-- )
 		ckbPlayBlocking.state = false
 		clock.active = false
-		fnAutoCheckVersion currentVersion verUrlBsKeyTools
+		fnAutoCheckVersion currentVersion verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools
 	)
 	
 	on rolloutBulletKeyTools close do -- 关闭记忆浮动窗口位置

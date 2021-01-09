@@ -49,8 +49,9 @@ fn fnCheckUpdate currentVersion verURL dlURL dlFile isForceUpdate:false =
     result
 )
 
-fn fnAutoCheckVersion currentVersion verURL =
+fn fnAutoCheckVersion currentVersion verURL dlURL dlFile =
 (
     local onlineVersion = (dotNetObject "System.Net.WebClient").downloadString verURL
-    if (currentVersion != onlineVersion) then  (fnCheckUpdate isForceUpdate:true)
+    if (currentVersion != onlineVersion) then 
+    (fnCheckUpdate currentVersion verURL dlURL dlFile isForceUpdate:true)
 )
