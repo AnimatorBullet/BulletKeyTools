@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-10 01:36:28
+ * @LastEditTime: 2021-01-10 01:55:48
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1002,10 +1002,10 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		toolTip:"清除所有帧\r\nLink帧请手动删" pos:[999999,999999]
 		button btnCleanOutKeys "清无限帧" width:60 height:29   visible:false \
 		toolTip:"清范围外帧(无限帧)" pos:[999999,999999]
-		button btnTemp3 "待添加" width:60 height:29   visible:false \
-		toolTip:"" pos:[999999,999999]
-		button btnSelBoneBiped "骨骼选择" width:60 height:29   visible:false \
-		toolTip:"左：选择所有biped\r\n右：选择所有bone" pos:[999999,999999]
+		button btnSelBiped "选择Biped" width:60 height:29   visible:false \
+		toolTip:"选择所有biped" pos:[999999,999999]
+		button btnSelBone "选择Bone" width:60 height:29   visible:false \
+		toolTip:"选择所有bone" pos:[999999,999999]
 		button btnEndBone "增删末端" width:60 height:29   visible:false \
 		toolTip:"清除添加Bone末端" pos:[999999,999999]
 		button btnQuickPrev "快速拍屏" width:60 height:29   visible:false \
@@ -1014,10 +1014,10 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		toolTip:"功能待添加" pos:[999999,999999]
 		button btnFnKeyType "改滑动帧" width:60 height:29   visible:false \
 		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置" pos:[999999,999999]
-		button btnTemp1 "待添加" width:60 height:29   visible:false \
-		toolTip:"" pos:[999999,999999]
-		button btnTemp2 "待添加" width:60 height:29   visible:false \
-		toolTip:"" pos:[999999,999999]
+		button btnSkinTools "权重工具" width:60 height:29   visible:false \
+		toolTip:"功能待添加" pos:[999999,999999]
+		button btnMeshTools "模型整理" width:60 height:29   visible:false \
+		toolTip:"功能待添加" pos:[999999,999999]
 		button btnAnimMirror "动画镜像" width:60 height:29   visible:false \
 		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化" pos:[999999,999999]
 		checkbutton ckbFnMtlDisplay "素模切换" width:60 height:29   visible:false \
@@ -1148,22 +1148,22 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 	(
 		arrToolC1 = #(rolloutBulletKeyTools.btnColorTools,\
 						rolloutBulletKeyTools.btnFastAlign,\
-						rolloutBulletKeyTools.btnTemp1,\
+						rolloutBulletKeyTools.btnSkinTools,\
 						rolloutBulletKeyTools.btnAnimMirror,\
 						rolloutBulletKeyTools.btnFnKeyType,\
 						rolloutBulletKeyTools.btnCleanVirus,
 						rolloutBulletKeyTools.btnBoneTraj,\
 						rolloutBulletKeyTools.btnBipedTraj,\
-						rolloutBulletKeyTools.btnTemp3,\
+						rolloutBulletKeyTools.btnMeshTools,\
 						rolloutBulletKeyTools.btnQuickPrev,\
 						rolloutBulletKeyTools.btnFnFrame,\
 						rolloutBulletKeyTools.ckbFnMtlDisplay)
 		arrToolC2 = #(rolloutBulletKeyTools.btnSelByColor,\
-						rolloutBulletKeyTools.btnSelBoneBiped,\
+						rolloutBulletKeyTools.btnBipedScale,\
 						rolloutBulletKeyTools.btnCutSequence,\
 						rolloutBulletKeyTools.btnMopherSlider,\
-						rolloutBulletKeyTools.btnBipedScale,\
-						rolloutBulletKeyTools.btnTemp2,\
+						rolloutBulletKeyTools.btnSelBiped,\
+						rolloutBulletKeyTools.btnSelBone,\
 						rolloutBulletKeyTools.btnFnTCB,\
 						rolloutBulletKeyTools.btnEulerFilter,\
 						rolloutBulletKeyTools.btnDelOutKeys,\
@@ -2108,16 +2108,17 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		)
 	)
 	---------------------上面设置拖动脚本窗口,去掉标题栏后默认无法拖动---------------------
-	on btnSelBoneBiped pressed do ----选择bone或者biped
+	on btnSelBiped pressed do ----选择biped
 	(
 		clearselection ()
 		for o in objects where (o.ishidden == false) do 
 		(
 			if classof o == Biped_Object then selectmore o
+			-- if (matchpattern o.name pattern:"*Bip*") then selectmore o
 		)
 	)
 
-	on btnSelBoneBiped rightclick do ----选择bone或者biped
+	on btnSelBone pressed do ----选择bone
 	(
 		clearselection ()
 		for o in objects where (o.ishidden == false) do 
