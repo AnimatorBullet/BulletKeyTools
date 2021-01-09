@@ -176,7 +176,7 @@
 	(
 		bmp_Background = openbitmap (pathIcons + "\DTools\DTrajEdit\BackGround.bmp"),
 		bmp_Title = openbitmap (pathIcons + "\DTools\DTrajEdit\Title.bmp"),
-		bmp_New = openbitmap ((pathIcons + "\DTools\DTrajEdit\New_Poly.bmp"),
+		bmp_New = openbitmap (pathIcons + "\DTools\DTrajEdit\New_Poly.bmp"),
 		bmp_New_Pivot = openbitmap (pathIcons + "\DTools\DTrajEdit\New_Pivot.bmp"),
 		bmp_About = openbitmap (pathIcons + "\DTools\DTrajEdit\About.bmp"),
 		bmp_Exit = openbitmap (pathIcons + "\DTools\DTrajEdit\Exit.bmp"),

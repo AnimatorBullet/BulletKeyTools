@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-10 01:19:45
+ * @LastEditTime: 2021-01-10 01:36:28
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1961,7 +1961,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 	(
         clock.active = false
         ckbPlayBlocking.state = false
-        ckbPlayBlocking.text = "Blocking"
+        ckbPlayBlocking.text = "跳帧播"
 	)
 
 	fn PlayBlocking = 
@@ -1988,7 +1988,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		m_PBStartTime = timeStamp() - (FramToMilisecond sliderTime)
 		sliderTime = m_PBKeyTimeArray[m_PBPointer]
 		clock.active = true
-		ckbPlayBlocking.text = "Stop it !"
+		ckbPlayBlocking.text = "停止!"
 	)
 
 	fn ReplayBlocking = 
@@ -2006,7 +2006,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		(
 			nameMyScript = getFilenameFile dirScript
 			btnMyScript.text = nameMyScript
-			iniArrMyScripts[idMyScript].name = nameMyScript
+			iniArrMyScripts[idMyScript].msName = nameMyScript
 			iniArrMyScripts[idMyScript].dir = dirScript
 		)
 		messagebox "右键可重新设置脚本快捷键!        "
@@ -2536,12 +2536,12 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		if state == false then
 		(
 			for o in objects as array where (classof o == BoneGeometry) do o.isHidden = false
-			rolloutBulletKeyTools.ckbHideButton.text = "隐藏Bone"
+			rolloutBulletKeyTools.ckbHideButton.text = "隐Bone"
 		)
 		else
 		(
 			for o in objects as array where (classof o == BoneGeometry) do o.isHidden = true
-			rolloutBulletKeyTools.ckbHideButton.text = "显示Bone"
+			rolloutBulletKeyTools.ckbHideButton.text = "显Bone"
 		)
 	)
 	
@@ -2571,6 +2571,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 	(
 		if state == on then
 		(
+			rolloutBulletKeyTools.ckbFreezeMesh.text = "解模型"
 			for o in objects where (((classof o == Editable_mesh) \
 			or (classof o == Editable_Poly) or (classof o == PolyMeshObject)) \
 			and (o.isHidden == false)) do
@@ -2581,6 +2582,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		)
 		else
 		(
+			rolloutBulletKeyTools.ckbFreezeMesh.text = "冻模型"
 			for o in objects where (((classof o == Editable_mesh) \
 			or (classof o == Editable_Poly) or (classof o == PolyMeshObject)) \
 			and (o.isHidden == false)) do
@@ -2722,6 +2724,8 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 
 	on ckbFnBoxDisplay changed state do 
 	(
+		if state == on then ckbFnBoxDisplay.text = "实体"
+				else ckbFnBoxDisplay.text = "BOX显"
 		for o in Geometry where (o.isHidden == false) do 
 		(
 			if ((classof o == BoneGeometry) or (classof o == Biped_Object)) then
