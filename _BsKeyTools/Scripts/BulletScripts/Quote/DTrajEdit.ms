@@ -1,4 +1,6 @@
-(	-- 2.07
+(
+	global pathIcons = ((getDir #scripts) + "\\BulletScripts\\Res")
+	-- 2.07
 	global DTrajEdit_DTrajs = #()
 	--if DTrajEdit_DTrajs == undefined then DTrajEdit_DTrajs = #()
 	
@@ -172,21 +174,21 @@
 	
 	struct DTrajEdit_Globals_Struct
 	(
-		bmp_Background = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\BackGround.bmp"),
-		bmp_Title = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\Title.bmp"),
-		bmp_New = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\New_Poly.bmp"),
-		bmp_New_Pivot = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\New_Pivot.bmp"),
-		bmp_About = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\About.bmp"),
-		bmp_Exit = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\Exit.bmp"),
-		bmp_Display = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\Display.bmp"),
-		bmp_DisplayAll = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\DisplayAll.bmp"),
-		bmp_Display_ON = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\Display_ON.bmp"),
-		bmp_DisplayAll_ON = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\DisplayAll_ON.bmp"),
-		bmp_Delete = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\Delete.bmp"),
-		bmp_Range= openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\Range.bmp"),
-		bmp_Dot = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\Dot.bmp"),
-		bmp_Dot_ON = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\Dot_ON.bmp"),
-		bmp_Move = openbitmap ((GetDir #userScripts) + "\DTools\DTrajEdit\Move.bmp"),
+		bmp_Background = openbitmap (pathIcons + "\DTools\DTrajEdit\BackGround.bmp"),
+		bmp_Title = openbitmap (pathIcons + "\DTools\DTrajEdit\Title.bmp"),
+		bmp_New = openbitmap ((pathIcons + "\DTools\DTrajEdit\New_Poly.bmp"),
+		bmp_New_Pivot = openbitmap (pathIcons + "\DTools\DTrajEdit\New_Pivot.bmp"),
+		bmp_About = openbitmap (pathIcons + "\DTools\DTrajEdit\About.bmp"),
+		bmp_Exit = openbitmap (pathIcons + "\DTools\DTrajEdit\Exit.bmp"),
+		bmp_Display = openbitmap (pathIcons + "\DTools\DTrajEdit\Display.bmp"),
+		bmp_DisplayAll = openbitmap (pathIcons + "\DTools\DTrajEdit\DisplayAll.bmp"),
+		bmp_Display_ON = openbitmap (pathIcons + "\DTools\DTrajEdit\Display_ON.bmp"),
+		bmp_DisplayAll_ON = openbitmap (pathIcons + "\DTools\DTrajEdit\DisplayAll_ON.bmp"),
+		bmp_Delete = openbitmap (pathIcons + "\DTools\DTrajEdit\Delete.bmp"),
+		bmp_Range= openbitmap (pathIcons + "\DTools\DTrajEdit\Range.bmp"),
+		bmp_Dot = openbitmap (pathIcons + "\DTools\DTrajEdit\Dot.bmp"),
+		bmp_Dot_ON = openbitmap (pathIcons + "\DTools\DTrajEdit\Dot_ON.bmp"),
+		bmp_Move = openbitmap (pathIcons + "\DTools\DTrajEdit\Move.bmp"),
 		
 		WindowToCursorOffset = [0,0],
 		
