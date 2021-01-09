@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2019-10-09 21:29:04
  * @LastEditors: Bullet.S
- * @LastEditTime: 2019-10-25 19:21:57
+ * @LastEditTime: 2021-01-09 22:50:04
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -202,3 +202,31 @@ fn fnSelKeys keyBegin KeyEnd symbol=  ---------------选择帧的方法
         )
     )
 )
+
+--------------------↓获取普通帧,Link帧不行↓-------------------------------------
+fn getControllers obj ctrls:#() =
+(
+    for item in refs.dependsOn obj do   
+    (
+        if isController item AND item.keyable do
+            append ctrls item
+
+        getControllers item ctrls:ctrls
+    )
+    ctrls
+)
+
+fn getAllKeys obj =
+(
+    local objCtrlr = getControllers obj
+    local allkeysArray = #()
+
+    for ctrlr in objCtrlr do
+    (
+        keysArray = ctrlr.keys
+    -- 	print keysArray
+        for k in keysArray do appendIfUnique allkeysArray k.time
+    )
+    return (sort allkeysArray)
+)
+-------------------------------------------------------------

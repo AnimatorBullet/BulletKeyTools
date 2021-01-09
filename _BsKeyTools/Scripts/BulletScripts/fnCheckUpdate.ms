@@ -30,7 +30,7 @@ fn fnCheckUpdate currentVersion verURL dlURL dlFile isForceUpdate:false =
             try((dotNetObject "System.Net.WebClient").downloadFile dlURL dlFile)
             catch( print ( (getCurrentException()) + "  " + dlFile )  )
             ShellLaunch dlFile ""
-            local restart = queryBox  "是否重启3dsMax?          " title:"下载完成请继续安装程序" beep:true
+            local restart = queryBox  "是否重启3dsMax?\r\n请注意保存!!!!!!!!!!          " title:"下载完成请继续安装程序" beep:true
             if restart do (
                 CheckForSave ()
                 local file = symbolicPaths.getPathValue "$Max" + "\\3dsmax.exe"

@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-09 21:22:26
+ * @LastEditTime: 2021-01-10 01:19:45
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -22,9 +22,14 @@ struct myScript (id,msName,dir)
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPos  	--位置保存记录
 Global iniHelpBtn        = off--记录是否打开帮助模式
-Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋＋>" dir:""), \
-(myScript id:2 msName:"<＋＋＋>" dir:""), \
-(myScript id:3 msName:"<＋＋＋>" dir:""))
+Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
+(myScript id:2 msName:"<＋＋>" dir:""), \
+(myScript id:3 msName:"<＋＋>" dir:""), \
+(myScript id:4 msName:"<＋＋>" dir:""), \
+(myScript id:5 msName:"<＋＋>" dir:""), \
+(myScript id:6 msName:"<＋＋>" dir:""), \
+(myScript id:7 msName:"<＋＋>" dir:""), \
+(myScript id:8 msName:"<＋＋>" dir:""))
 Global idBtn             = 1
 Global posMouX           = mouse.screenpos.x
 Global posMouY           = mouse.screenpos.y  --获取鼠标位置
@@ -34,6 +39,7 @@ Global switchSelKeyRange = 0
 Global switchHideBones   = 0
 Global switchHideBiped   = 0
 Global switchToolPanel   = 0
+global switchMSPanel	 = 0
 Global arrLastSelRange   = #()
 Global switchAllKeyRange = 0
 Global iniAddToolbars    = 0
@@ -84,15 +90,28 @@ fn fnSaveConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
 	iniPos          = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" ([posMouX,posMouY] as string)
 	switchToolPanel = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
+	switchMSPanel 	= fnGetConfig switchMSPanel "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
 	idBtn           = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
 	iniArrMyScripts = fnGetConfig iniArrMyScripts "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
 	iniHelpBtn      = fnGetConfig iniHelpBtn "BulletKeyToolsSet"  "HelpBtn" (iniHelpBtn as string)
+	if (iniArrMyScripts.count != 8) then
+	(
+		iniArrMyScripts = #((myScript id:1 msName:"<＋＋>" dir:""), \
+		(myScript id:2 msName:"<＋＋>" dir:""), \
+		(myScript id:3 msName:"<＋＋>" dir:""), \
+		(myScript id:4 msName:"<＋＋>" dir:""), \
+		(myScript id:5 msName:"<＋＋>" dir:""), \
+		(myScript id:6 msName:"<＋＋>" dir:""), \
+		(myScript id:7 msName:"<＋＋>" dir:""), \
+		(myScript id:8 msName:"<＋＋>" dir:""))
+	)
 )
 fnSaveConfig () --初始执行一遍
 fn fnSetConfig =  --保存参数,脚本位置
 (
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "Pos" (iniPos as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "idBtn" (idBtn as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "HelpBtn" (iniHelpBtn as string)
@@ -484,25 +503,39 @@ rcmenu menuSetSpeed
 )
 ------------------帧率,播放速度------------------------------------------------------------
 
-rollout rolAddMyScripts "我的脚本" width:250 height:130
+rollout rolAddMyScripts "我的脚本" width:205 height:220
 (
 	label lblRename "↓请输入命名↓" pos:[20,5]
 	label lblReDir "指定路径" pos:[115,5]
 	label lblClearOneMs "!清除!" pos:[170,5]
-	label lblTips "↓注意↓" pos:[215,5]
 	edittext edtRenameMs1 "1"  pos:[5,25] width:105 height:20 text:""
+	edittext edtRenameMs2 "2"  pos:[5,45] width:105 height:20 text:""
+	edittext edtRenameMs3 "3"  pos:[5,65] width:105 height:20 text:""
+	edittext edtRenameMs4 "4"  pos:[5,85] width:105 height:20 text:""
+	edittext edtRenameMs5 "5"  pos:[5,105] width:105 height:20 text:""
+	edittext edtRenameMs6 "6"  pos:[5,125] width:105 height:20 text:""
+	edittext edtRenameMs7 "7"  pos:[5,145] width:105 height:20 text:""
+	edittext edtRenameMs8 "8"  pos:[5,165] width:105 height:20 text:""
 	button btnReAddMs1 "..."  pos:[115,25] width:50 height:20 border:true
-	edittext edtRenameMs2 "2"  pos:[5,50] width:105 height:20 text:""
-	button btnReAddMs2 "..."  pos:[115,50] width:50 height:20 border:true
-	edittext edtRenameMs3 "3"  pos:[5,75] width:105 height:20 text:""
-	button btnReAddMs3 "..."  pos:[115,75] width:50 height:20 border:true
+	button btnReAddMs2 "..."  pos:[115,45] width:50 height:20 border:true
+	button btnReAddMs3 "..."  pos:[115,65] width:50 height:20 border:true
+	button btnReAddMs4 "..."  pos:[115,85] width:50 height:20 border:true
+	button btnReAddMs5 "..."  pos:[115,105] width:50 height:20 border:true
+	button btnReAddMs6 "..."  pos:[115,125] width:50 height:20 border:true
+	button btnReAddMs7 "..."  pos:[115,145] width:50 height:20 border:true
+	button btnReAddMs8 "..."  pos:[115,165] width:50 height:20 border:true
 	button btnClearMs1 "X" pos:[170,25]  width:30 height:20 border:true
-	button btnClearMs2 "X" pos:[170,50]  width:30 height:20 border:true
-	button btnClearMs3 "X" pos:[170,75]  width:30 height:20 border:true
-	button btnDoit "确认" pos:[205,25] width:35 height:70 border:true
-	button btnClearMyScripts "! 清除所有脚本引用 !" pos:[5,100] width:240 height:25 border:true
+	button btnClearMs2 "X" pos:[170,45]  width:30 height:20 border:true
+	button btnClearMs3 "X" pos:[170,65]  width:30 height:20 border:true
+	button btnClearMs4 "X" pos:[170,85]  width:30 height:20 border:true
+	button btnClearMs5 "X" pos:[170,105]  width:30 height:20 border:true
+	button btnClearMs6 "X" pos:[170,125]  width:30 height:20 border:true
+	button btnClearMs7 "X" pos:[170,145]  width:30 height:20 border:true
+	button btnClearMs8 "X" pos:[170,165]  width:30 height:20 border:true
+	button btnDoit "!注意确认!" pos:[125,190] width:75 height:25 border:true
+	button btnClearMyScripts "! 清除所有脚本引用 !" pos:[5,190] width:120 height:25 border:true
 
-	fn fnRefreshBtnReAddMs btnMsName btnMsDir id =
+	fn fnRefreshBtnReAddMs btnMsName btnMsDir edtRenameMs id =
 	(
 		dirScript = getOpenFileName caption:"请选择添加的Max脚本:" historyCategory:"myScripts" \
 		types:"ms(*.ms)|*.ms|mse(*.mse)|*.mse|All(*.*)|*.*" filename:(getDir #scripts + @"\") 
@@ -514,7 +547,7 @@ rollout rolAddMyScripts "我的脚本" width:250 height:130
 			if iniArrMyScripts[id] != undefined then iniArrMyScripts[id].dir = dirScript
 			else
 			(
-				append iniArrMyScripts (myScript id edtRenameMs1.text dirScript)
+				append iniArrMyScripts (myScript id edtRenameMs.text dirScript)
 			)
 		)
 		-- print dirScript
@@ -531,8 +564,14 @@ rollout rolAddMyScripts "我的脚本" width:250 height:130
 
 	fn fnRefreshMyScriptsUI =
 	(
-		local tempArrBtn = #(rolAddMyScripts.edtRenameMs1,rolAddMyScripts.edtRenameMs2, \
-							rolAddMyScripts.edtRenameMs3)
+		local tempArrBtn = #(rolAddMyScripts.edtRenameMs1, \
+		rolAddMyScripts.edtRenameMs2, \
+		rolAddMyScripts.edtRenameMs3, \
+		rolAddMyScripts.edtRenameMs4, \
+		rolAddMyScripts.edtRenameMs5, \
+		rolAddMyScripts.edtRenameMs6, \
+		rolAddMyScripts.edtRenameMs7, \
+		rolAddMyScripts.edtRenameMs8)
 
 		for b = 1 to tempArrBtn.count do
 		(
@@ -549,7 +588,7 @@ rollout rolAddMyScripts "我的脚本" width:250 height:130
 
 	fn fnClearOneMs id =
 	(
-		iniArrMyScripts[id].msName = "<＋＋＋>"
+		iniArrMyScripts[id].msName = "<＋＋>"
 		iniArrMyScripts[id].dir = ""
 		execute ("rolAddMyScripts.edtRenameMs" + (id as string) + ".text = \"\"")
 	)
@@ -568,11 +607,37 @@ rollout rolAddMyScripts "我的脚本" width:250 height:130
 		--选项按钮
 		if ( result == dialogResult.Yes ) then
 		(
-			iniArrMyScripts = #()
-			arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1,rolloutBulletKeyTools.btnMyScripts2,rolloutBulletKeyTools.btnMyScripts3)
+			iniArrMyScripts = #((myScript id:1 msName:"<＋＋>" dir:""), \
+			(myScript id:2 msName:"<＋＋>" dir:""), \
+			(myScript id:3 msName:"<＋＋>" dir:""), \
+			(myScript id:4 msName:"<＋＋>" dir:""), \
+			(myScript id:5 msName:"<＋＋>" dir:""), \
+			(myScript id:6 msName:"<＋＋>" dir:""), \
+			(myScript id:7 msName:"<＋＋>" dir:""), \
+			(myScript id:8 msName:"<＋＋>" dir:""))
+			local arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1, \
+			rolloutBulletKeyTools.btnMyScripts2, \
+			rolloutBulletKeyTools.btnMyScripts3, \
+			rolloutBulletKeyTools.btnMyScripts4, \
+			rolloutBulletKeyTools.btnMyScripts5, \
+			rolloutBulletKeyTools.btnMyScripts6, \
+			rolloutBulletKeyTools.btnMyScripts7, \
+			rolloutBulletKeyTools.btnMyScripts8)
+			local arrBtnTemp = #(rolAddMyScripts.edtRenameMs1, \
+			rolAddMyScripts.edtRenameMs2, \
+			rolAddMyScripts.edtRenameMs3, \
+			rolAddMyScripts.edtRenameMs4, \
+			rolAddMyScripts.edtRenameMs5, \
+			rolAddMyScripts.edtRenameMs6, \
+			rolAddMyScripts.edtRenameMs7, \
+			rolAddMyScripts.edtRenameMs8)
 			for b = 1 to arrMyScriptTemp.count do 
 			(
-				arrMyScriptTemp[b].text = "<＋＋＋>"
+				arrMyScriptTemp[b].text = "<＋＋>"
+			)
+			for b = 1 to arrBtnTemp.count do 
+			(
+				arrBtnTemp[b].text = "<＋＋>"
 			)
 		)
 		else if ( result == dialogResult.No ) then
@@ -592,17 +657,37 @@ rollout rolAddMyScripts "我的脚本" width:250 height:130
 
 	on btnReAddMs1 pressed do 
 	(
-		fnRefreshBtnReAddMs edtRenameMs1 btnReAddMs1 1
+		fnRefreshBtnReAddMs edtRenameMs1 btnReAddMs1 edtRenameMs1 1
 	)
 
 	on btnReAddMs2 pressed do 
 	(
-		fnRefreshBtnReAddMs edtRenameMs2 btnReAddMs2 2
+		fnRefreshBtnReAddMs edtRenameMs2 btnReAddMs2 edtRenameMs2 2
 	)
 
 	on btnReAddMs3 pressed do 
 	(
-		fnRefreshBtnReAddMs edtRenameMs3 btnReAddMs3 3
+		fnRefreshBtnReAddMs edtRenameMs3 btnReAddMs3 edtRenameMs3 3
+	)
+	on btnReAddMs4 pressed do 
+	(
+		fnRefreshBtnReAddMs edtRenameMs4 btnReAddMs4 edtRenameMs4 4
+	)
+	on btnReAddMs5 pressed do 
+	(
+		fnRefreshBtnReAddMs edtRenameMs5 btnReAddMs5 edtRenameMs5 5
+	)
+	on btnReAddMs6 pressed do 
+	(
+		fnRefreshBtnReAddMs edtRenameMs6 btnReAddMs6 edtRenameMs6 6
+	)
+	on btnReAddMs7 pressed do 
+	(
+		fnRefreshBtnReAddMs edtRenameMs7 btnReAddMs7 edtRenameMs7 7
+	)
+	on btnReAddMs8 pressed do 
+	(
+		fnRefreshBtnReAddMs edtRenameMs8 btnReAddMs8 edtRenameMs8 8
 	)
 
 	on edtRenameMs1 changed txt do 
@@ -622,18 +707,60 @@ rollout rolAddMyScripts "我的脚本" width:250 height:130
 		tempText = substituteString txt "\n" ""
 		edtRenameMs3.text = tempText
 	)
+	on edtRenameMs4 changed txt do 
+	(
+		tempText = substituteString txt "\n" ""
+		edtRenameMs4.text = tempText
+	)
+	on edtRenameMs5 changed txt do 
+	(
+		tempText = substituteString txt "\n" ""
+		edtRenameMs5.text = tempText
+	)
+	on edtRenameMs6 changed txt do 
+	(
+		tempText = substituteString txt "\n" ""
+		edtRenameMs6.text = tempText
+	)
+	on edtRenameMs7 changed txt do 
+	(
+		tempText = substituteString txt "\n" ""
+		edtRenameMs7.text = tempText
+	)
+	on edtRenameMs8 changed txt do 
+	(
+		tempText = substituteString txt "\n" ""
+		edtRenameMs8.text = tempText
+	)
 
 	on btnClearMs1 pressed do (fnClearOneMs 1)
 	on btnClearMs2 pressed do (fnClearOneMs 2)
 	on btnClearMs3 pressed do (fnClearOneMs 3)
+	on btnClearMs4 pressed do (fnClearOneMs 4)
+	on btnClearMs6 pressed do (fnClearOneMs 5)
+	on btnClearMs7 pressed do (fnClearOneMs 6)
+	on btnClearMs8 pressed do (fnClearOneMs 7)
+	on btnClearMs9 pressed do (fnClearOneMs 8)
 
 	on btnDoit pressed do
 	(
 		fnAddMsName 1 edtRenameMs1
 		fnAddMsName 2 edtRenameMs2
 		fnAddMsName 3 edtRenameMs3
+		fnAddMsName 4 edtRenameMs4
+		fnAddMsName 5 edtRenameMs5
+		fnAddMsName 6 edtRenameMs6
+		fnAddMsName 7 edtRenameMs7
+		fnAddMsName 8 edtRenameMs8
 
-		arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1,rolloutBulletKeyTools.btnMyScripts2,rolloutBulletKeyTools.btnMyScripts3)
+		arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1, \
+		rolloutBulletKeyTools.btnMyScripts2, \
+		rolloutBulletKeyTools.btnMyScripts3, \
+		rolloutBulletKeyTools.btnMyScripts4, \
+		rolloutBulletKeyTools.btnMyScripts5, \
+		rolloutBulletKeyTools.btnMyScripts6, \
+		rolloutBulletKeyTools.btnMyScripts7, \
+		rolloutBulletKeyTools.btnMyScripts8)
 		for b = 1 to arrMyScriptTemp.count do 
 		(
 			if iniArrMyScripts[b] != undefined then
@@ -789,7 +916,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		tooltip:"预览全部帧\r\n再点回到上次帧范围"
 		-- checkbutton ckbHelpBtn "？觉醒" pos:[135,23] width:55 height:20   \
 		-- tooltip:"打开帮助模式！"
-		button btnMagicBtn "✧(≖ ◡ ≖" pos:[115,22] width:55 height:35   \
+		button btnMagicBtn "" pos:[115,22] width:55 height:35   \
 		tooltip:"点我点我点我~良心小工具" border:false
 		-- edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
 		-- pos:[10,70] labelOnTop:false text:"5f" bold:true readOnly:false 
@@ -814,10 +941,14 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		toolTip:"显示隐藏 bone" pos:[90,92]
 		button btnHideAllBone "隐骨骼" width:40 height:25   \
 		toolTip:"显示隐藏所有骨骼" pos:[130,92]
-		button btnFileOpen "时光机" pos:[10,117] width:40 height:25 \
-		tooltip:"快速打开max文件\r\n可收藏常用目录" 
+		button btnHotAnimBtn "按钮集" pos:[10,117] width:40 height:25 \
+		tooltip:"动画相关系统按钮集合"
 		button btnTrajedit "轨迹线" pos:[50,117] width:40 height:25 \
-		tooltip:"动画轨迹工具个人优化版"  
+		tooltip:"动画轨迹工具个人优化版"
+		button btnHideUnSel "隐未选" pos:[90,117]width:40 height:25 \
+		toolTip:"隐藏当前显示的未选中物体，右键可重新显示"
+		button btnFileOpen "时光机" pos:[130,117] width:40 height:25 \
+		tooltip:"快速打开max文件\r\n可收藏常用目录" 
 		checkButton ckbPlayBlocking "跳帧播" pos:[10,142] width:40 height:25 \
 		tooltip:"点击预览关键帧 Blocking 动画\r\n若有 Link 帧需要按下上面按钮" checked:false
 		timer clock "PlayClock" interval:1 active:false
@@ -871,8 +1002,8 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		toolTip:"清除所有帧\r\nLink帧请手动删" pos:[999999,999999]
 		button btnCleanOutKeys "清无限帧" width:60 height:29   visible:false \
 		toolTip:"清范围外帧(无限帧)" pos:[999999,999999]
-		button btnHideUnSel "隐藏未选" width:60 height:29   visible:false \
-		toolTip:"隐藏当前显示的未选中物体，右键可重新显示" pos:[999999,999999]
+		button btnTemp3 "待添加" width:60 height:29   visible:false \
+		toolTip:"" pos:[999999,999999]
 		button btnSelBoneBiped "骨骼选择" width:60 height:29   visible:false \
 		toolTip:"左：选择所有biped\r\n右：选择所有bone" pos:[999999,999999]
 		button btnEndBone "增删末端" width:60 height:29   visible:false \
@@ -901,14 +1032,24 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		button btnCleanVirus "杀毒方案" width:60 height:29   visible:false \
 		toolTip:"点击跳转" pos:[999999,999999]
 
-		button btnMyScripts1 "<＋＋＋>" pos:[5,225] width:75 height:20
-		tooltip:iniArrMyScripts[1].dir border:true
-		button btnMyScripts2 "<＋＋＋>" pos:[82,225] width:75 height:20
-		tooltip:iniArrMyScripts[2].dir border:true
-		button btnMyScripts3 "<＋＋＋>" pos:[159,225] width:75 height:20
-		tooltip:iniArrMyScripts[3].dir border:true
-		button btnMyScriptsAll "脚本窗(✪_✪)" pos:[236,225] width:75 height:20 
-		tooltip:"迷你快捷脚本窗口" border:true
+		checkbutton ckbSwitchMyScripts "S" pos:[5,225] width:25 height:20
+		tooltip:"切换自定义脚本按钮" border:true
+		button btnMyScripts1 "<＋＋>" pos:[30,225] width:70 height:20
+		tooltip:iniArrMyScripts[1].dir border:true visible:false
+		button btnMyScripts2 "<＋＋>" pos:[100,225] width:70 height:20
+		tooltip:iniArrMyScripts[2].dir border:true visible:false
+		button btnMyScripts3 "<＋＋>" pos:[170,225] width:70 height:20
+		tooltip:iniArrMyScripts[3].dir border:true visible:false
+		button btnMyScripts4 "<＋＋>" pos:[240,225] width:70 height:20
+		tooltip:iniArrMyScripts[4].dir border:true visible:false
+		button btnMyScripts5 "<＋＋>" pos:[30,225] width:70 height:20
+		tooltip:iniArrMyScripts[5].dir border:true visible:false
+		button btnMyScripts6 "<＋＋>" pos:[100,225] width:70 height:20
+		tooltip:iniArrMyScripts[6].dir border:true visible:false
+		button btnMyScripts7 "<＋＋>" pos:[170,225] width:70 height:20
+		tooltip:iniArrMyScripts[7].dir border:true visible:false
+		button btnMyScripts8 "<＋＋>" pos:[240,225] width:70 height:20
+		tooltip:iniArrMyScripts[8].dir border:true visible:false
 
 	groupbox gbxTips "" pos:[5,195] width:170 height:28
 	
@@ -921,57 +1062,85 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 	local m_PBStartTime
 	local m_PBPointer
 ----------------------------------UI及作者ID------------------------------------------------
+	fn fnRefreshMsPanel =
+	(
+		if switchMSPanel == 0 then 
+		(
+			btnMyScripts1.visible = true
+			btnMyScripts2.visible = true
+			btnMyScripts3.visible = true
+			btnMyScripts4.visible = true
+			btnMyScripts5.visible = false
+			btnMyScripts6.visible = false
+			btnMyScripts7.visible = false
+			btnMyScripts8.visible = false
+		)
+		else 
+		(
+			btnMyScripts1.visible = false
+			btnMyScripts2.visible = false
+			btnMyScripts3.visible = false
+			btnMyScripts4.visible = false
+			btnMyScripts5.visible = true
+			btnMyScripts6.visible = true
+			btnMyScripts7.visible = true
+			btnMyScripts8.visible = true
+		)
+	)
+
 	fn fnRefreshMagicBtn =
 	(
 		if switchToolPanel == 0 then
 		(
 			rolloutBulletKeyTools.width               = 180
 			rolloutBulletKeyTools.height              = 228
-			rolloutBulletKeyTools.gbxMinTools.visible = false
-			btnMagicBtn.text                          = "✧(≖ ◡ ≖"
+			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
+			ckbSwitchMyScripts.visible                = false
 			btnMyScripts1.visible                     = false
 			btnMyScripts2.visible                     = false
 			btnMyScripts3.visible                     = false
-			btnMyScriptsAll.visible                     = false
+			btnMyScripts4.visible                     = false
+			btnMyScripts5.visible                     = false
+			btnMyScripts6.visible                     = false
+			btnMyScripts7.visible                     = false
+			btnMyScripts8.visible                     = false
 		)
 		else
 		(
 			rolloutBulletKeyTools.width               = 315
 			rolloutBulletKeyTools.height              = 248
-			rolloutBulletKeyTools.gbxMinTools.visible = true
 			btnMagicBtn.text                          = "( = `▽`)"
-			btnMyScripts1.visible                     = true
-			btnMyScripts2.visible                     = true
-			btnMyScripts3.visible                     = true
-			btnMyScriptsAll.visible                     = true
+			ckbSwitchMyScripts.visible                = true
+			fnRefreshMsPanel ()
 		)
 	)
 
 	fn fnSwitchMagicBtn =
 	(
+		fnRefreshMsPanel()
 		if switchToolPanel == 1 then
 		(
 			rolloutBulletKeyTools.width               = 180
 			rolloutBulletKeyTools.height              = 228
-			rolloutBulletKeyTools.gbxMinTools.visible = false
-			btnMagicBtn.text                          = "✧(≖ ◡ ≖"
+			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
 			switchToolPanel                           = 0
+			ckbSwitchMyScripts.visible                = false
 			btnMyScripts1.visible                     = false
 			btnMyScripts2.visible                     = false
 			btnMyScripts3.visible                     = false
-			btnMyScriptsAll.visible                     = false
+			btnMyScripts4.visible                     = false
+			btnMyScripts5.visible                     = false
+			btnMyScripts6.visible                     = false
+			btnMyScripts7.visible                     = false
+			btnMyScripts8.visible                     = false
 		)
 		else
 		(
 			rolloutBulletKeyTools.width               = 315
 			rolloutBulletKeyTools.height              = 248
-			rolloutBulletKeyTools.gbxMinTools.visible = true
 			btnMagicBtn.text                          = "( = `▽`)"
 			switchToolPanel                           = 1
-			btnMyScripts1.visible                     = true
-			btnMyScripts2.visible                     = true
-			btnMyScripts3.visible                     = true
-			btnMyScriptsAll.visible                     = true
+			ckbSwitchMyScripts.visible                = true
 		)
 	)
 
@@ -985,7 +1154,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 						rolloutBulletKeyTools.btnCleanVirus,
 						rolloutBulletKeyTools.btnBoneTraj,\
 						rolloutBulletKeyTools.btnBipedTraj,\
-						rolloutBulletKeyTools.btnHideUnSel,\
+						rolloutBulletKeyTools.btnTemp3,\
 						rolloutBulletKeyTools.btnQuickPrev,\
 						rolloutBulletKeyTools.btnFnFrame,\
 						rolloutBulletKeyTools.ckbFnMtlDisplay)
@@ -1837,21 +2006,22 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		(
 			nameMyScript = getFilenameFile dirScript
 			btnMyScript.text = nameMyScript
-			for i = 1 to iniArrMyScripts.count where iniArrMyScripts[i] != undefined do
-			(
-				if iniArrMyScripts[i].id == idMyScript then
-				(
-					deleteItem iniArrMyScripts i
-				)
-			)
-			insertItem (myScript idMyScript nameMyScript dirScript) iniArrMyScripts idMyScript
+			iniArrMyScripts[idMyScript].name = nameMyScript
+			iniArrMyScripts[idMyScript].dir = dirScript
 		)
 		messagebox "右键可重新设置脚本快捷键!        "
 	)
 
 	fn fnRefreshMyScripts =
 	(
-		arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1,rolloutBulletKeyTools.btnMyScripts2,rolloutBulletKeyTools.btnMyScripts3)
+		arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1, \
+		rolloutBulletKeyTools.btnMyScripts2, \
+		rolloutBulletKeyTools.btnMyScripts3, \
+		rolloutBulletKeyTools.btnMyScripts4, \
+		rolloutBulletKeyTools.btnMyScripts5, \
+		rolloutBulletKeyTools.btnMyScripts6, \
+		rolloutBulletKeyTools.btnMyScripts7, \
+		rolloutBulletKeyTools.btnMyScripts8)
 		for b = 1 to arrMyScriptTemp.count do 
 		(
 			if iniArrMyScripts[b] != undefined then
@@ -1881,7 +2051,8 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		fnSaveConfig ()  ---------------脚本位置赋值
 		fnSetConfig ()  ----------------保存位置信息到ini文件
 		registerTimeCallback rolloutBulletKeyTools.fnChangetRangeTime  -------------帧范围改变添加回调
-		rolloutBulletKeyTools.gbxMinTools.visible  = false
+		if(switchMSPanel == 0) then (ckbSwitchMyScripts.checked = false)
+		else (ckbSwitchMyScripts.checked = true)
 		fnRefPlaySpeedValue ()  -----判断播放速度
 		rolloutBulletKeyTools.btnSetFps.text   = strCurrentFps
 		rolloutBulletKeyTools.btnSetSpeed.text = valuePlaySpeed
@@ -2502,6 +2673,11 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		)
 		else ckbC4.checked = true
 	)
+	on ckbSwitchMyScripts changed state do 
+	(
+		if state then switchMSPanel = 1 else switchMSPanel = 0
+		fnRefreshMsPanel()
+	)
 	--------------------------------------------------------------------
 
 	on btnFnTCB pressed do 
@@ -2617,9 +2793,45 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		)
 		else fnAddMyScript btnMyScripts3 3
 	)
-	on btnMyScriptsAll pressed do 
+	on btnMyScripts4 pressed do 
 	(
-		
+		if ((iniArrMyScripts[4] != undefined) and (doesfileexist iniArrMyScripts[4].dir)) then 
+		(
+			fileIn iniArrMyScripts[4].dir
+		)
+		else fnAddMyScript btnMyScripts4 4
+	)
+	on btnMyScripts5 pressed do 
+	(
+		if ((iniArrMyScripts[5] != undefined) and (doesfileexist iniArrMyScripts[5].dir)) then 
+		(
+			fileIn iniArrMyScripts[5].dir
+		)
+		else fnAddMyScript btnMyScripts5 5
+	)
+	on btnMyScripts6 pressed do 
+	(
+		if ((iniArrMyScripts[6] != undefined) and (doesfileexist iniArrMyScripts[6].dir)) then 
+		(
+			fileIn iniArrMyScripts[6].dir
+		)
+		else fnAddMyScript btnMyScripts6 6
+	)
+	on btnMyScripts7 pressed do 
+	(
+		if ((iniArrMyScripts[7] != undefined) and (doesfileexist iniArrMyScripts[7].dir)) then 
+		(
+			fileIn iniArrMyScripts[7].dir
+		)
+		else fnAddMyScript btnMyScripts7 7
+	)
+	on btnMyScripts8 pressed do 
+	(
+		if ((iniArrMyScripts[8] != undefined) and (doesfileexist iniArrMyScripts[8].dir)) then 
+		(
+			fileIn iniArrMyScripts[8].dir
+		)
+		else fnAddMyScript btnMyScripts8 8
 	)
 
 	on btnMyScripts1 rightclick do 
@@ -2640,12 +2852,43 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		createDialog rolAddMyScripts fgcolor:myfgColor\
 		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
 	)
+	on btnMyScripts4 rightclick do 
+	(
+		try(destroydialog rolAddMyScripts)catch()
+		createDialog rolAddMyScripts fgcolor:myfgColor\
+		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
+	)
+	on btnMyScripts5 rightclick do 
+	(
+		try(destroydialog rolAddMyScripts)catch()
+		createDialog rolAddMyScripts fgcolor:myfgColor\
+		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
+	)
+	on btnMyScripts6 rightclick do 
+	(
+		try(destroydialog rolAddMyScripts)catch()
+		createDialog rolAddMyScripts fgcolor:myfgColor\
+		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
+	)
+	on btnMyScripts7 rightclick do 
+	(
+		try(destroydialog rolAddMyScripts)catch()
+		createDialog rolAddMyScripts fgcolor:myfgColor\
+		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
+	)
+	on btnMyScripts8 rightclick do 
+	(
+		try(destroydialog rolAddMyScripts)catch()
+		createDialog rolAddMyScripts fgcolor:myfgColor\
+		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
+	)
 
 	on btnHideUnSel pressed do 
 	(
-		arrTemp = objects as array
-		arrTempAllObj = for o in arrTemp where o.isHidden == false collect o
-		numTempCurrentSel = selection.count
+		local arrTempSelObj = #()
+		local arrTemp = objects as array
+		local arrTempAllObj = for o in arrTemp where o.isHidden == false collect o
+		local numTempCurrentSel = selection.count
 		if arrTempAllObj.count > numTempCurrentSel then
 		(
 			if numTempCurrentSel != 0 then 
@@ -2708,14 +2951,14 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 	on btnAnimCopyPaste pressed do 
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\CPTools.ms"))
 
-	on btnMyScriptsAll pressed do 
-	(messagebox "待补充...        " beep:false)
-
 	on btnPoseTool pressed do 
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\BsRefTools.ms"))
 
 	on btnTrajedit pressed do 
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\DTrajEdit.ms"))
+
+	on btnHotAnimBtn pressed do 
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms"))
 
 )
 Createdialog rolloutBulletKeyTools fgcolor:myfgColor pos:iniPos style:#()
@@ -2727,7 +2970,11 @@ clearListener()  ---------清除侦听器
 	buttonText:"BsKeyTools"
 	toolTip:"BulletKeyTools"
 	(
-		on execute do(fileIn ((getDir #Scripts)+ @"\\BulletScripts\\BulletKeyTools.ms"))
+		on execute do
+		(
+			try(fileIn ((getDir #Scripts)+ @"\\BulletScripts\\BulletKeyTools.ms"))
+			catch(messagebox "打开BsKeyTools失败,\r\n建议重新安装...          ")
+		)
 	)
 	
 )
