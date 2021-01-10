@@ -37,7 +37,7 @@ fn fnCheckUpdate currentVersion verURL dlURL dlFile isForceUpdate:false =
             if restart do (
                 CheckForSave ()
                 local file = symbolicPaths.getPathValue "$Max" + "\\3dsmax.exe"
-                shellLaunch file
+                shellLaunch file ""
                 quitMAX()
             )
             result = OK
