@@ -3,15 +3,18 @@
  * @Author: Bullet.S
  * @Date: 2020-12-29 01:12:45
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-07 13:12:52
+ * @LastEditTime: 2021-01-10 15:50:34
  * @Email: animator.bullet@foxmail.com
  */
 
 try(destroydialog rolAddRefFolder)catch()
 try(destroydialog rolRefTools)catch()
 
-global currentVersion = "0.1.1beta"
+global currentVersion = "0.1.2"
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
+
+-- global spm = (dotNetclass "System.Net.ServicePointManager")
+-- spm.SecurityProtocol = spm.SecurityProtocol.Tls12
 
 global dotDrawingImage = dotNetclass "System.Drawing.Image"
 global dotNetClipboard = DotNetclass "System.Windows.Forms.Clipboard"
@@ -179,13 +182,11 @@ rcmenu RCmenuRefConfig
 	local myMs = (getDir #Scripts)+ @"\\BulletScripts\\BsRefTools.ms"
     local startupPath = (getDir #StartupScripts)+ @"\\BsRefTools.ms"
 
-	subMenu "更新"
-	(
-		menuItem mitemUpdate "一键更新"
-		menuItem mItemForceUpdate "强制更新"
-		menuItem mItemUninstall "卸载"
-	)
-    
+	-- subMenu "更新"
+	-- (
+	-- 	menuItem mitemUpdate "一键更新"
+	-- 	menuItem mItemForceUpdate "强制更新"
+	-- )
 
 	subMenu "工具栏按钮"
 	(menuItem submConfigAddToolBar "添加"
@@ -195,7 +196,8 @@ rcmenu RCmenuRefConfig
 	(menuItem submConfigHighDpi "设置高分辨率"
 	menuItem submConfigCleanMat "清理并整理材质球"
 	menuItem submConfigClearTempRef "清理参考图暂存目录"
-	menuItem submConfigAutoLoad "是否自启")
+	menuItem submConfigAutoLoad "是否自启"
+	menuItem mItemUninstall "卸载")
     
     menuItem menuJoinGroup "🐧交流小群"
     menuItem menuBilibili "📺Bullet.S"
@@ -324,62 +326,62 @@ rcmenu RCmenuRefConfig
 		enableSceneRedraw()
 	)
 
-	fn fnCheckUpdate isForceUpdate:false = 
-	(
-		local result = undefined
+	-- fn fnCheckUpdate isForceUpdate:false = 
+	-- (
+	-- 	local result = undefined
 
-		if internet.CheckConnection url:"https://gitee.com" force:true == true then -- 检查网络是否能连接
-		(
-			local LaterVersion_installed = true
-			local verURL = "https://gitee.com/acebullet/BsReferenceTools/raw/main/_BsRefTools/EXE/version.dat"
-			local onlineVersion = (dotNetObject "System.Net.WebClient").downloadString verURL
+	-- 	if internet.CheckConnection url:"https://gitee.com" force:true == true then -- 检查网络是否能连接
+	-- 	(
+	-- 		local LaterVersion_installed = true
+	-- 		local verURL = "https://gitee.com/acebullet/BsReferenceTools/raw/main/_BsRefTools/EXE/version.dat"
+	-- 		local onlineVersion = (dotNetObject "System.Net.WebClient").downloadString verURL
 
-			if (isForceUpdate == false) then
-			(
-				if (currentVersion != onlineVersion) then (LaterVersion_installed = false)
-				else (LaterVersion_installed = true)
-			)
-			else (LaterVersion_installed = false)
+	-- 		if (isForceUpdate == false) then
+	-- 		(
+	-- 			if (currentVersion != onlineVersion) then (LaterVersion_installed = false)
+	-- 			else (LaterVersion_installed = true)
+	-- 		)
+	-- 		else (LaterVersion_installed = false)
 
-			if LaterVersion_installed do (messageBox  ("您已安装最新版本：" + onlineVersion + "\r\n\r\n若与本地不对应请稍后重试~        ") title:"最新版本" beep:false;result = OK)
+	-- 		if LaterVersion_installed do (messageBox  ("您已安装最新版本：" + onlineVersion + "\r\n\r\n若与本地不对应请稍后重试~        ") title:"最新版本" beep:false;result = OK)
 
-			if not LaterVersion_installed AND (queryBox ("远程最新版本为: " + onlineVersion + "\r\n本地当前版本为: " + currentVersion + \
-				"\r\n\r\n是否立即下载更新并安装脚本?\r\n\r\n(建议只更新正式版,beta仅供测试不保证稳定)        ") title:"是否更新脚本") do 
-			(
-				local webRoot = "https://gitee.com/acebullet/BsReferenceTools/raw/main/_BsRefTools/EXE/_BsRefTools%EF%BC%88%E8%A3%85%E5%AE%8C%E9%87%8D%E5%90%AFMAX,%E8%AF%AF%E6%9D%80%E8%AF%B7%E4%BF%A1%E4%BB%BB%EF%BC%89.exe"
-				local dlFile = (getdir #temp) + "\\_BsRefTools（装完重启MAX,误杀请信任）.exe"
-				local Root = symbolicPaths.getPathValue "$Max"  --max根目录
+	-- 		if not LaterVersion_installed AND (queryBox ("远程最新版本为: " + onlineVersion + "\r\n本地当前版本为: " + currentVersion + \
+	-- 			"\r\n\r\n是否立即下载更新并安装脚本?\r\n\r\n(建议只更新正式版,beta仅供测试不保证稳定)        ") title:"是否更新脚本") do 
+	-- 		(
+	-- 			local webRoot = "https://gitee.com/acebullet/BsReferenceTools/raw/main/_BsRefTools/EXE/_BsRefTools%EF%BC%88%E8%A3%85%E5%AE%8C%E9%87%8D%E5%90%AFMAX,%E8%AF%AF%E6%9D%80%E8%AF%B7%E4%BF%A1%E4%BB%BB%EF%BC%89.exe"
+	-- 			local dlFile = (getdir #temp) + "\\_BsRefTools（装完重启MAX,误杀请信任）.exe"
+	-- 			local Root = symbolicPaths.getPathValue "$Max"  --max根目录
 
-				if (doesFileExist dlFile) then (try(fnDelFileDir dlFile)catch(messageBox ("可能因为权限无法清除旧版本下载, 请手动删除:\r\n\r\n"+dlFile);ShellLaunch (getdir #temp) ""))
+	-- 			if (doesFileExist dlFile) then (try(fnDelFileDir dlFile)catch(messageBox ("可能因为权限无法清除旧版本下载, 请手动删除:\r\n\r\n"+dlFile);ShellLaunch (getdir #temp) ""))
 
-				try((dotNetObject "System.Net.WebClient").downloadFile webRoot dlFile)
-				catch( print ( (getCurrentException()) + "  " + dlFile )  )
-				ShellLaunch dlFile ""
-				local restart = queryBox  "请检查F11侦听器有无报错,是否重启3dsMax?          " title:"下载完成请继续安装程序" beep:true
-				if restart do (
-					CheckForSave ()
-					local file = symbolicPaths.getPathValue "$Max" + "\\3dsmax.exe"
-					shellLaunch file
-					quitMAX()
-				)
-				result = OK
-			)
-		)
-		else
-		(
-			--检查网络是否能连接
-			if internet.CheckConnection url:"https://gitee.com" force:true == true then (messagebox "下载服务器当前不可用,请稍后再试";result = undefined)
-			else (messageBox "无网络连接";result = undefined)
-		)
-		result
-	)
+	-- 			try((dotNetObject "System.Net.WebClient").downloadFile webRoot dlFile)
+	-- 			catch( print ( (getCurrentException()) + "  " + dlFile )  )
+	-- 			ShellLaunch dlFile ""
+	-- 			local restart = queryBox  "请检查F11侦听器有无报错,是否重启3dsMax?          " title:"下载完成请继续安装程序" beep:true
+	-- 			if restart do (
+	-- 				CheckForSave ()
+	-- 				local file = symbolicPaths.getPathValue "$Max" + "\\3dsmax.exe"
+	-- 				shellLaunch file
+	-- 				quitMAX()
+	-- 			)
+	-- 			result = OK
+	-- 		)
+	-- 	)
+	-- 	else
+	-- 	(
+	-- 		--检查网络是否能连接
+	-- 		if internet.CheckConnection url:"https://gitee.com" force:true == true then (messagebox "下载服务器当前不可用,请稍后再试";result = undefined)
+	-- 		else (messageBox "无网络连接";result = undefined)
+	-- 	)
+	-- 	result
+	-- )
 
-	fn fnCheckVersion =
-	(
-		local verURL = "https://gitee.com/acebullet/BsReferenceTools/raw/main/_BsRefTools/EXE/version.dat"
-		local onlineVersion = (dotNetObject "System.Net.WebClient").downloadString verURL
-		if (currentVersion != onlineVersion) then  (fnCheckUpdate isForceUpdate:true)
-	)
+	-- fn fnCheckVersion =
+	-- (
+	-- 	local verURL = "https://gitee.com/acebullet/BsReferenceTools/raw/main/_BsRefTools/EXE/version.dat"
+	-- 	local onlineVersion = (dotNetObject "System.Net.WebClient").downloadString verURL
+	-- 	if (currentVersion != onlineVersion) then  (fnCheckUpdate isForceUpdate:true)
+	-- )
 
     on RCmenuRefConfig open do
 	(
@@ -440,21 +442,21 @@ rcmenu RCmenuRefConfig
 		title:"清理参考图" beep:false) then(fnCleanRefPlaneAndMat ())
 	)
 
-	on mitemUpdate picked do 
-	(
-		try(destroydialog rolAddRefFolder)catch()
-		try(destroydialog rolRefTools)catch()
-		fnCheckUpdate isForceUpdate:false
-		fileIn ((getDir #Scripts)+ @"\\BulletScripts\\BsRefTools.ms")
-	)
+	-- on mitemUpdate picked do 
+	-- (
+	-- 	try(destroydialog rolAddRefFolder)catch()
+	-- 	try(destroydialog rolRefTools)catch()
+	-- 	fnCheckUpdate isForceUpdate:false
+	-- 	fileIn ((getDir #Scripts)+ @"\\BulletScripts\\BsRefTools.ms")
+	-- )
 
-	on mItemForceUpdate picked do 
-	(
-		try(destroydialog rolAddRefFolder)catch()
-		try(destroydialog rolRefTools)catch()
-		fnCheckUpdate isForceUpdate:true
-		fileIn ((getDir #Scripts)+ @"\\BulletScripts\\BsRefTools.ms")
-	)
+	-- on mItemForceUpdate picked do 
+	-- (
+	-- 	try(destroydialog rolAddRefFolder)catch()
+	-- 	try(destroydialog rolRefTools)catch()
+	-- 	fnCheckUpdate isForceUpdate:true
+	-- 	fileIn ((getDir #Scripts)+ @"\\BulletScripts\\BsRefTools.ms")
+	-- )
 
 	on mItemUninstall picked do 
 	(
@@ -806,6 +808,14 @@ rollout rolRefTools ("[参考工具]-BsRefTools_v" + currentVersion)  width:340 
 		if (iniRefFolder4.name != "") then (btnRefDir4.text = iniRefFolder4.name) else (btnRefDir4.text = "<＋＋＋>")
 	)
 
+	fn fnRefreshDate =
+	(
+		local arrTime = (getUniversalTime())
+		local dayWeekID = (mod arrTime[3] 7) as integer
+		lblDateTime.text = dateTime.Year as string + "/" + dateTime.Month as string + "/" \
+		+ dateTime.Day as string + "  星期" + arrDayWeek[dayWeekID + 1] as string
+	)
+
 	on rolRefTools rbuttondown pos do 
 	(
 		tempLastFolder = fnGetLastFolder edtBrowseFolder.text
@@ -822,9 +832,8 @@ rollout rolRefTools ("[参考工具]-BsRefTools_v" + currentVersion)  width:340 
 		fnFreshRefDirText ()
 		fnRefreshList iniLastRefFolder.dir
         ltbFilterPrefix.selection = 0
-        lblDateTime.text = dateTime.Year as string + "/" + dateTime.Month as string + "/" \
-		+ dateTime.Day as string + "  星期" + dayWeek[mod (getUniversalTime())[3] 7] as string
-		RCmenuRefConfig.fnCheckVersion ()
+        fnRefreshDate ()
+		-- RCmenuRefConfig.fnCheckVersion ()
     )
 
     on rolRefTools close do -- 关闭记忆浮动窗口位置

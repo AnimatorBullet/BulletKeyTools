@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-08 12:13:58
+ * @LastEditTime: 2021-01-10 15:43:37
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -13,7 +13,7 @@ try(destroydialog rolAddItem)catch()
 
 struct itemsFolder (name,dir)
 global dateTime = (dotNetClass "System.DateTime").Now
-global dayWeek = #( "一", "二", "三", "四", "五", "六", "日")
+global arrDayWeek = #("日", "一", "二", "三", "四", "五", "六")
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPosOpenTools
 -- Global iniWidthOpenTools  = 340
@@ -448,6 +448,14 @@ rollout rolBsOpenTools "" width:340 height:345
 		)
 	)
 
+	fn fnRefreshDate =
+	(
+		local arrTime = (getUniversalTime())
+		local dayWeekID = (mod arrTime[3] 7) as integer
+		lblDateTime.text = dateTime.Year as string + "/" + dateTime.Month as string + "/" \
+		+ dateTime.Day as string + "  星期" + arrDayWeek[dayWeekID + 1] as string
+	)
+
 	----------------------------------------------------------------------------------------------------
 	
 	on rolBsOpenTools open do 
@@ -467,8 +475,7 @@ rollout rolBsOpenTools "" width:340 height:345
 		ltbFilterPrefix.selection = 0
 		fnRefreshFilterItems ()
 		ddlLikedFolder.selection = iniSelectedID
-		lblDateTime.text = dateTime.Year as string + "/" + dateTime.Month as string + "/" \
-		+ dateTime.Day as string + "  星期" + dayWeek[mod (getUniversalTime())[3] 7] as string
+		fnRefreshDate ()
 	)
 
 	on rolBsOpenTools close do -- 关闭记忆浮动窗口位置
