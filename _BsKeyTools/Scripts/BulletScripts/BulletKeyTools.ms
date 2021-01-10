@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-10 15:06:45
+ * @LastEditTime: 2021-01-10 16:00:02
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -12,7 +12,7 @@ try(destroydialog rolFnKeys)catch()
 try(destroydialog rolAddMyScripts)catch()
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
-global currentVersion = "0.9.4"
+global curVerBsKeyTools = "0.9.4"
 global verUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/version.dat"
 global dlUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/_BsKeyTools%EF%BC%88%E8%A3%85%E5%AE%8C%E9%87%8D%E5%90%AFMAX,%E8%AF%AF%E6%9D%80%E8%AF%B7%E4%BF%A1%E4%BB%BB%EF%BC%89.exe"
 global dlFileBsKeyTools = (getdir #temp) + "\\_BsKeyTools（装完重启MAX,误杀请信任）.exe"
@@ -310,10 +310,10 @@ rcmenu menuConfig
 	)
 
 	on mItemCheckUpdate picked do 
-	(fnCheckUpdate currentVersion verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools isForceUpdate:false)
+	(fnCheckUpdate curVerBsKeyTools verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools isForceUpdate:false)
 
 	on mItemForceUpdate picked do 
-	(fnCheckUpdate currentVersion verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools isForceUpdate:true)
+	(fnCheckUpdate curVerBsKeyTools verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools isForceUpdate:true)
 
 	on mItemAutoCheckUpdate picked do 
 	(
@@ -909,7 +909,7 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 -------------主UI-----------------------------------------------------------------
 rollout rolloutBulletKeyTools "" width:180 height:228
 (
-	local strMainRol = ("BsKeyTools v" + currentVersion + "--右键设置")
+	local strMainRol = ("BsKeyTools v" + curVerBsKeyTools + "--右键设置")
 	---------------------------------UI--------------------------------------
 	groupbox gbxMainUI strMainRol pos:[5,5] width:170 height:192
 	
@@ -2072,7 +2072,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		ckbPlayBlocking.state = false
 		clock.active = false
 		if (iniAutoCheckUpdate == true) then 
-		(fnAutoCheckVersion currentVersion verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools)
+		(fnAutoCheckVersion curVerBsKeyTools verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools)
 	)
 	
 	on rolloutBulletKeyTools close do -- 关闭记忆浮动窗口位置
