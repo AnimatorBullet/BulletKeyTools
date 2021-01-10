@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-10 02:11:50
+ * @LastEditTime: 2021-01-10 15:06:45
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -21,7 +21,6 @@ struct myScript (id,msName,dir)
 
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPos  	--位置保存记录
-Global iniHelpBtn        = off--记录是否打开帮助模式
 Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
 (myScript id:2 msName:"<＋＋>" dir:""), \
 (myScript id:3 msName:"<＋＋>" dir:""), \
@@ -30,24 +29,25 @@ Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
 (myScript id:6 msName:"<＋＋>" dir:""), \
 (myScript id:7 msName:"<＋＋>" dir:""), \
 (myScript id:8 msName:"<＋＋>" dir:""))
-Global idBtn             = 1
-Global posMouX           = mouse.screenpos.x
-Global posMouY           = mouse.screenpos.y  --获取鼠标位置
-Global posMouMoved       = [0,0]
-Global switchMouseState  = false
-Global switchSelKeyRange = 0
-Global switchHideBones   = 0
-Global switchHideBiped   = 0
-Global switchToolPanel   = 0
-global switchMSPanel	 = 0
-Global arrLastSelRange   = #()
-Global switchAllKeyRange = 0
-Global iniAddToolbars    = 0
-Global arrLastAllRange   = #()
-Global arrKeysTime       = #()  -----------biped和bone的首尾帧
-Global arrLinkKeys       = #()  -----------存link帧
-Global arrKeysSelected   = #()  -----------存选中的帧
-global arrBlockingKeys   = #()  -----------选中或者所有物体的所有关键帧
+Global idBtn              = 1
+Global posMouX            = mouse.screenpos.x
+Global posMouY            = mouse.screenpos.y  --获取鼠标位置
+Global posMouMoved        = [0,0]
+Global switchMouseState   = false
+Global switchSelKeyRange  = 0
+Global switchHideBones    = 0
+Global switchHideBiped    = 0
+Global switchToolPanel    = 0
+global switchMSPanel      = 0
+global iniAutoCheckUpdate = false
+Global arrLastSelRange    = #()
+Global switchAllKeyRange  = 0
+Global iniAddToolbars     = 0
+Global arrLastAllRange    = #()
+Global arrKeysTime        = #()  -----------biped和bone的首尾帧
+Global arrLinkKeys        = #()  -----------存link帧
+Global arrKeysSelected    = #()  -----------存选中的帧
+global arrBlockingKeys    = #()  -----------选中或者所有物体的所有关键帧
 Global keyFirst
 Global keyEnd
 Global keySelFirst
@@ -88,12 +88,12 @@ fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方�
 )
 fn fnSaveConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
-	iniPos          = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" ([posMouX,posMouY] as string)
-	switchToolPanel = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
-	switchMSPanel 	= fnGetConfig switchMSPanel "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
-	idBtn           = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
-	iniArrMyScripts = fnGetConfig iniArrMyScripts "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
-	iniHelpBtn      = fnGetConfig iniHelpBtn "BulletKeyToolsSet"  "HelpBtn" (iniHelpBtn as string)
+	iniPos             = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" ([posMouX,posMouY] as string)
+	switchToolPanel    = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
+	switchMSPanel      = fnGetConfig switchMSPanel "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
+	idBtn              = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
+	iniArrMyScripts    = fnGetConfig iniArrMyScripts "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
+	iniAutoCheckUpdate = fnGetConfig iniAutoCheckUpdate "BulletKeyToolsSet"  "AutoCheckUpdate" (iniAutoCheckUpdate as string)
 	if (iniArrMyScripts.count != 8) then
 	(
 		iniArrMyScripts = #((myScript id:1 msName:"<＋＋>" dir:""), \
@@ -114,7 +114,7 @@ fn fnSetConfig =  --保存参数,脚本位置
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "idBtn" (idBtn as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "HelpBtn" (iniHelpBtn as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "AutoCheckUpdate" (iniAutoCheckUpdate as string)
 )
 ---------------配合BulletTools工具的ini文件保存位置信息-----------------
 
@@ -259,6 +259,7 @@ rcmenu menuConfig
 	(
 		menuItem mItemCheckUpdate "检查更新"
 		menuItem mItemForceUpdate "强制更新"
+		menuItem mItemAutoCheckUpdate "自动检测更新"
 	)
 	separator menuSepUninstall
 	menuItem mItemClose "关闭工具"
@@ -270,6 +271,7 @@ rcmenu menuConfig
 		else (mItemIsStartup.checked = false)
 		if (iniAddToolbars == 1) then (mItemAddToolBarBtn.checked = true)
 		else (mItemAddToolBarBtn.checked = false)
+		mItemAutoCheckUpdate.checked = iniAutoCheckUpdate
 	)
 	on mItemIsStartup picked do 
 	(
@@ -312,6 +314,13 @@ rcmenu menuConfig
 
 	on mItemForceUpdate picked do 
 	(fnCheckUpdate currentVersion verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools isForceUpdate:true)
+
+	on mItemAutoCheckUpdate picked do 
+	(
+		if (mItemAutoCheckUpdate.checked == true) then (mItemAutoCheckUpdate.checked = false)
+		else (mItemAutoCheckUpdate.checked = true)
+		iniAutoCheckUpdate = mItemAutoCheckUpdate.checked
+	)
 
 	on mItemClose picked do 
 	(
@@ -914,8 +923,6 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		tooltip:"预览选择帧\r\n再点回到上次帧范围"
 		button btnAllFrameDisplay "首尾帧" pos:[60,40] width:50 height:20 \
 		tooltip:"预览全部帧\r\n再点回到上次帧范围"
-		-- checkbutton ckbHelpBtn "？觉醒" pos:[135,23] width:55 height:20   \
-		-- tooltip:"打开帮助模式！"
 		button btnMagicBtn "" pos:[115,22] width:55 height:35   \
 		tooltip:"点我点我点我~良心小工具" border:false
 		-- edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
@@ -2045,7 +2052,6 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 -- 		btnMoveAfterKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,13,13,13,13,true,true)
 		-- dotnet.AddEventHandler myTimer #elapsed fnRefreshHelpText
 		-- myTimer.Start()
-		-- ckbHelpBtn.checked = iniHelpBtn
 		-- timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
 		-- iniPos = (GetDialogPos rolloutBulletKeyTools) 
 		fnSaveConfig ()  ---------------脚本位置赋值
@@ -2065,7 +2071,8 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		-- )
 		ckbPlayBlocking.state = false
 		clock.active = false
-		fnAutoCheckVersion currentVersion verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools
+		if (iniAutoCheckUpdate == true) then 
+		(fnAutoCheckVersion currentVersion verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools)
 	)
 	
 	on rolloutBulletKeyTools close do -- 关闭记忆浮动窗口位置
@@ -2167,17 +2174,6 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 	(
 		fnSwitchMagicBtn ()
 	)
-
-	-- on ckbHelpBtn changed state do 
-	-- (
-	-- 	iniHelpBtn = state
-	-- 	if state == off then 
-	-- 	(
-	-- 		gbxMinTools.caption = " < 小工具说明 > "
-	-- 		-- tick_tock.active = false
-	-- 	)
-	-- 	-- else tick_tock.active = true
-	-- )
 
 	on ckbPlayBlocking changed state do (
         -- if (selection.count == 0) do (
