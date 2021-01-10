@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2020-12-29 01:12:45
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-10 15:50:34
+ * @LastEditTime: 2021-01-10 16:05:48
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -27,7 +27,7 @@ global numCurrentPic = 1
 global tempSavePath  = (getdir #temp) + @"\\tempReferencePic"
 
 global dateTime = (dotNetClass "System.DateTime").Now
-global dayWeek  = #( "一", "二", "三", "四", "五", "六", "日")
+global arrDayWeek = #("日", "一", "二", "三", "四", "五", "六")
 Global iniPosRefTools
 global iniLastRefFolder = (itemsFolder name:"" dir:"")
 global iniRefFolder1    = (itemsFolder name:"<＋＋＋>" dir:"")
