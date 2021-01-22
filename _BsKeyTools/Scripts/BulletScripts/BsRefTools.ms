@@ -471,7 +471,7 @@ rcmenu RCmenuRefConfig
 
 	on menuJoinGroup picked do 
 	(
-		if (queryBox "是否加入个人分享交流群？          \r\n(游戏，动画爱好者休闲吹水正能量分享群)\r\n        " \
+		if (queryBox "是否加入个人分享交流群？\r\n\r\n(游戏，动画爱好者休闲吹水正能量分享群)\r\n\r\n子弹工具人(993590655)，确认可直接跳转链接~          \r\n        " \
 		title:"加入交流群" beep:false) then
 		(
 		shellLaunch "https://jq.qq.com/?_wv=1027&k=hmeHhTwu" "")

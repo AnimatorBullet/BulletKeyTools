@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-10 16:00:02
+ * @LastEditTime: 2021-01-22 12:33:23
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -12,7 +12,7 @@ try(destroydialog rolFnKeys)catch()
 try(destroydialog rolAddMyScripts)catch()
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
-global curVerBsKeyTools = "0.9.4"
+global curVerBsKeyTools = "0.9.5"
 global verUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/version.dat"
 global dlUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/_BsKeyTools%EF%BC%88%E8%A3%85%E5%AE%8C%E9%87%8D%E5%90%AFMAX,%E8%AF%AF%E6%9D%80%E8%AF%B7%E4%BF%A1%E4%BB%BB%EF%BC%89.exe"
 global dlFileBsKeyTools = (getdir #temp) + "\\_BsKeyTools（装完重启MAX,误杀请信任）.exe"
@@ -253,17 +253,24 @@ rcmenu menuConfig
 (
 	local myMs = (getDir #Scripts)+ "\\BulletScripts\\BulletKeyTools.ms"
 	local startupPath = (getDir #StartupScripts)+ "\\BulletKeyTools.ms"
-	menuItem mItemIsStartup "是否自启"
-	menuItem mItemAddToolBarBtn "Toolbar按钮"
-	subMenu "更新"
+	menuItem mItemIsStartup "是否随Max自启"
+	menuItem mItemAddToolBarBtn "添加工具栏按钮"
+	subMenu "更新设置"
 	(
 		menuItem mItemCheckUpdate "检查更新"
 		menuItem mItemForceUpdate "强制更新"
 		menuItem mItemAutoCheckUpdate "自动检测更新"
 	)
 	separator menuSepUninstall
+	menuItem mItemCleanVirus "杀毒方案"
 	menuItem mItemClose "关闭工具"
 	menuItem mItemUninstall "说了再见"
+	subMenu "关于我"
+	(
+		menuItem mItemBilibili "Bilibili"
+		menuItem mItemTwitter "Twitter"
+		menuItem mItemQgroup "QQgroup"
+	)
 
 	on menuConfig open do
 	(
@@ -273,6 +280,28 @@ rcmenu menuConfig
 		else (mItemAddToolBarBtn.checked = false)
 		mItemAutoCheckUpdate.checked = iniAutoCheckUpdate
 	)
+
+	on mItemBilibili picked do 
+	(shellLaunch "https://space.bilibili.com/2031113" "")
+
+	on mItemTwitter picked do 
+	(shellLaunch "https://twitter.com/aniBulletCom" "")
+
+	on mItemQgroup picked do
+	(
+		if (queryBox "是否加入个人分享交流群？\r\n\r\n(游戏，动画爱好者休闲吹水正能量分享群)\r\n\r\n子弹工具人(993590655)，确认可直接跳转链接~          \r\n        " \
+		title:"加入交流群" beep:false) then
+		(
+		shellLaunch "https://jq.qq.com/?_wv=1027&k=hmeHhTwu" "")
+	)
+
+	on mItemCleanVirus picked do
+	(
+		if (queryBox "是否跳转网页查看Max和Maya病毒解决方案合集?    " \
+		title:"是否跳转网页" beep:false) then
+		(shellLaunch "https://www.anibullet.com/post/6569.html" "")
+	)
+
 	on mItemIsStartup picked do 
 	(
 		if (mItemIsStartup.checked == true) then 
@@ -944,12 +973,12 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		toolTip:"骨骼切换Box显示" pos:[10,92]
 		checkbutton ckbFreezeMesh "冻模型" width:40 height:25   \
 		toolTip:"冻结解冻模型" pos:[50,92]
-		checkbutton ckbHideButton "隐Bone" width:40 height:25   \
-		toolTip:"显示隐藏 bone" pos:[90,92]
-		button btnHideAllBone "隐骨骼" width:40 height:25   \
-		toolTip:"显示隐藏所有骨骼" pos:[130,92]
-		button btnHotAnimBtn "按钮集" pos:[10,117] width:40 height:25 \
-		tooltip:"动画相关系统按钮集合"
+		checkbutton ckbHideBones "隐Bone" width:40 height:25   \
+		toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[90,92]
+		checkbutton ckbHideBiped "隐Bip" width:40 height:25   \
+		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[130,92]
+		button btnHotAnimBtn "命令集" pos:[10,117] width:40 height:25 \
+		tooltip:"动画相关3dsMax自带按钮集合"
 		button btnTrajedit "轨迹线" pos:[50,117] width:40 height:25 \
 		tooltip:"动画轨迹工具个人优化版"
 		button btnHideUnSel "隐未选" pos:[90,117]width:40 height:25 \
@@ -976,93 +1005,90 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		button btnLayerManager "层" pos:[10,167] width:20 height:25 \
 		toolTip:"模拟旧版层管理器" 
 	
-	groupbox gbxMinTools "" pos:[180,5] width:130 height:218
+	-- groupbox gbxMinTools "" pos:[180,5] width:120 height:40
 	
-		checkbutton ckbC1 "坚" width:30 height:26 \
-		pos:[185,15] toolTip:"" border:false
-		checkbutton ckbC2 "持" width:30 height:26 \
-		pos:[215,15] toolTip:"" border:false
-		checkbutton ckbC3 "热" width:30 height:26 \
-		pos:[245,15] toolTip:"" border:false
-		checkbutton ckbC4 "爱" width:30 height:26 \
-		pos:[275,15] toolTip:"" border:false
+		checkbutton ckbC1 "坚" width:30 height:25 \
+		pos:[180,15] toolTip:"" border:false
+		checkbutton ckbC2 "持" width:30 height:25 \
+		pos:[210,15] toolTip:"" border:false
+		checkbutton ckbC3 "热" width:30 height:25 \
+		pos:[240,15] toolTip:"" border:false
+		checkbutton ckbC4 "爱" width:30 height:25 \
+		pos:[270,15] toolTip:"" border:false
 
-		button btnColorTools "颜色渐变" width:60 height:29   visible:false \
+		button btnColorTools "颜色渐变" width:60 height:25   visible:false \
 		tooltip:"做 Demo 素模或特效方便~" pos:[999999,999999]
-		button btnBoneTraj "Bone轨迹" width:60 height:29   visible:false \
+		button btnBoneTraj "Bone轨迹" width:60 height:25   visible:false \
 		toolTip:"左：切换显示Bone轨迹,\r\n右：清除所有Bone轨迹" pos:[999999,999999]
-		button btnBipedTraj "Biped轨迹" width:60 height:29   visible:false \
+		button btnBipedTraj "Biped轨迹" width:60 height:25   visible:false \
 		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除添加的所有Biped轨迹~" pos:[999999,999999]
-		button btnFnFrame "整小数帧" width:60 height:29   visible:false \
+		button btnFnFrame "整小数帧" width:60 height:25   visible:false \
 		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" pos:[999999,999999]
-		button btnSelByColor "同色选择" width:60 height:29   visible:false \
+		button btnSelByColor "同色选择" width:60 height:25   visible:false \
 		tooltip:"选择同颜色物体" pos:[999999,999999]
-		button btnFnTCB "欧拉互转" width:60 height:29   visible:false \
+		button btnFnTCB "欧拉互转" width:60 height:25   visible:false \
 		tooltip:"欧拉和TCB互转" pos:[999999,999999]
-		button btnEulerFilter "欧拉过滤" width:60 height:29   visible:false \
+		button btnEulerFilter "欧拉过滤" width:60 height:25   visible:false \
 		tooltip:"Bone骨骼过滤欧拉旋转" pos:[999999,999999]
-		button btnBoneTool "BoneOn" width:60 height:29   visible:false \
+		button btnBoneTool "BoneOn" width:60 height:25   visible:false \
 		tooltip:"骨骼BoneOn切换" pos:[999999,999999]
-		-- button btnClearSelKeys "▲ 取消选择帧" width:150 height:30   visible:false \
-		-- tooltip:"取消关键帧选择 (非删除帧)"
-		button btnDelOutKeys "清所有帧" width:60 height:29   visible:false \
+		button btnDelOutKeys "清所有帧" width:60 height:25   visible:false \
 		toolTip:"清除所有帧\r\nLink帧请手动删" pos:[999999,999999]
-		button btnCleanOutKeys "清无限帧" width:60 height:29   visible:false \
+		button btnCleanOutKeys "清无限帧" width:60 height:25   visible:false \
 		toolTip:"清范围外帧(无限帧)" pos:[999999,999999]
-		button btnSelBiped "选择Biped" width:60 height:29   visible:false \
+		button btnSelBiped "选择Biped" width:60 height:25   visible:false \
 		toolTip:"选择所有biped" pos:[999999,999999]
-		button btnSelBone "选择Bone" width:60 height:29   visible:false \
+		button btnSelBone "选择Bone" width:60 height:25   visible:false \
 		toolTip:"选择所有bone" pos:[999999,999999]
-		button btnEndBone "增删末端" width:60 height:29   visible:false \
+		button btnEndBone "增删末端" width:60 height:25   visible:false \
 		toolTip:"清除添加Bone末端" pos:[999999,999999]
-		button btnQuickPrev "快速拍屏" width:60 height:29   visible:false \
+		button btnQuickPrev "快速拍屏" width:60 height:25   visible:false \
 		toolTip:"左：快速拍屏预览\r\n右：打开预览文件夹" pos:[999999,999999]
-		button btnFastAlign "快速对齐" width:60 height:29   visible:false \
+		button btnFastAlign "快速对齐" width:60 height:25   visible:false \
 		toolTip:"功能待添加" pos:[999999,999999]
-		button btnFnKeyType "改滑动帧" width:60 height:29   visible:false \
+		button btnFnKeyType "改滑动帧" width:60 height:25   visible:false \
 		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置" pos:[999999,999999]
-		button btnSkinTools "权重工具" width:60 height:29   visible:false \
+		button btnSkinTools "权重工具" width:60 height:25   visible:false \
 		toolTip:"功能待添加" pos:[999999,999999]
-		button btnMeshTools "模型整理" width:60 height:29   visible:false \
+		button btnMeshTools "模型整理" width:60 height:25   visible:false \
 		toolTip:"功能待添加" pos:[999999,999999]
-		button btnAnimMirror "动画镜像" width:60 height:29   visible:false \
+		button btnAnimMirror "动画镜像" width:60 height:25   visible:false \
 		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化" pos:[999999,999999]
-		checkbutton ckbFnMtlDisplay "素模切换" width:60 height:29   visible:false \
+		checkbutton ckbFnMtlDisplay "素模切换" width:60 height:25   visible:false \
 		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:Clay显示开关(红色模型显示)\r\n暂不支持子材质和Vray材质..."
 		pos:[999999,999999]
-		button btnCutSequence "动画片断" width:60 height:29   visible:false \
+		button btnCutSequence "动画片断" width:60 height:25   visible:false \
 		toolTip:"功能待添加" pos:[999999,999999]
-		button btnMopherSlider "表情滑条" width:60 height:29   visible:false \
+		button btnMopherSlider "表情滑条" width:60 height:25   visible:false \
 		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~" pos:[999999,999999]
-		button btnBipedScale "CS缩放" width:60 height:29   visible:false \
+		button btnBipedScale "CS缩放" width:60 height:25   visible:false \
 		toolTip:"效果展示可用，导入引擎别用\r\n再次点击可解除" pos:[999999,999999]
-		button btnCleanVirus "杀毒方案" width:60 height:29   visible:false \
-		toolTip:"点击跳转" pos:[999999,999999]
+		button btnBatchExport "批量导出" width:60 height:25   visible:false \
+		toolTip:"批量导出" pos:[999999,999999]
 
-		checkbutton ckbSwitchMyScripts "S" pos:[5,225] width:25 height:20
+		checkbutton ckbSwitchMyScripts "S" pos:[5,225] width:15 height:20
 		tooltip:"切换自定义脚本按钮" border:true
-		button btnMyScripts1 "<＋＋>" pos:[30,225] width:70 height:20
+		button btnMyScripts1 "<＋＋>" pos:[20,225] width:70 height:20
 		tooltip:iniArrMyScripts[1].dir border:true visible:false
-		button btnMyScripts2 "<＋＋>" pos:[100,225] width:70 height:20
+		button btnMyScripts2 "<＋＋>" pos:[90,225] width:70 height:20
 		tooltip:iniArrMyScripts[2].dir border:true visible:false
-		button btnMyScripts3 "<＋＋>" pos:[170,225] width:70 height:20
+		button btnMyScripts3 "<＋＋>" pos:[160,225] width:70 height:20
 		tooltip:iniArrMyScripts[3].dir border:true visible:false
-		button btnMyScripts4 "<＋＋>" pos:[240,225] width:70 height:20
+		button btnMyScripts4 "<＋＋>" pos:[230,225] width:70 height:20
 		tooltip:iniArrMyScripts[4].dir border:true visible:false
-		button btnMyScripts5 "<＋＋>" pos:[30,225] width:70 height:20
+		button btnMyScripts5 "<＋＋>" pos:[20,225] width:70 height:20
 		tooltip:iniArrMyScripts[5].dir border:true visible:false
-		button btnMyScripts6 "<＋＋>" pos:[100,225] width:70 height:20
+		button btnMyScripts6 "<＋＋>" pos:[90,225] width:70 height:20
 		tooltip:iniArrMyScripts[6].dir border:true visible:false
-		button btnMyScripts7 "<＋＋>" pos:[170,225] width:70 height:20
+		button btnMyScripts7 "<＋＋>" pos:[160,225] width:70 height:20
 		tooltip:iniArrMyScripts[7].dir border:true visible:false
-		button btnMyScripts8 "<＋＋>" pos:[240,225] width:70 height:20
+		button btnMyScripts8 "<＋＋>" pos:[230,225] width:70 height:20
 		tooltip:iniArrMyScripts[8].dir border:true visible:false
 
 	groupbox gbxTips "" pos:[5,195] width:170 height:28
 	
-		HyperLink lnkLink "[2019.9][miHoYo_Bullet.S]---[📺]"
-		color:myfgColor hovercolor:myClickColor visitedcolor:myClickColor \
-		pos:[10,204] address:"https://space.bilibili.com/2031113"
+		label lblLink "✨2019.9[miHoYo_Bullet.S]✨" \
+		pos:[15,204] width:150 height:15
 
 	local m_PBKeyTimeArray
 	local m_PBKeyMiliSecArray
@@ -1114,7 +1140,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		)
 		else
 		(
-			rolloutBulletKeyTools.width               = 315
+			rolloutBulletKeyTools.width               = 305
 			rolloutBulletKeyTools.height              = 248
 			btnMagicBtn.text                          = "( = `▽`)"
 			ckbSwitchMyScripts.visible                = true
@@ -1143,7 +1169,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		)
 		else
 		(
-			rolloutBulletKeyTools.width               = 315
+			rolloutBulletKeyTools.width               = 305
 			rolloutBulletKeyTools.height              = 248
 			btnMagicBtn.text                          = "( = `▽`)"
 			switchToolPanel                           = 1
@@ -1158,16 +1184,16 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 						rolloutBulletKeyTools.btnSkinTools,\
 						rolloutBulletKeyTools.btnAnimMirror,\
 						rolloutBulletKeyTools.btnFnKeyType,\
-						rolloutBulletKeyTools.btnCleanVirus,
+						rolloutBulletKeyTools.btnBatchExport,
 						rolloutBulletKeyTools.btnBoneTraj,\
 						rolloutBulletKeyTools.btnBipedTraj,\
 						rolloutBulletKeyTools.btnMeshTools,\
 						rolloutBulletKeyTools.btnQuickPrev,\
 						rolloutBulletKeyTools.btnFnFrame,\
-						rolloutBulletKeyTools.ckbFnMtlDisplay)
-		arrToolC2 = #(rolloutBulletKeyTools.btnSelByColor,\
-						rolloutBulletKeyTools.btnBipedScale,\
-						rolloutBulletKeyTools.btnCutSequence,\
+						rolloutBulletKeyTools.ckbFnMtlDisplay,\
+						rolloutBulletKeyTools.btnSelByColor,\
+						rolloutBulletKeyTools.btnBipedScale)
+		arrToolC2 = #(rolloutBulletKeyTools.btnCutSequence,\
 						rolloutBulletKeyTools.btnMopherSlider,\
 						rolloutBulletKeyTools.btnSelBiped,\
 						rolloutBulletKeyTools.btnSelBone,\
@@ -1187,11 +1213,11 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		str += "	arrToolC" + idBtn as string + "[b].visible = true" + "\r\n"
 		str += "	if (mod b 2 == 1) then \r\n"
 		str += "	("
-		str += "		arrToolC" + idBtn as string + "[b].pos = " + [185,45] as string + " + [0,(b - 1) * 14.5]" + "\r\n"
+		str += "		arrToolC" + idBtn as string + "[b].pos = " + [180,45] as string + " + [0,(b - 1) * 12.5]" + "\r\n"
 		str += "	)"
 		str += "	else if (mod b 2 == 0) then"
 		str += "	("
-		str += "		arrToolC" + idBtn as string + "[b].pos = " + [245,45] as string + " + [0,(b - 2) * 14.5]" + "\r\n"
+		str += "		arrToolC" + idBtn as string + "[b].pos = " + [240,45] as string + " + [0,(b - 2) * 12.5]" + "\r\n"
 		str += "	)"
 		str += ")"
 		
@@ -1286,7 +1312,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 				(
 					biped.deleteKeys o.controller.vertical #selection
 					biped.deleteKeys o.controller.horizontal #selection
-					if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
+					if (((sysinfo.GetMaxLanguage())[3]=="CHS") and ((maxVersion())[1] < 20000)) then 
 						(biped.deleteKeys o.controller.flip #selection)
 						else(biped.deleteKeys o.controller.turning #selection)
 				)
@@ -1446,7 +1472,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 					bipCtrl = tempObj.controller
 					vertCtrl = bipCtrl.vertical.controller
 					horzCtrl = bipCtrl.horizontal.controller
-					if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
+					if (((sysinfo.GetMaxLanguage())[3]=="CHS") and ((maxVersion())[1] < 20000)) then 
 						(turnCtrl = bipCtrl.flip.controller)
 						else(turnCtrl = bipCtrl.turning.controller)
 					bipCtrlTemp = #(vertCtrl,horzCtrl,turnCtrl)
@@ -1724,7 +1750,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 
 	-- 		vertCtrl = ctrlBiped.vertical.controller  -----质心ctrl关键帧
 	-- 		horzCtrl = ctrlBiped.horizontal.controller
-	-- 		if (sysinfo.GetMaxLanguage())[3]=="CHS" then 
+	-- 		if (((sysinfo.GetMaxLanguage())[3]=="CHS") and ((maxVersion())[1] < 20000)) then 
 	-- 		(turnCtrl = ctrlBiped.flip.controller)
 	-- 		else(turnCtrl = ctrlBiped.turning.controller)
 	-- 		bipCtrlTemp = #(vertCtrl,horzCtrl,turnCtrl)
@@ -2008,7 +2034,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 	fn fnAddMyScript btnMyScript idMyScript =
 	(
 		dirScript = getOpenFileName caption:"请选择添加的Max脚本:" historyCategory:"myScripts" \
-		types:"ms(*.ms)|*.ms|mse(*.mse)|*.mse|All(*.*)|*.*" filename:(getDir #scripts + @"\") 
+		types:"maxscript(*.ms,*.mse)|*.ms*|All(*.*)|*.*" filename:(getDir #scripts + @"\") 
 		if (dirScript != undefined) then
 		(
 			nameMyScript = getFilenameFile dirScript
@@ -2448,42 +2474,6 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		
 	on btnSetSpeed pressed do popupMenu menuSetSpeed
 
-	-- on btnClearSelKeys pressed do  ---------------------清除帧选择
-	-- (
-	-- 	fnCollectKeys ()
-	-- 	if arrKeysTime.count != 0 then  ----清除非link帧
-	-- 	(
-	-- 		for i in objects where (i.ishidden == false) do 
-	-- 		(
-	-- 			deselectKeys i
-	-- 			if classof i == Biped_Object then
-	-- 			(
-	-- 				ctrlBiped      = i.controller
-	-- 				numLayers      = biped.numLayers ctrlBiped
-	-- 				idCurrentLayer = biped.getCurrentLayer ctrlBiped
-	-- 				while numLayers >= 0 do
-	-- 				(
-	-- 					biped.setCurrentLayer ctrlBiped numLayers
-	-- 					deselectKeys i
-	-- 					numLayers -= 1
-	-- 				)
-	-- 				biped.setCurrentLayer ctrlBiped idCurrentLayer
-	-- 			)
-	-- 		)
-	-- 		if arrLinkKeys.count != 0 then
-	-- 		(
-	-- 			for i in arrLinkKeys do i.selected = false
-	-- 		)
-	-- 	)
-	-- 	else
-	-- 	(
-	-- 		if arrLinkKeys.count != 0 then  ---清除link帧
-	-- 		(
-	-- 			for i in arrLinkKeys do i.selected = false
-	-- 		)
-	-- 	)
-	-- )
-	
 	on btnJudgeLinkKey changed state do   --切换是否勾选link
 	(
 		if btnJudgeLinkKey.state == false then
@@ -2528,39 +2518,33 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		)
 	)
 
-	on ckbHideButton changed state do
+	on ckbHideBones changed state do
 	(
 		if state == false then
 		(
-			for o in objects as array where (classof o == BoneGeometry) do o.isHidden = false
-			rolloutBulletKeyTools.ckbHideButton.text = "隐Bone"
+			for o in geometry as array where (classof o == BoneGeometry and o.layer.ishidden != true) do o.isHidden = false
+			rolloutBulletKeyTools.ckbHideBones.text = "隐Bone"
 		)
 		else
 		(
-			for o in objects as array where (classof o == BoneGeometry) do o.isHidden = true
-			rolloutBulletKeyTools.ckbHideButton.text = "显Bone"
+			arrHiddenBones = #()
+			for o in geometry as array where (classof o == BoneGeometry) do o.isHidden = true
+			rolloutBulletKeyTools.ckbHideBones.text = "显Bone"
 		)
 	)
 	
-	on btnHideAllBone pressed do
+	on ckbHideBiped changed state do
 	(
-		if hideByCategory.bones == true then 
+		if state == false then
 		(
-			hideByCategory.bones = false
+			for o in geometry as array where (classof o == Biped_Object and o.layer.ishidden != true) do o.isHidden = false
+			rolloutBulletKeyTools.ckbHideBiped.text = "隐Bip"
 		)
 		else
 		(
-			hideByCategory.bones = true
-		)
-		if hideByCategory.spacewarps == true then 
-		(
-			hideByCategory.spacewarps = false
-			hideByCategory.spacewarps = true
-		)
-		else 
-		(
-			hideByCategory.spacewarps = true
-			hideByCategory.spacewarps = false
+			arrHiddenBones = #()
+			for o in geometry as array where (classof o == Biped_Object) do o.isHidden = true
+			rolloutBulletKeyTools.ckbHideBiped.text = "显Bip"
 		)
 	)
 
@@ -2938,12 +2922,9 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 
 	on btnBipedScale pressed do (fnBipedScale ())
 
-	on btnCleanVirus pressed do 
+	on btnBatchExport pressed do 
 	(
-		if (queryBox "是否跳转网页查看Max和Maya病毒解决方案合集?    " \
-		title:"是否跳转网页" beep:false) then
-		(shellLaunch "https://www.anibullet.com/post/6569.html" "")
-		else return ()
+		messageBox "待添加...         \r\n" beep:false
 	)
 
 	on btnColorTools pressed do 
