@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-22 12:33:23
+ * @LastEditTime: 2021-01-24 22:23:21
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -30,8 +30,6 @@ Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
 (myScript id:7 msName:"<＋＋>" dir:""), \
 (myScript id:8 msName:"<＋＋>" dir:""))
 Global idBtn              = 1
-Global posMouX            = mouse.screenpos.x
-Global posMouY            = mouse.screenpos.y  --获取鼠标位置
 Global posMouMoved        = [0,0]
 Global switchMouseState   = false
 Global switchSelKeyRange  = 0
@@ -88,7 +86,7 @@ fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方�
 )
 fn fnSaveConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
-	iniPos             = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" ([posMouX,posMouY] as string)
+	iniPos             = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" (mouse.screenpos as string)
 	switchToolPanel    = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
 	switchMSPanel      = fnGetConfig switchMSPanel "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
 	idBtn              = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
@@ -1016,54 +1014,56 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		checkbutton ckbC4 "爱" width:30 height:25 \
 		pos:[270,15] toolTip:"" border:false
 
-		button btnColorTools "颜色渐变" width:60 height:25   visible:false \
+		local btnHeight = 25
+		local btnWidth = 60
+		button btnColorTools "颜色渐变" width:btnWidth height:btnHeight visible:false \
 		tooltip:"做 Demo 素模或特效方便~" pos:[999999,999999]
-		button btnBoneTraj "Bone轨迹" width:60 height:25   visible:false \
+		button btnBoneTraj "Bone轨迹" width:btnWidth height:btnHeight visible:false \
 		toolTip:"左：切换显示Bone轨迹,\r\n右：清除所有Bone轨迹" pos:[999999,999999]
-		button btnBipedTraj "Biped轨迹" width:60 height:25   visible:false \
+		button btnBipedTraj "Biped轨迹" width:btnWidth height:btnHeight visible:false \
 		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除添加的所有Biped轨迹~" pos:[999999,999999]
-		button btnFnFrame "整小数帧" width:60 height:25   visible:false \
+		button btnFnFrame "整小数帧" width:btnWidth height:btnHeight visible:false \
 		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" pos:[999999,999999]
-		button btnSelByColor "同色选择" width:60 height:25   visible:false \
+		button btnSelByColor "同色选择" width:btnWidth height:btnHeight visible:false \
 		tooltip:"选择同颜色物体" pos:[999999,999999]
-		button btnFnTCB "欧拉互转" width:60 height:25   visible:false \
+		button btnFnTCB "欧拉互转" width:btnWidth height:btnHeight visible:false \
 		tooltip:"欧拉和TCB互转" pos:[999999,999999]
-		button btnEulerFilter "欧拉过滤" width:60 height:25   visible:false \
+		button btnEulerFilter "欧拉过滤" width:btnWidth height:btnHeight visible:false \
 		tooltip:"Bone骨骼过滤欧拉旋转" pos:[999999,999999]
-		button btnBoneTool "BoneOn" width:60 height:25   visible:false \
+		button btnBoneTool "BoneOn" width:btnWidth height:btnHeight visible:false \
 		tooltip:"骨骼BoneOn切换" pos:[999999,999999]
-		button btnDelOutKeys "清所有帧" width:60 height:25   visible:false \
+		button btnDelOutKeys "清所有帧" width:btnWidth height:btnHeight visible:false \
 		toolTip:"清除所有帧\r\nLink帧请手动删" pos:[999999,999999]
-		button btnCleanOutKeys "清无限帧" width:60 height:25   visible:false \
+		button btnCleanOutKeys "清无限帧" width:btnWidth height:btnHeight visible:false \
 		toolTip:"清范围外帧(无限帧)" pos:[999999,999999]
-		button btnSelBiped "选择Biped" width:60 height:25   visible:false \
+		button btnSelBiped "选择Biped" width:btnWidth height:btnHeight visible:false \
 		toolTip:"选择所有biped" pos:[999999,999999]
-		button btnSelBone "选择Bone" width:60 height:25   visible:false \
+		button btnSelBone "选择Bone" width:btnWidth height:btnHeight  visible:false \
 		toolTip:"选择所有bone" pos:[999999,999999]
-		button btnEndBone "增删末端" width:60 height:25   visible:false \
+		button btnEndBone "增删末端" width:btnWidth height:btnHeight visible:false \
 		toolTip:"清除添加Bone末端" pos:[999999,999999]
-		button btnQuickPrev "快速拍屏" width:60 height:25   visible:false \
+		button btnQuickPrev "快速拍屏" width:btnWidth height:btnHeight visible:false \
 		toolTip:"左：快速拍屏预览\r\n右：打开预览文件夹" pos:[999999,999999]
-		button btnFastAlign "快速对齐" width:60 height:25   visible:false \
+		button btnFastAlign "快速对齐" width:btnWidth height:btnHeight visible:false \
 		toolTip:"功能待添加" pos:[999999,999999]
-		button btnFnKeyType "改滑动帧" width:60 height:25   visible:false \
+		button btnFnKeyType "改滑动帧" width:btnWidth height:btnHeight visible:false \
 		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置" pos:[999999,999999]
-		button btnSkinTools "权重工具" width:60 height:25   visible:false \
+		button btnSkinTools "权重工具" width:btnWidth height:btnHeight visible:false \
 		toolTip:"功能待添加" pos:[999999,999999]
-		button btnMeshTools "模型整理" width:60 height:25   visible:false \
+		button btnMeshTools "模型整理" width:btnWidth height:btnHeight visible:false \
 		toolTip:"功能待添加" pos:[999999,999999]
-		button btnAnimMirror "动画镜像" width:60 height:25   visible:false \
+		button btnAnimMirror "动画镜像" width:btnWidth height:btnHeight visible:false \
 		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化" pos:[999999,999999]
-		checkbutton ckbFnMtlDisplay "素模切换" width:60 height:25   visible:false \
+		checkbutton ckbFnMtlDisplay "素模切换" width:btnWidth height:btnHeight visible:false \
 		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:Clay显示开关(红色模型显示)\r\n暂不支持子材质和Vray材质..."
 		pos:[999999,999999]
-		button btnCutSequence "动画片断" width:60 height:25   visible:false \
+		button btnCutSequence "动画片断" width:btnWidth height:btnHeight visible:false \
 		toolTip:"功能待添加" pos:[999999,999999]
-		button btnMopherSlider "表情滑条" width:60 height:25   visible:false \
+		button btnMopherSlider "表情滑条" width:btnWidth height:btnHeight visible:false \
 		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~" pos:[999999,999999]
-		button btnBipedScale "CS缩放" width:60 height:25   visible:false \
+		button btnBipedScale "CS缩放" width:btnWidth height:btnHeight visible:false \
 		toolTip:"效果展示可用，导入引擎别用\r\n再次点击可解除" pos:[999999,999999]
-		button btnBatchExport "批量导出" width:60 height:25   visible:false \
+		button btnBatchExport "批量导出" width:btnWidth height:btnHeight visible:false \
 		toolTip:"批量导出" pos:[999999,999999]
 
 		checkbutton ckbSwitchMyScripts "S" pos:[5,225] width:15 height:20
