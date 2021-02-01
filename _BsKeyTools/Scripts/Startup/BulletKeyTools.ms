@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-24 22:23:21
+ * @LastEditTime: 2021-01-28 18:00:03
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -946,10 +946,12 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		range:[-999999999,999999999,animationrange.start] scale:1
 		spinner spiEndTime "" pos:[60,21] width:50 height:20 type:#integer \
 		range:[-999999999,999999999,animationrange.end] scale:1
-		button btnCutFrameDisplay "选定帧" pos:[10,40] width:50 height:20 \
+		button btnCutFrameDisplay "选定帧" pos:[10,40] width:40 height:20 \
 		tooltip:"预览选择帧\r\n再点回到上次帧范围"
-		button btnAllFrameDisplay "首尾帧" pos:[60,40] width:50 height:20 \
+		button btnAllFrameDisplay "首尾帧" pos:[50,40] width:40 height:20 \
 		tooltip:"预览全部帧\r\n再点回到上次帧范围"
+		button btnZeroFrameDisplay "零" pos:[90,40] width:20 height:20 \
+		tooltip:"显示0帧"
 		button btnMagicBtn "" pos:[115,22] width:55 height:35   \
 		tooltip:"点我点我点我~良心小工具" border:false
 		-- edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
@@ -1005,17 +1007,17 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 	
 	-- groupbox gbxMinTools "" pos:[180,5] width:120 height:40
 	
-		checkbutton ckbC1 "坚" width:30 height:25 \
+		checkbutton ckbC1 "坚" width:27.5 height:25 \
 		pos:[180,15] toolTip:"" border:false
-		checkbutton ckbC2 "持" width:30 height:25 \
-		pos:[210,15] toolTip:"" border:false
-		checkbutton ckbC3 "热" width:30 height:25 \
-		pos:[240,15] toolTip:"" border:false
-		checkbutton ckbC4 "爱" width:30 height:25 \
-		pos:[270,15] toolTip:"" border:false
+		checkbutton ckbC2 "持" width:27.5 height:25 \
+		pos:[207.5,15] toolTip:"" border:false
+		checkbutton ckbC3 "热" width:27.5 height:25 \
+		pos:[235,15] toolTip:"" border:false
+		checkbutton ckbC4 "爱" width:27.5 height:25 \
+		pos:[262.5,15] toolTip:"" border:false
 
 		local btnHeight = 25
-		local btnWidth = 60
+		local btnWidth = 55
 		button btnColorTools "颜色渐变" width:btnWidth height:btnHeight visible:false \
 		tooltip:"做 Demo 素模或特效方便~" pos:[999999,999999]
 		button btnBoneTraj "Bone轨迹" width:btnWidth height:btnHeight visible:false \
@@ -1066,23 +1068,24 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		button btnBatchExport "批量导出" width:btnWidth height:btnHeight visible:false \
 		toolTip:"批量导出" pos:[999999,999999]
 
+		local btnMsWidth = 67.5
 		checkbutton ckbSwitchMyScripts "S" pos:[5,225] width:15 height:20
 		tooltip:"切换自定义脚本按钮" border:true
-		button btnMyScripts1 "<＋＋>" pos:[20,225] width:70 height:20
+		button btnMyScripts1 "<＋＋>" pos:[20,225] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[1].dir border:true visible:false
-		button btnMyScripts2 "<＋＋>" pos:[90,225] width:70 height:20
+		button btnMyScripts2 "<＋＋>" pos:[87.5,225] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[2].dir border:true visible:false
-		button btnMyScripts3 "<＋＋>" pos:[160,225] width:70 height:20
+		button btnMyScripts3 "<＋＋>" pos:[155,225] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[3].dir border:true visible:false
-		button btnMyScripts4 "<＋＋>" pos:[230,225] width:70 height:20
+		button btnMyScripts4 "<＋＋>" pos:[222.5,225] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[4].dir border:true visible:false
-		button btnMyScripts5 "<＋＋>" pos:[20,225] width:70 height:20
+		button btnMyScripts5 "<＋＋>" pos:[20,225] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[5].dir border:true visible:false
-		button btnMyScripts6 "<＋＋>" pos:[90,225] width:70 height:20
+		button btnMyScripts6 "<＋＋>" pos:[87.5,225] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[6].dir border:true visible:false
-		button btnMyScripts7 "<＋＋>" pos:[160,225] width:70 height:20
+		button btnMyScripts7 "<＋＋>" pos:[155,225] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[7].dir border:true visible:false
-		button btnMyScripts8 "<＋＋>" pos:[230,225] width:70 height:20
+		button btnMyScripts8 "<＋＋>" pos:[222.5,225] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[8].dir border:true visible:false
 
 	groupbox gbxTips "" pos:[5,195] width:170 height:28
@@ -1140,7 +1143,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		)
 		else
 		(
-			rolloutBulletKeyTools.width               = 305
+			rolloutBulletKeyTools.width               = 295
 			rolloutBulletKeyTools.height              = 248
 			btnMagicBtn.text                          = "( = `▽`)"
 			ckbSwitchMyScripts.visible                = true
@@ -1169,7 +1172,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		)
 		else
 		(
-			rolloutBulletKeyTools.width               = 305
+			rolloutBulletKeyTools.width               = 295
 			rolloutBulletKeyTools.height              = 248
 			btnMagicBtn.text                          = "( = `▽`)"
 			switchToolPanel                           = 1
@@ -1217,7 +1220,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		str += "	)"
 		str += "	else if (mod b 2 == 0) then"
 		str += "	("
-		str += "		arrToolC" + idBtn as string + "[b].pos = " + [240,45] as string + " + [0,(b - 2) * 12.5]" + "\r\n"
+		str += "		arrToolC" + idBtn as string + "[b].pos = " + [235,45] as string + " + [0,(b - 2) * 12.5]" + "\r\n"
 		str += "	)"
 		str += ")"
 		
@@ -2586,7 +2589,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 
 	on btnQuickSave rightclick do (max file saveas)
 
-	on btnCutFrameDisplay pressed do with undo on  ---------------帧栏显示首尾帧范围
+	on btnCutFrameDisplay pressed do with undo on  ---------------帧栏显示选定帧范围
 	(
 		if switchSelKeyRange == 0 then
 		(
@@ -2617,6 +2620,11 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 			switchAllKeyRange = 0
 			arrLastAllRange = #()
 		)
+	)
+
+	on btnZeroFrameDisplay pressed do with undo on  ---------------帧栏显示0帧
+	(
+		animationrange = interval 0f animationrange.end
 	)
 
 	------------切换工具栏分类--------------------------------------------
@@ -2940,7 +2948,8 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\DTrajEdit.ms"))
 
 	on btnHotAnimBtn pressed do 
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms"))
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms")
+	popupMenu rcBsAnimBtnBox pos:[mouse.screenpos.x - 120,mouse.screenpos.y])
 
 )
 Createdialog rolloutBulletKeyTools fgcolor:myfgColor pos:iniPos style:#()
