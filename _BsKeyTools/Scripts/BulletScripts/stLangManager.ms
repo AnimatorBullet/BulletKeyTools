@@ -1,4 +1,4 @@
-struct fnLangManager 
+struct stLangManager 
 (
 	fileDefaultLang = "ENG",
 	strFileFormat = @".lng",	
@@ -13,7 +13,7 @@ struct fnLangManager
 		return fileLang
 	),
 	lang = fnGetLang(),
-	fn fnTranslateStr strSetWord strToolName = (
+	fn fnTranslateStr strToolName strSetWord = (
 		local fileLang = fnGetLang strToolName
 		local o = getIniSetting fileLang strToolName strSetWord
 		if(o == "") do return strSetWord
