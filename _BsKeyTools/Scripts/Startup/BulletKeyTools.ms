@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-28 18:00:03
+ * @LastEditTime: 2021-02-03 23:17:46
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -257,7 +257,7 @@ rcmenu menuConfig
 	(
 		menuItem mItemCheckUpdate "检查更新"
 		menuItem mItemForceUpdate "强制更新"
-		menuItem mItemAutoCheckUpdate "自动检测更新"
+		menuItem mItemAutoCheckUpdate "自动检测"
 	)
 	separator menuSepUninstall
 	menuItem mItemCleanVirus "杀毒方案"
@@ -934,90 +934,90 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 -----------------------------------------------------------------
 
 -------------主UI-----------------------------------------------------------------
-rollout rolloutBulletKeyTools "" width:180 height:228
+rollout rolloutBulletKeyTools "" width:200 height:233
 (
-	local strMainRol = ("BsKeyTools v" + curVerBsKeyTools + "--右键设置")
+	local strMainRol = ("BsKeyTools v" + curVerBsKeyTools + "-----右键设置")
 	---------------------------------UI--------------------------------------
-	groupbox gbxMainUI strMainRol pos:[5,5] width:170 height:192
+	groupbox gbxMainUI strMainRol pos:[5,5] width:190 height:192
 	
 		-- label lblRangeStartText "起始帧" pos:[15,21] width:80 height:20
 		-- label lblRangeEndText "结束帧" pos:[65,21] width:80 height:20
-		spinner spiStartTime "" pos:[10,21] width:50 height:20 type:#integer \
+		spinner spiStartTime "" pos:[10,21] width:60 height:20 type:#integer \
 		range:[-999999999,999999999,animationrange.start] scale:1
-		spinner spiEndTime "" pos:[60,21] width:50 height:20 type:#integer \
+		spinner spiEndTime "" pos:[70,21] width:60 height:20 type:#integer \
 		range:[-999999999,999999999,animationrange.end] scale:1
-		button btnCutFrameDisplay "选定帧" pos:[10,40] width:40 height:20 \
+		button btnCutFrameDisplay "选定帧" pos:[10,40] width:45 height:20 \
 		tooltip:"预览选择帧\r\n再点回到上次帧范围"
-		button btnAllFrameDisplay "首尾帧" pos:[50,40] width:40 height:20 \
+		button btnAllFrameDisplay "首尾帧" pos:[55,40] width:45 height:20 \
 		tooltip:"预览全部帧\r\n再点回到上次帧范围"
-		button btnZeroFrameDisplay "零" pos:[90,40] width:20 height:20 \
+		button btnZeroFrameDisplay "零" pos:[100,40] width:30 height:20 \
 		tooltip:"显示0帧"
-		button btnMagicBtn "" pos:[115,22] width:55 height:35   \
+		button btnMagicBtn "" pos:[135,22] width:55 height:35   \
 		tooltip:"点我点我点我~良心小工具" border:false
 		-- edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
 		-- pos:[10,70] labelOnTop:false text:"5f" bold:true readOnly:false 
 		-- button btnSet5 "5f" width:35 pos:[90,67]
 		-- button btnSetAdd "+5f" width:35 pos:[125,67]
 		-- button btnSetOpposite "负" width:30 pos:[160,67]
-		checkbutton btnJudgeLinkKey "Link?" \
-		pos:[10,60] tooltip:"是否存在Link帧?" width:35 height:30 checked:false  
+		checkbutton btnJudgeLinkKey "Link帧?" \
+		pos:[10,60] tooltip:"是否存在Link帧?" width:45 height:30 checked:false  
 		button btnSelBeforeKeys "" \
-		pos:[45,60] width:40 height:30 toolTip:"选择滑条前面关键帧"  
+		pos:[55,60] width:40 height:30 toolTip:"选择滑条前面关键帧"  
 		button btnSelAllKeys "" \
-		pos:[85,60] width:45 height:30 toolTip:"选择所有关键帧"  
+		pos:[95,60] width:45 height:30 toolTip:"选择所有关键帧"  
 		button btnSelAfterKeys "" \
-		pos:[130,60] width:40 height:30 toolTip:"选择滑条后面关键帧"  
+		pos:[140,60] width:40 height:30 toolTip:"选择滑条后面关键帧"  
 		-- button btnMoveKeys " " width:30 height:30 \
 		-- pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~"  
-		checkbutton ckbFnBoxDisplay "BOX显" width:40 height:25  \
+		checkbutton ckbFnBoxDisplay "BOX显" width:45 height:25  \
 		toolTip:"骨骼切换Box显示" pos:[10,92]
-		checkbutton ckbFreezeMesh "冻模型" width:40 height:25   \
-		toolTip:"冻结解冻模型" pos:[50,92]
-		checkbutton ckbHideBones "隐Bone" width:40 height:25   \
-		toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[90,92]
-		checkbutton ckbHideBiped "隐Bip" width:40 height:25   \
-		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[130,92]
-		button btnHotAnimBtn "命令集" pos:[10,117] width:40 height:25 \
+		checkbutton ckbFreezeMesh "冻模型" width:45 height:25   \
+		toolTip:"冻结解冻模型" pos:[55,92]
+		checkbutton ckbHideBones "隐Bone" width:45 height:25   \
+		toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[100,92]
+		checkbutton ckbHideBiped "隐Bip" width:45 height:25   \
+		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[145,92]
+		button btnHotAnimBtn "命令集" pos:[10,117] width:45 height:25 \
 		tooltip:"动画相关3dsMax自带按钮集合"
-		button btnTrajedit "轨迹线" pos:[50,117] width:40 height:25 \
+		button btnTrajedit "轨迹线" pos:[55,117] width:45 height:25 \
 		tooltip:"动画轨迹工具个人优化版"
-		button btnHideUnSel "隐未选" pos:[90,117]width:40 height:25 \
+		button btnHideUnSel "隐未选" pos:[100,117]width:45 height:25 \
 		toolTip:"隐藏当前显示的未选中物体，右键可重新显示"
-		button btnFileOpen "时光机" pos:[130,117] width:40 height:25 \
+		button btnFileOpen "时光机" pos:[145,117] width:45 height:25 \
 		tooltip:"快速打开max文件\r\n可收藏常用目录" 
-		checkButton ckbPlayBlocking "跳帧播" pos:[10,142] width:40 height:25 \
+		checkButton ckbPlayBlocking "跳帧播" pos:[10,142] width:45 height:25 \
 		tooltip:"点击预览关键帧 Blocking 动画\r\n若有 Link 帧需要按下上面按钮" checked:false
 		timer clock "PlayClock" interval:1 active:false
-		button btnSpringMagic "飘带解" pos:[50,142] width:40 height:25 \
+		button btnSpringMagic "飘带解" pos:[55,142] width:45 height:25 \
 		tooltip:"左点新版,右点旧版" 
-		button btnCSTools "CS选择" pos:[90,142] width:40 height:25 \
+		button btnCSTools "CS选择" pos:[100,142] width:45 height:25 \
 		toolTip:"快速选择CS骨骼和调Biped等" 
-		button btnAnimCopyPaste "暴力贴"  pos:[130,142] width:40 height:25 \
+		button btnAnimCopyPaste "暴力贴"  pos:[145,142] width:45 height:25 \
 		toolTip:"动画暴力粘贴(待优化)" 
-		button btnPoseTool "库" pos:[30,167] width:20 height:25 \
-		toolTip:"参考库工具,待完善"
-		button btnQuickSave "快备份" pos:[50,167] width:40 height:25 \
-		toolTip:"快速备份" 
-		button btnSetFps "" pos:[90,167] width:40 height:25 \
-		toolTip:"设置帧率" 
-		button btnSetSpeed "" pos:[130,167] width:40 height:25 \
-		toolTip:"设置播放速度" 
-		button btnLayerManager "层" pos:[10,167] width:20 height:25 \
+		button btnLayerManager "层" pos:[10,167] width:22.5 height:25 \
 		toolTip:"模拟旧版层管理器" 
+		button btnPoseTool "库" pos:[32.5,167] width:22.5 height:25 \
+		toolTip:"参考库工具,待完善"
+		button btnQuickSave "快备份" pos:[55,167] width:45 height:25 \
+		toolTip:"快速备份" 
+		button btnSetFps "" pos:[100,167] width:45 height:25 \
+		toolTip:"设置帧率" 
+		button btnSetSpeed "" pos:[145,167] width:45 height:25 \
+		toolTip:"设置播放速度" 
 	
-	-- groupbox gbxMinTools "" pos:[180,5] width:120 height:40
+	groupbox gbxMinTools "" pos:[200,5] width:130 height:220
 	
-		checkbutton ckbC1 "坚" width:27.5 height:25 \
-		pos:[180,15] toolTip:"" border:false
-		checkbutton ckbC2 "持" width:27.5 height:25 \
-		pos:[207.5,15] toolTip:"" border:false
-		checkbutton ckbC3 "热" width:27.5 height:25 \
+		checkbutton ckbC1 "坚" width:30 height:20 \
+		pos:[205,15] toolTip:"" border:false
+		checkbutton ckbC2 "持" width:30 height:20 \
 		pos:[235,15] toolTip:"" border:false
-		checkbutton ckbC4 "爱" width:27.5 height:25 \
-		pos:[262.5,15] toolTip:"" border:false
+		checkbutton ckbC3 "热" width:30 height:20 \
+		pos:[265,15] toolTip:"" border:false
+		checkbutton ckbC4 "爱" width:30 height:20 \
+		pos:[295,15] toolTip:"" border:false
 
-		local btnHeight = 25
-		local btnWidth = 55
+		local btnHeight = 30
+		local btnWidth = 60
 		button btnColorTools "颜色渐变" width:btnWidth height:btnHeight visible:false \
 		tooltip:"做 Demo 素模或特效方便~" pos:[999999,999999]
 		button btnBoneTraj "Bone轨迹" width:btnWidth height:btnHeight visible:false \
@@ -1068,30 +1068,30 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		button btnBatchExport "批量导出" width:btnWidth height:btnHeight visible:false \
 		toolTip:"批量导出" pos:[999999,999999]
 
-		local btnMsWidth = 67.5
-		checkbutton ckbSwitchMyScripts "S" pos:[5,225] width:15 height:20
+		local btnMsWidth = 72.5
+		checkbutton ckbSwitchMyScripts ">_<" pos:[5,230] width:35 height:20
 		tooltip:"切换自定义脚本按钮" border:true
-		button btnMyScripts1 "<＋＋>" pos:[20,225] width:btnMsWidth height:20
+		button btnMyScripts1 "<＋＋>" pos:[40,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[1].dir border:true visible:false
-		button btnMyScripts2 "<＋＋>" pos:[87.5,225] width:btnMsWidth height:20
+		button btnMyScripts2 "<＋＋>" pos:[112.5,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[2].dir border:true visible:false
-		button btnMyScripts3 "<＋＋>" pos:[155,225] width:btnMsWidth height:20
+		button btnMyScripts3 "<＋＋>" pos:[185,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[3].dir border:true visible:false
-		button btnMyScripts4 "<＋＋>" pos:[222.5,225] width:btnMsWidth height:20
+		button btnMyScripts4 "<＋＋>" pos:[257.5,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[4].dir border:true visible:false
-		button btnMyScripts5 "<＋＋>" pos:[20,225] width:btnMsWidth height:20
+		button btnMyScripts5 "<＋＋>" pos:[40,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[5].dir border:true visible:false
-		button btnMyScripts6 "<＋＋>" pos:[87.5,225] width:btnMsWidth height:20
+		button btnMyScripts6 "<＋＋>" pos:[112.5,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[6].dir border:true visible:false
-		button btnMyScripts7 "<＋＋>" pos:[155,225] width:btnMsWidth height:20
+		button btnMyScripts7 "<＋＋>" pos:[185,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[7].dir border:true visible:false
-		button btnMyScripts8 "<＋＋>" pos:[222.5,225] width:btnMsWidth height:20
+		button btnMyScripts8 "<＋＋>" pos:[257.5,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[8].dir border:true visible:false
 
-	groupbox gbxTips "" pos:[5,195] width:170 height:28
+	groupbox gbxTips "" pos:[5,195] width:190 height:30
 	
 		label lblLink "✨2019.9[miHoYo_Bullet.S]✨" \
-		pos:[15,204] width:150 height:15
+		pos:[20,205] width:170 height:15
 
 	local m_PBKeyTimeArray
 	local m_PBKeyMiliSecArray
@@ -1128,8 +1128,8 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 	(
 		if switchToolPanel == 0 then
 		(
-			rolloutBulletKeyTools.width               = 180
-			rolloutBulletKeyTools.height              = 228
+			rolloutBulletKeyTools.width               = 200
+			rolloutBulletKeyTools.height              = 233
 			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
 			ckbSwitchMyScripts.visible                = false
 			btnMyScripts1.visible                     = false
@@ -1143,8 +1143,8 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		)
 		else
 		(
-			rolloutBulletKeyTools.width               = 295
-			rolloutBulletKeyTools.height              = 248
+			rolloutBulletKeyTools.width               = 335
+			rolloutBulletKeyTools.height              = 253
 			btnMagicBtn.text                          = "( = `▽`)"
 			ckbSwitchMyScripts.visible                = true
 			fnRefreshMsPanel ()
@@ -1156,8 +1156,8 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		fnRefreshMsPanel()
 		if switchToolPanel == 1 then
 		(
-			rolloutBulletKeyTools.width               = 180
-			rolloutBulletKeyTools.height              = 228
+			rolloutBulletKeyTools.width               = 200
+			rolloutBulletKeyTools.height              = 233
 			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
 			switchToolPanel                           = 0
 			ckbSwitchMyScripts.visible                = false
@@ -1172,8 +1172,8 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		)
 		else
 		(
-			rolloutBulletKeyTools.width               = 295
-			rolloutBulletKeyTools.height              = 248
+			rolloutBulletKeyTools.width               = 335
+			rolloutBulletKeyTools.height              = 253
 			btnMagicBtn.text                          = "( = `▽`)"
 			switchToolPanel                           = 1
 			ckbSwitchMyScripts.visible                = true
@@ -1193,9 +1193,7 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 						rolloutBulletKeyTools.btnMeshTools,\
 						rolloutBulletKeyTools.btnQuickPrev,\
 						rolloutBulletKeyTools.btnFnFrame,\
-						rolloutBulletKeyTools.ckbFnMtlDisplay,\
-						rolloutBulletKeyTools.btnSelByColor,\
-						rolloutBulletKeyTools.btnBipedScale)
+						rolloutBulletKeyTools.ckbFnMtlDisplay)
 		arrToolC2 = #(rolloutBulletKeyTools.btnCutSequence,\
 						rolloutBulletKeyTools.btnMopherSlider,\
 						rolloutBulletKeyTools.btnSelBiped,\
@@ -1205,7 +1203,9 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 						rolloutBulletKeyTools.btnDelOutKeys,\
 						rolloutBulletKeyTools.btnCleanOutKeys,\
 						rolloutBulletKeyTools.btnEndBone,\
-						rolloutBulletKeyTools.btnBoneTool)
+						rolloutBulletKeyTools.btnBoneTool,\
+						rolloutBulletKeyTools.btnBipedScale,\
+						rolloutBulletKeyTools.btnSelByColor)
 
 		local arrBtnAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4
 
@@ -1216,11 +1216,11 @@ rollout rolloutBulletKeyTools "" width:180 height:228
 		str += "	arrToolC" + idBtn as string + "[b].visible = true" + "\r\n"
 		str += "	if (mod b 2 == 1) then \r\n"
 		str += "	("
-		str += "		arrToolC" + idBtn as string + "[b].pos = " + [180,45] as string + " + [0,(b - 1) * 12.5]" + "\r\n"
+		str += "		arrToolC" + idBtn as string + "[b].pos = " + [205,40] as string + " + [0,(b - 1) * 15]" + "\r\n"
 		str += "	)"
 		str += "	else if (mod b 2 == 0) then"
 		str += "	("
-		str += "		arrToolC" + idBtn as string + "[b].pos = " + [235,45] as string + " + [0,(b - 2) * 12.5]" + "\r\n"
+		str += "		arrToolC" + idBtn as string + "[b].pos = " + [265,40] as string + " + [0,(b - 2) * 15]" + "\r\n"
 		str += "	)"
 		str += ")"
 		
@@ -2964,7 +2964,7 @@ clearListener()  ---------清除侦听器
 		on execute do
 		(
 			try(fileIn ((getDir #Scripts)+ @"\\BulletScripts\\BulletKeyTools.ms"))
-			catch(messagebox "打开BsKeyTools失败,\r\n建议重新安装...          ")
+			catch(messagebox "打开BsKeyTools失败,\r\n建议重启Max或重新安装...          ")
 		)
 	)
 	
