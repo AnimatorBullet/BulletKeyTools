@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-03 23:17:46
+ * @LastEditTime: 2021-02-04 19:12:44
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -959,14 +959,16 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		-- button btnSet5 "5f" width:35 pos:[90,67]
 		-- button btnSetAdd "+5f" width:35 pos:[125,67]
 		-- button btnSetOpposite "负" width:30 pos:[160,67]
-		checkbutton btnJudgeLinkKey "Link帧?" \
-		pos:[10,60] tooltip:"是否存在Link帧?" width:45 height:30 checked:false  
+		checkbutton btnJudgeLinkKey "Link?" \
+		pos:[10,60] tooltip:"是否存在Link帧?" width:35 height:30 checked:false  
 		button btnSelBeforeKeys "" \
-		pos:[55,60] width:40 height:30 toolTip:"选择滑条前面关键帧"  
+		pos:[45,60] width:35 height:30 toolTip:"选择滑条前面关键帧"  
 		button btnSelAllKeys "" \
-		pos:[95,60] width:45 height:30 toolTip:"选择所有关键帧"  
+		pos:[80,60] width:35 height:30 toolTip:"选择所有关键帧"  
 		button btnSelAfterKeys "" \
-		pos:[140,60] width:40 height:30 toolTip:"选择滑条后面关键帧"  
+		pos:[115,60] width:35 height:30 toolTip:"选择滑条后面关键帧"
+		checkbutton btnShadowCut "剪影" \
+		pos:[150,60] width:40 height:30 toolTip:"切换剪影显示"
 		-- button btnMoveKeys " " width:30 height:30 \
 		-- pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~"  
 		checkbutton ckbFnBoxDisplay "BOX显" width:45 height:25  \
@@ -1032,8 +1034,8 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		tooltip:"欧拉和TCB互转" pos:[999999,999999]
 		button btnEulerFilter "欧拉过滤" width:btnWidth height:btnHeight visible:false \
 		tooltip:"Bone骨骼过滤欧拉旋转" pos:[999999,999999]
-		button btnBoneTool "BoneOn" width:btnWidth height:btnHeight visible:false \
-		tooltip:"骨骼BoneOn切换" pos:[999999,999999]
+		button btnImageComp "构图辅助" width:btnWidth height:btnHeight visible:false \
+		tooltip:"各种经典分割视图以辅助构图" pos:[999999,999999]
 		button btnDelOutKeys "清所有帧" width:btnWidth height:btnHeight visible:false \
 		toolTip:"清除所有帧\r\nLink帧请手动删" pos:[999999,999999]
 		button btnCleanOutKeys "清无限帧" width:btnWidth height:btnHeight visible:false \
@@ -1203,7 +1205,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 						rolloutBulletKeyTools.btnDelOutKeys,\
 						rolloutBulletKeyTools.btnCleanOutKeys,\
 						rolloutBulletKeyTools.btnEndBone,\
-						rolloutBulletKeyTools.btnBoneTool,\
+						rolloutBulletKeyTools.btnImageComp,\
 						rolloutBulletKeyTools.btnBipedScale,\
 						rolloutBulletKeyTools.btnSelByColor)
 
@@ -2681,16 +2683,8 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		)
 	)
 
-	-- on btnBoneTool pressed do (macros.run "Animation Tools" "BoneAdjustmentTools")
-
-	on btnBoneTool pressed do 
-	(
-		for i in selection where classof i == BoneGeometry do
-		(
-			if i.boneEnable == false then i.boneEnable = true
-			else i.boneEnable = false
-		)
-	)
+	on btnImageComp pressed do 
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\ImageCompHelper.ms"))
 	
 	on btnFnKeyType pressed do 
 	(
@@ -2950,6 +2944,9 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	on btnHotAnimBtn pressed do 
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms")
 	popupMenu rcBsAnimBtnBox pos:[mouse.screenpos.x - 120,mouse.screenpos.y])
+
+	on btnShadowCut changed state do
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\Silhouette.ms"))
 
 )
 Createdialog rolloutBulletKeyTools fgcolor:myfgColor pos:iniPos style:#()
