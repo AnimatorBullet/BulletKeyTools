@@ -574,7 +574,7 @@ struct ImageCompHelper (
 		)
 	),
 
-	ro = rollout ro "ICH" width:112 height:445 (
+	ro = rollout ro "构图辅助" width:112 height:445 (
 
 		local self  -- Parent struct reference
 		local colorDivisor = 1.5
@@ -584,37 +584,37 @@ struct ImageCompHelper (
 		colorPicker cp_diagonals "" pos:[-1,108] width:23 height:22 color:(color 255 0 0)
 		colorPicker cp_golden "" pos:[-1,131] width:23 height:22 color:(color 255 110 0)
 		colorPicker cp_spiral "" pos:[-1,177] width:23 height:22 color:(color 255 255 255)
-		colorPicker cp_cross "" pos:[-1,200] width:23 height:22 color:(color 0 0 155)
+		colorPicker cp_cross "" pos:[-1,200] width:23 height:22 color:(color 0 255 255)
 		colorPicker cp_triangle "" pos:[-1,154] width:23 height:22 color:(color 0 255 175)
 
-		checkbutton ckb_thirds "Rule of Thirds" pos:[23,85] width:88 height:22 toolTip:"" checked:false
-		checkbutton ckb_golden "Golden Ratio" pos:[23,131] width:88 height:22 toolTip:"" checked:false
-		checkbutton ckb_cross "Center Cross" pos:[23,200] width:88 height:22 toolTip:"" checked:false
-		checkbutton ckb_diagonals "Diagonals" pos:[23,108] width:88 height:22 toolTip:"" checked:false
-		checkbutton ckb_triangle "Golden Triangle" pos:[23,154] width:88 height:22 toolTip:"Rightclick to flip" checked:false
-		checkbutton ckb_custom "Custom" pos:[23,56] width:88 height:22 toolTip:"" checked:false
-		checkbutton ckb_spiral "Golden Spiral" pos:[23,177] width:88 height:22 toolTip:"Rightclick to flip spiral" checked:false
+		checkbutton ckb_thirds "三分构图" pos:[23,85] width:88 height:22 toolTip:"" checked:false
+		checkbutton ckb_golden "黄金分割" pos:[23,131] width:88 height:22 toolTip:"" checked:false
+		checkbutton ckb_cross "十字交叉" pos:[23,200] width:88 height:22 toolTip:"" checked:false
+		checkbutton ckb_diagonals "对角线式" pos:[23,108] width:88 height:22 toolTip:"" checked:false
+		checkbutton ckb_triangle "黄金三角" pos:[23,154] width:88 height:22 toolTip:"右击翻转" checked:false
+		checkbutton ckb_custom "自定义" pos:[23,56] width:88 height:22 toolTip:"" checked:false
+		checkbutton ckb_spiral "黄金螺旋" pos:[23,177] width:88 height:22 toolTip:"右击翻转螺旋" checked:false
 		
 
 		
-		GroupBox grp_custom "Custom:" pos:[1,0] width:110 height:82
-		spinner spn_XDivs "X Divs:" pos:[27,16] width:80 height:16 range:[0,999,4] type:#integer scale:1
-		spinner spn_YDivs "Y Divs:" pos:[27,34] width:80 height:16 range:[0,999,4] type:#integer scale:1
+		GroupBox grp_custom "自定义:" pos:[1,0] width:110 height:82
+		spinner spn_XDivs "X 段数:" pos:[27,16] width:80 height:16 range:[0,999,4] type:#integer scale:1
+		spinner spn_YDivs "Y 段数:" pos:[27,34] width:80 height:16 range:[0,999,4] type:#integer scale:1
 
-        button btn_cam "Camera" pos:[1,225] width:62 height:28
-        button btn_target "Target" pos:[65,225] width:46 height:28
+        button btn_cam "相机" pos:[1,225] width:62 height:28
+        button btn_target "目标" pos:[65,225] width:46 height:28
 		
-		GroupBox grp_gsextra "Golden Spiral Extra:" pos:[1,255] width:110 height:75
-		spinner spn_zoom "Zoom" pos:[0,270] width:105 height:22 range:[-50,50,0] type:#integer
-		spinner spn_ShiftX "Offset X" pos:[0,290] width:105 heigh:22 range:[-100,100,0] type:#integer
-		spinner spn_ShiftY "Offset Y" pos:[0,310] width:105 heigh:22 range:[-100,100,0] type:#integer
-		checkbutton ckb_unlock "Unlock Spiral" pos:[1,332] width:110 height:22 toolTip:"Unlock spiral ratio" checked:false
+		GroupBox grp_gsextra "黄金螺旋 设置:" pos:[1,255] width:110 height:75
+		spinner spn_zoom "缩放" pos:[0,270] width:105 height:22 range:[-50,50,0] type:#integer
+		spinner spn_ShiftX "偏移 X" pos:[0,290] width:105 heigh:22 range:[-100,100,0] type:#integer
+		spinner spn_ShiftY "偏移 Y" pos:[0,310] width:105 heigh:22 range:[-100,100,0] type:#integer
+		checkbutton ckb_unlock "解锁螺旋" pos:[1,332] width:110 height:22 toolTip:"解锁螺旋比" checked:false
 		
 		--GroupBox grp_misc "Misc:" pos:[1,355] width:112 height:30
-		dropdownList drp_aspect "Aspect Ratio:" pos:[1,355] width:110 height:22 items:#("A4, A3", "1:1", "5:4", "4:3", "3:2", "16:9", "16:10", "1.85:1", "2:1", "2.35:1")
+		dropdownList drp_aspect "长宽比:" pos:[1,355] width:110 height:22 items:#("A4, A3", "1:1", "5:4", "4:3", "3:2", "16:9", "16:10", "1.85:1", "2:1", "2.35:1")
 		--checkbutton ckb_portrait "Portrait" pos:[1,395] width:112 height:22 toolTip:"Portrait / Landscape Toggle"
-		button btn_portrait "Landscape / Portrait" pos:[1,395] width:110 height:22 toolTip: "Aspect Ratio Toggle" checked:false
-		checkbutton ckb_safe "Safe Frame" pos:[1,420] width:110 height:22 toolTip:"Portrait" checked:true
+		button btn_portrait "横向 / 纵向" pos:[1,395] width:110 height:22 toolTip: "长宽比切换" checked:false
+		checkbutton ckb_safe "安全框" pos:[1,420] width:110 height:22 toolTip:"安全框" checked:true
 
 
 		fn updateHighlightColors force:true = (
@@ -755,12 +755,12 @@ struct ImageCompHelper (
 	
 		on btn_portrait pressed do(
 			if  rendImageAspectRatio >= 1 then(
-				btn_portrait.text = "Portrait"
+				btn_portrait.text = "纵向"
 				imagecomphelper.pl=1
 				
 			)
 			else(
-				btn_portrait.text = "Landscape"
+				btn_portrait.text = "横向"
 				imagecomphelper.pl=0
 			)
 			local rwidth = renderwidth
