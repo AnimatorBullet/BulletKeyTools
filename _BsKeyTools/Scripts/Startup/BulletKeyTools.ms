@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-05 15:07:34
+ * @LastEditTime: 2021-02-05 19:39:01
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -2292,7 +2292,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 			hideByCategory.bones = true
 		)
 	)
-
+--TODO:模型独显,待补充
 	on btnBipedTraj pressed do 
 	(
 		fnAddTrajLayer () ----是否创建轨迹层
