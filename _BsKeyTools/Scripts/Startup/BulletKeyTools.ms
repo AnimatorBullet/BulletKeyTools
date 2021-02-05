@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-04 19:12:44
+ * @LastEditTime: 2021-02-05 15:07:34
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -967,7 +967,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		pos:[80,60] width:35 height:30 toolTip:"选择所有关键帧"  
 		button btnSelAfterKeys "" \
 		pos:[115,60] width:35 height:30 toolTip:"选择滑条后面关键帧"
-		checkbutton btnShadowCut "剪影" \
+		checkbutton ckbShadowCut "剪影" \
 		pos:[150,60] width:40 height:30 toolTip:"切换剪影显示"
 		-- button btnMoveKeys " " width:30 height:30 \
 		-- pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~"  
@@ -1022,8 +1022,8 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		local btnWidth = 60
 		button btnColorTools "颜色渐变" width:btnWidth height:btnHeight visible:false \
 		tooltip:"做 Demo 素模或特效方便~" pos:[999999,999999]
-		button btnBoneTraj "Bone轨迹" width:btnWidth height:btnHeight visible:false \
-		toolTip:"左：切换显示Bone轨迹,\r\n右：清除所有Bone轨迹" pos:[999999,999999]
+		checkbutton ckbIsoMesh "模型独显" width:btnWidth height:btnHeight visible:false \
+		toolTip:"单独显示模型预览" pos:[999999,999999]
 		button btnBipedTraj "Biped轨迹" width:btnWidth height:btnHeight visible:false \
 		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除添加的所有Biped轨迹~" pos:[999999,999999]
 		button btnFnFrame "整小数帧" width:btnWidth height:btnHeight visible:false \
@@ -1190,7 +1190,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 						rolloutBulletKeyTools.btnAnimMirror,\
 						rolloutBulletKeyTools.btnFnKeyType,\
 						rolloutBulletKeyTools.btnBatchExport,
-						rolloutBulletKeyTools.btnBoneTraj,\
+						rolloutBulletKeyTools.ckbIsoMesh,\
 						rolloutBulletKeyTools.btnBipedTraj,\
 						rolloutBulletKeyTools.btnMeshTools,\
 						rolloutBulletKeyTools.btnQuickPrev,\
@@ -2268,20 +2268,28 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		FileIn ((getDir #scripts) + "\\BulletScripts" + "\\BsOpenTools.ms")
 	)
 
-	on btnBoneTraj pressed do ------显示bone的轨迹
+	on ckbIsoMesh changed state do
 	(
-		for i in (selection as array) where (classof i != Biped_Object) do
+		if state then
 		(
-			if i.showtrajectory == true then i.showtrajectory = false
-			else i.showtrajectory = true
+			hideByCategory.geometry = false
+			hideByCategory.shapes = true
+			hideByCategory.lights = true
+			hideByCategory.cameras = true
+			hideByCategory.helpers = true
+			hideByCategory.spacewarps = true
+			hideByCategory.particles = true
+			hideByCategory.bones = true
 		)
-	)
-
-	on btnBoneTraj rightclick do   ----右键取消bone的轨迹显示
-	(
-		for i in (objects as array) where (classof i != Biped_Object) do
+		else 
 		(
-			if i.showtrajectory == true then i.showtrajectory = false
+			hideByCategory.shapes = true
+			hideByCategory.lights = true
+			hideByCategory.cameras = true
+			hideByCategory.helpers = true
+			hideByCategory.spacewarps = true
+			hideByCategory.particles = true
+			hideByCategory.bones = true
 		)
 	)
 
@@ -2945,7 +2953,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms")
 	popupMenu rcBsAnimBtnBox pos:[mouse.screenpos.x - 120,mouse.screenpos.y])
 
-	on btnShadowCut changed state do
+	on ckbShadowCut changed state do
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\Silhouette.ms"))
 
 )
