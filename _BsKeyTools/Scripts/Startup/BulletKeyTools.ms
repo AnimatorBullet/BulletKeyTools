@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-05 19:39:01
+ * @LastEditTime: 2021-02-07 16:01:39
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1093,7 +1093,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	groupbox gbxTips "" pos:[5,195] width:190 height:30
 	
 		label lblLink "✨2019.9[miHoYo_Bullet.S]✨" \
-		pos:[20,205] width:170 height:15
+		pos:[25,205] width:160 height:15
 
 	local m_PBKeyTimeArray
 	local m_PBKeyMiliSecArray
@@ -2283,16 +2283,15 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		)
 		else 
 		(
-			hideByCategory.shapes = true
-			hideByCategory.lights = true
-			hideByCategory.cameras = true
-			hideByCategory.helpers = true
-			hideByCategory.spacewarps = true
-			hideByCategory.particles = true
-			hideByCategory.bones = true
+			hideByCategory.shapes = false
+			hideByCategory.lights = false
+			hideByCategory.cameras = false
+			hideByCategory.helpers = false
+			hideByCategory.spacewarps = false
+			hideByCategory.particles = false
+			hideByCategory.bones = false
 		)
 	)
---TODO:模型独显,待补充
 	on btnBipedTraj pressed do 
 	(
 		fnAddTrajLayer () ----是否创建轨迹层
