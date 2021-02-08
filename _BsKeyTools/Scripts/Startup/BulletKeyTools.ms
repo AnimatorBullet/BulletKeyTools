@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-07 16:01:39
+ * @LastEditTime: 2021-02-08 18:40:15
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1052,8 +1052,8 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		toolTip:"功能待添加" pos:[999999,999999]
 		button btnFnKeyType "改滑动帧" width:btnWidth height:btnHeight visible:false \
 		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置" pos:[999999,999999]
-		button btnSkinTools "权重工具" width:btnWidth height:btnHeight visible:false \
-		toolTip:"功能待添加" pos:[999999,999999]
+		button btnRenameTools "改名工具" width:btnWidth height:btnHeight visible:false \
+		toolTip:"超级重命名工具" pos:[999999,999999]
 		button btnMeshTools "模型整理" width:btnWidth height:btnHeight visible:false \
 		toolTip:"功能待添加" pos:[999999,999999]
 		button btnAnimMirror "动画镜像" width:btnWidth height:btnHeight visible:false \
@@ -1186,7 +1186,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	(
 		arrToolC1 = #(rolloutBulletKeyTools.btnColorTools,\
 						rolloutBulletKeyTools.btnFastAlign,\
-						rolloutBulletKeyTools.btnSkinTools,\
+						rolloutBulletKeyTools.btnRenameTools,\
 						rolloutBulletKeyTools.btnAnimMirror,\
 						rolloutBulletKeyTools.btnFnKeyType,\
 						rolloutBulletKeyTools.btnBatchExport,
@@ -2954,6 +2954,9 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 
 	on ckbShadowCut changed state do
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\Silhouette.ms"))
+
+	on btnRenameTools pressed do
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\P_ObjectRenamer.ms"))
 
 )
 Createdialog rolloutBulletKeyTools fgcolor:myfgColor pos:iniPos style:#()
