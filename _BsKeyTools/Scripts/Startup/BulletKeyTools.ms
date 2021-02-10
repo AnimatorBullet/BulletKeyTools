@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-08 18:40:15
+ * @LastEditTime: 2021-02-10 15:55:22
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -37,7 +37,7 @@ Global switchHideBones    = 0
 Global switchHideBiped    = 0
 Global switchToolPanel    = 0
 global switchMSPanel      = 0
-global iniAutoCheckUpdate = false
+global iniAutoCheckUpdate = true
 Global arrLastSelRange    = #()
 Global switchAllKeyRange  = 0
 Global iniAddToolbars     = 0
@@ -46,6 +46,7 @@ Global arrKeysTime        = #()  -----------biped和bone的首尾帧
 Global arrLinkKeys        = #()  -----------存link帧
 Global arrKeysSelected    = #()  -----------存选中的帧
 global arrBlockingKeys    = #()  -----------选中或者所有物体的所有关键帧
+global arrBoneEndAll      = #()  -----------末端骨骼临时层
 Global keyFirst
 Global keyEnd
 Global keySelFirst
@@ -253,6 +254,7 @@ rcmenu menuConfig
 	local startupPath = (getDir #StartupScripts)+ "\\BulletKeyTools.ms"
 	menuItem mItemIsStartup "是否随Max自启"
 	menuItem mItemAddToolBarBtn "添加工具栏按钮"
+	menuItem mItemUpdateLog "更新记录"
 	subMenu "更新设置"
 	(
 		menuItem mItemCheckUpdate "检查更新"
@@ -376,6 +378,8 @@ rcmenu menuConfig
 			(messagebox "已清理干净，保留配置文件备用...    \r\n" beep:false title:"卸载成功！")
 		)
 	)
+
+	on mItemUpdateLog picked do (FileIn ((getDir #scripts) + "\\BulletScripts\\UpdateLog.ms"))
 )
 
 -------------------帧率,播放速度--------------------------------------------------------------
@@ -1020,55 +1024,62 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 
 		local btnHeight = 30
 		local btnWidth = 60
+		local btnPos = [999999,999999]
+		button btnTemp "待添加" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp2 "待添加" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
 		button btnColorTools "颜色渐变" width:btnWidth height:btnHeight visible:false \
-		tooltip:"做 Demo 素模或特效方便~" pos:[999999,999999]
+		tooltip:"做 Demo 素模或特效方便~" pos:btnPos
 		checkbutton ckbIsoMesh "模型独显" width:btnWidth height:btnHeight visible:false \
-		toolTip:"单独显示模型预览" pos:[999999,999999]
+		toolTip:"单独显示模型预览" pos:btnPos
 		button btnBipedTraj "Biped轨迹" width:btnWidth height:btnHeight visible:false \
-		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除添加的所有Biped轨迹~" pos:[999999,999999]
+		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除添加的所有Biped轨迹~" pos:btnPos
 		button btnFnFrame "整小数帧" width:btnWidth height:btnHeight visible:false \
-		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" pos:[999999,999999]
+		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" pos:btnPos
 		button btnSelByColor "同色选择" width:btnWidth height:btnHeight visible:false \
-		tooltip:"选择同颜色物体" pos:[999999,999999]
-		button btnFnTCB "欧拉互转" width:btnWidth height:btnHeight visible:false \
-		tooltip:"欧拉和TCB互转" pos:[999999,999999]
+		tooltip:"选择同颜色物体" pos:btnPos
+		button btnFnTCB "TCB/欧拉" width:btnWidth height:btnHeight visible:false \
+		tooltip:"欧拉和TCB互转" pos:btnPos
 		button btnEulerFilter "欧拉过滤" width:btnWidth height:btnHeight visible:false \
-		tooltip:"Bone骨骼过滤欧拉旋转" pos:[999999,999999]
+		tooltip:"Bone骨骼过滤欧拉旋转" pos:btnPos
 		button btnImageComp "构图辅助" width:btnWidth height:btnHeight visible:false \
-		tooltip:"各种经典分割视图以辅助构图" pos:[999999,999999]
+		tooltip:"各种经典分割视图以辅助构图" pos:btnPos
 		button btnDelOutKeys "清所有帧" width:btnWidth height:btnHeight visible:false \
-		toolTip:"清除所有帧\r\nLink帧请手动删" pos:[999999,999999]
+		toolTip:"清除所有帧\r\nLink帧请手动删" pos:btnPos
 		button btnCleanOutKeys "清无限帧" width:btnWidth height:btnHeight visible:false \
-		toolTip:"清范围外帧(无限帧)" pos:[999999,999999]
+		toolTip:"清范围外帧(无限帧)" pos:btnPos
 		button btnSelBiped "选择Biped" width:btnWidth height:btnHeight visible:false \
-		toolTip:"选择所有biped" pos:[999999,999999]
+		toolTip:"选择所有biped" pos:btnPos
 		button btnSelBone "选择Bone" width:btnWidth height:btnHeight  visible:false \
-		toolTip:"选择所有bone" pos:[999999,999999]
+		toolTip:"选择所有bone" pos:btnPos
 		button btnEndBone "增删末端" width:btnWidth height:btnHeight visible:false \
-		toolTip:"清除添加Bone末端" pos:[999999,999999]
+		toolTip:"添加选择的Bone末端，可回退\r\n右键清除（注意 \"tempBoneEndAll\" 层）" pos:btnPos
 		button btnQuickPrev "快速拍屏" width:btnWidth height:btnHeight visible:false \
-		toolTip:"左：快速拍屏预览\r\n右：打开预览文件夹" pos:[999999,999999]
+		toolTip:"左：快速拍屏预览\r\n右：打开预览文件夹" pos:btnPos
 		button btnFastAlign "快速对齐" width:btnWidth height:btnHeight visible:false \
-		toolTip:"功能待添加" pos:[999999,999999]
+		toolTip:"功能待添加" pos:btnPos
 		button btnFnKeyType "改滑动帧" width:btnWidth height:btnHeight visible:false \
-		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置" pos:[999999,999999]
+		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置" pos:btnPos
 		button btnRenameTools "改名工具" width:btnWidth height:btnHeight visible:false \
-		toolTip:"超级重命名工具" pos:[999999,999999]
+		toolTip:"超级重命名工具" pos:btnPos
 		button btnMeshTools "模型整理" width:btnWidth height:btnHeight visible:false \
-		toolTip:"功能待添加" pos:[999999,999999]
+		toolTip:"功能待添加" pos:btnPos
 		button btnAnimMirror "动画镜像" width:btnWidth height:btnHeight visible:false \
-		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化" pos:[999999,999999]
+		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化" pos:btnPos
 		checkbutton ckbFnMtlDisplay "素模切换" width:btnWidth height:btnHeight visible:false \
 		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:Clay显示开关(红色模型显示)\r\n暂不支持子材质和Vray材质..."
-		pos:[999999,999999]
+		pos:btnPos
 		button btnCutSequence "动画片断" width:btnWidth height:btnHeight visible:false \
-		toolTip:"功能待添加" pos:[999999,999999]
+		toolTip:"功能待添加" pos:btnPos
 		button btnMopherSlider "表情滑条" width:btnWidth height:btnHeight visible:false \
-		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~" pos:[999999,999999]
+		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~" pos:btnPos
 		button btnBipedScale "CS缩放" width:btnWidth height:btnHeight visible:false \
-		toolTip:"效果展示可用，导入引擎别用\r\n再次点击可解除" pos:[999999,999999]
+		toolTip:"效果展示可用，导入引擎别用\r\n再次点击可解除" pos:btnPos
 		button btnBatchExport "批量导出" width:btnWidth height:btnHeight visible:false \
-		toolTip:"批量导出" pos:[999999,999999]
+		toolTip:"批量导出" pos:btnPos
+		button btnCameraFromView "视角相机" width:btnWidth height:btnHeight visible:false \
+		toolTip:"根据自由视角创建相机" pos:btnPos
 
 		local btnMsWidth = 72.5
 		checkbutton ckbSwitchMyScripts ">_<" pos:[5,230] width:35 height:20
@@ -1186,7 +1197,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	(
 		arrToolC1 = #(rolloutBulletKeyTools.btnColorTools,\
 						rolloutBulletKeyTools.btnFastAlign,\
-						rolloutBulletKeyTools.btnRenameTools,\
+						rolloutBulletKeyTools.btnImageComp,\
 						rolloutBulletKeyTools.btnAnimMirror,\
 						rolloutBulletKeyTools.btnFnKeyType,\
 						rolloutBulletKeyTools.btnBatchExport,
@@ -1205,9 +1216,33 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 						rolloutBulletKeyTools.btnDelOutKeys,\
 						rolloutBulletKeyTools.btnCleanOutKeys,\
 						rolloutBulletKeyTools.btnEndBone,\
-						rolloutBulletKeyTools.btnImageComp,\
+						rolloutBulletKeyTools.btnRenameTools,\
 						rolloutBulletKeyTools.btnBipedScale,\
 						rolloutBulletKeyTools.btnSelByColor)
+		arrToolC3 = #(rolloutBulletKeyTools.btnCameraFromView,\
+						rolloutBulletKeyTools.btnTemp,\
+						rolloutBulletKeyTools.btnTemp,\
+						rolloutBulletKeyTools.btnTemp,\
+						rolloutBulletKeyTools.btnTemp,\
+						rolloutBulletKeyTools.btnTemp,\
+						rolloutBulletKeyTools.btnTemp,\
+						rolloutBulletKeyTools.btnTemp,\
+						rolloutBulletKeyTools.btnTemp,\
+						rolloutBulletKeyTools.btnTemp,\
+						rolloutBulletKeyTools.btnTemp,\
+						rolloutBulletKeyTools.btnTemp)
+		arrToolC4 = #(rolloutBulletKeyTools.btnTemp2,\
+						rolloutBulletKeyTools.btnTemp2,\
+						rolloutBulletKeyTools.btnTemp2,\
+						rolloutBulletKeyTools.btnTemp2,\
+						rolloutBulletKeyTools.btnTemp2,\
+						rolloutBulletKeyTools.btnTemp2,\
+						rolloutBulletKeyTools.btnTemp2,\
+						rolloutBulletKeyTools.btnTemp2,\
+						rolloutBulletKeyTools.btnTemp2,\
+						rolloutBulletKeyTools.btnTemp2,\
+						rolloutBulletKeyTools.btnTemp2,\
+						rolloutBulletKeyTools.btnTemp2)
 
 		local arrBtnAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4
 
@@ -1839,14 +1874,15 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	-- 	)
 	-- )
 
-	fn fnAddTrajLayer =
+	fn fnAddTrajLayer strlayerName templayerTarget =
 	(
-		if (LayerManager.getLayerFromName "Biped_Trajectories") != undefined then
+		if (LayerManager.getLayerFromName strlayerName) != undefined then
 		(
-			layerTraj = LayerManager.getLayerFromName "Biped_Trajectories"
+			templayerTarget = LayerManager.getLayerFromName strlayerName
 		)
-		else layerTraj = LayerManager.newLayerFromName "Biped_Trajectories"
-		layerTraj.lock = on
+		else templayerTarget = LayerManager.newLayerFromName strlayerName
+		templayerTarget.lock = on
+		templayerTarget
 	)
 
 	fn fnAddBipedTraj tempBiped =
@@ -2294,7 +2330,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	)
 	on btnBipedTraj pressed do 
 	(
-		fnAddTrajLayer () ----是否创建轨迹层
+		layerTraj = (fnAddTrajLayer "Biped_Trajectories" layerTraj) ----是否创建轨迹层
 		if (selection.count > 1) then
 		(
 			for i in (selection as array) do
@@ -2958,6 +2994,62 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	on btnRenameTools pressed do
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\P_ObjectRenamer.ms"))
 
+	on btnCameraFromView pressed do
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\CreateCameraFromView.ms"))
+
+	on btnEndBone pressed do 
+	(
+		local tempLayerBoneEnd
+		if (LayerManager.getLayerFromName "tempBoneEndAll") != undefined then
+		(tempLayerBoneEnd = LayerManager.getLayerFromName "tempBoneEndAll")
+		else (tempLayerBoneEnd = LayerManager.newLayerFromName "tempBoneEndAll")
+		if selection.count != 0 then with undo on 
+		(
+			arrSel = selection as array
+			for i in 1 to arrSel.count do
+			(
+				tempChild = execute ("$'" + arrSel[i].name + "'/...*")
+				if (tempChild[tempChild.count] != undefined) then 
+				(
+					parentBone = tempChild[tempChild.count]
+				)
+				else (parentBone  = arrSel[i])
+				parentTrans = parentBone.transform
+				parentPos   = parentTrans.translation
+		
+				newBone = BoneSys.createBone parentPos (parentPos+6) parentBone.dir
+				newBone.transform = parentTrans
+				newBone.taper     = 90
+		
+				if iskindof arrSel[i] BoneGeometry==true do 
+				(
+					in coordSys Local move newBone [parentBone.length,0,0]
+					newBone.parent    = parentBone
+					newBone.width     = parentBone.width
+					newBone.height    = parentBone.height
+					newBone.length    = (parentBone.width+parentBone.height)/2
+					newBone.wirecolor = parentBone.wirecolor
+				)
+				append arrBoneEndAll newBone
+				tempLayerBoneEnd.addNode newBone
+			)
+			messageBox "注意：\r\n\r\n点确定完成添加，\r\n\r\n会创建新层存放末端，\r\n\r\n重启软件后无法回退，\r\n\r\n可点击右键或手动清除之前添加的末端，\r\n\r\n（在 tempBoneEndAll 层中）                                     "
+		)
+		else (messagebox "请选择要添加末端的 Bone 骨骼~          " beep:false)
+	)
+
+	on btnEndBone rightclick do with undo on
+	(
+		if (LayerManager.getLayerFromName "tempBoneEndAll") != undefined then
+		(
+			tempLayerBoneEnd = LayerManager.getLayerFromName "tempBoneEndAll"
+			tempLayerBoneEnd.nodes &arrLayerNodeTemp
+			for i in arrLayerNodeTemp do delete i
+			LayerManager.deleteLayerHierarchy "tempBoneEndAll" forceDelete:true
+			arrBoneEndAll = #()
+			messagebox "点确定清理添加的骨骼末端 (在 tempBoneEndAll 层中的骨骼) ~          "
+		)
+	)
 )
 Createdialog rolloutBulletKeyTools fgcolor:myfgColor pos:iniPos style:#()
 clearListener()  ---------清除侦听器
@@ -2974,5 +3066,4 @@ clearListener()  ---------清除侦听器
 			catch(messagebox "打开BsKeyTools失败,\r\n建议重启Max或重新安装...          ")
 		)
 	)
-	
 )
