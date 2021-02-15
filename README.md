@@ -8,8 +8,8 @@
  -->
 # BulletKeyTools
 KeyTools for 3ds Max...
-## 帮助文档
-https://acedocs.tk/
+## 帮助
+https://space.bilibili.com/2031113
 ## 下载链接
 [![BulletKeyTools](https://img.shields.io/badge/BulletKeyTools-LatestReleases-success?style=flat-square&logo=github)](https://github.com/AnimatorBullet/BulletKeyTools/releases/latest)
 

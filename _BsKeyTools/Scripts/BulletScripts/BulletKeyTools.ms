@@ -3,15 +3,17 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-03 23:17:46
+ * @LastEditTime: 2021-02-15 14:15:16
 * @Email: animator.bullet@foxmail.com
 */
 
-try(destroydialog rolloutBulletKeyTools)catch()
+try(destroydialog rolBsKeyTools)catch()
 try(destroydialog rolFnKeys)catch()
 try(destroydialog rolAddMyScripts)catch()
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
+
 global curVerBsKeyTools = "0.9.5"
 global verUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/version.dat"
 global dlUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/_BsKeyTools%EF%BC%88%E8%A3%85%E5%AE%8C%E9%87%8D%E5%90%AFMAX,%E8%AF%AF%E6%9D%80%E8%AF%B7%E4%BF%A1%E4%BB%BB%EF%BC%89.exe"
@@ -19,6 +21,7 @@ global dlFileBsKeyTools = (getdir #temp) + "\\_BsKeyTools（装完重启MAX,误�
 
 struct myScript (id,msName,dir)
 
+Global rolBsKeyTools
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPos  	--位置保存记录
 Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
@@ -30,22 +33,33 @@ Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
 (myScript id:7 msName:"<＋＋>" dir:""), \
 (myScript id:8 msName:"<＋＋>" dir:""))
 Global idBtn              = 1
-Global posMouMoved        = [0,0]
-Global switchMouseState   = false
-Global switchSelKeyRange  = 0
-Global switchHideBones    = 0
-Global switchHideBiped    = 0
+global iniAutoCheckUpdate = true
 Global switchToolPanel    = 0
 global switchMSPanel      = 0
-global iniAutoCheckUpdate = false
-Global arrLastSelRange    = #()
-Global switchAllKeyRange  = 0
-Global iniAddToolbars     = 0
-Global arrLastAllRange    = #()
-Global arrKeysTime        = #()  -----------biped和bone的首尾帧
-Global arrLinkKeys        = #()  -----------存link帧
-Global arrKeysSelected    = #()  -----------存选中的帧
-global arrBlockingKeys    = #()  -----------选中或者所有物体的所有关键帧
+Global iniToolC1          = #(1,2,3,4,5,6,7,8,9,10,11,12)
+Global iniToolC2          = #(1,2,3,4,5,6,7,8,9,10,11,12)
+Global iniToolC3          = #(1,2,3,4,5,6,7,8,9,10,11,12)
+Global iniToolC4          = #(1,2,3,4,5,6,7,8,9,10,11,12)
+--------👆保存的设置参数------------------------------------------------------------
+global myFgColor
+global myClickColor
+global myCheckedColor ----fnGetColorTheme.ms
+Global posMouMoved       = [0,0]
+Global switchMouseState  = false
+Global switchSelKeyRange = 0
+Global arrLastSelRange   = #()
+Global switchAllKeyRange = 0
+Global iniAddToolbars    = 0
+Global arrLastAllRange   = #()
+Global arrKeysTime       = #()  -----------biped和bone的首尾帧
+Global arrLinkKeys       = #()  -----------存link帧
+Global arrKeysSelected   = #()  -----------存选中的帧
+global arrBlockingKeys   = #()  -----------选中或者所有物体的所有关键帧
+global arrBoneEndAll     = #()  -----------末端骨骼临时层
+Global arrToolC1         = #()
+Global arrToolC2         = #()
+Global arrToolC3         = #()
+Global arrToolC4         = #()
 Global keyFirst
 Global keyEnd
 Global keySelFirst
@@ -60,16 +74,9 @@ Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
 Global arrTraj            = #()  ---轨迹存放数组, 方便删除
 Global arrTempUnSelection = #()  ---隐藏未选中临时存放数组
-Global arrToolC1          = #()  ----------工具按钮数组
-Global arrToolC2          = #()  ----------工具按钮数组
-Global arrToolC3          = #()  ----------工具按钮数组
-Global arrToolC4          = #()  ----------工具按钮数组
 Global uiClientOffsets    = undefined
-Global rolloutBulletKeyTools
 Global menuSetFps
 Global menuSetSpeed
-global myfgColor
-global myClickColor
 Global SIOFile = dotNetClass "System.IO.File"
 Global SIODir = dotNetClass "System.IO.Directory"
 -- Global myTimer = dotnetobject "System.Timers.Timer" 500 autoreset:true
@@ -84,7 +91,14 @@ fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方�
 	)
 	if attr == "" then attr = (execute valueAttr) else (attr = execute attr)  --判断记录为空与否得到需要的记录参数
 )
-fn fnSaveConfig =  --引用上面方法提出需要的参数
+fn fnLoadToolConfig =
+(
+	iniToolC1 = fnGetConfig iniToolC1 "BulletKeyToolsSet"  "iniToolC1" (iniToolC1 as string)
+	iniToolC2 = fnGetConfig iniToolC2 "BulletKeyToolsSet"  "iniToolC2" (iniToolC2 as string)
+	iniToolC3 = fnGetConfig iniToolC3 "BulletKeyToolsSet"  "iniToolC3" (iniToolC3 as string)
+	iniToolC4 = fnGetConfig iniToolC4 "BulletKeyToolsSet"  "iniToolC4" (iniToolC4 as string)
+)
+fn fnLoadConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
 	iniPos             = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" (mouse.screenpos as string)
 	switchToolPanel    = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
@@ -92,6 +106,7 @@ fn fnSaveConfig =  --引用上面方法提出需要的参数
 	idBtn              = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
 	iniArrMyScripts    = fnGetConfig iniArrMyScripts "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
 	iniAutoCheckUpdate = fnGetConfig iniAutoCheckUpdate "BulletKeyToolsSet"  "AutoCheckUpdate" (iniAutoCheckUpdate as string)
+	fnLoadToolConfig()
 	if (iniArrMyScripts.count != 8) then
 	(
 		iniArrMyScripts = #((myScript id:1 msName:"<＋＋>" dir:""), \
@@ -104,7 +119,7 @@ fn fnSaveConfig =  --引用上面方法提出需要的参数
 		(myScript id:8 msName:"<＋＋>" dir:""))
 	)
 )
-fnSaveConfig () --初始执行一遍
+fnLoadConfig () --初始执行一遍
 fn fnSetConfig =  --保存参数,脚本位置
 (
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "Pos" (iniPos as string)
@@ -113,32 +128,12 @@ fn fnSetConfig =  --保存参数,脚本位置
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "idBtn" (idBtn as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
 	SetINISetting BulletConfig "BulletKeyToolsSet"  "AutoCheckUpdate" (iniAutoCheckUpdate as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC1" (iniToolC1 as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC2" (iniToolC2 as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC3" (iniToolC3 as string)
+	SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC4" (iniToolC4 as string)
 )
 ---------------配合BulletTools工具的ini文件保存位置信息-----------------
-
-fn fnGetColorTheme =
-(
-	local curColorThemeFile = colorMan.getFileName()
-	if (curColorThemeFile != undefined) then
-	(
-		if (matchpattern curColorThemeFile pattern:"*light*") then
-		(
-			myfgColor    = (color 65 105 225)
-			myClickColor = (color 0 139 139)
-		)
-		else
-		(
-			myfgColor    = (color 219 209 72)
-			myClickColor = (color 0 255 127)
-		)
-	)
-	else
-	(
-		myfgColor    = (color 219 209 72)
-		myClickColor = (color 0 255 127)
-	)
-)
-fnGetColorTheme() ----获取当前主题是深色还是浅色,来更改文字颜色
 
 -------------------右键面板空白处设置---------------------------------------------------------
 fn fnDelFileDir targetDel =  --删除文件
@@ -253,6 +248,7 @@ rcmenu menuConfig
 	local startupPath = (getDir #StartupScripts)+ "\\BulletKeyTools.ms"
 	menuItem mItemIsStartup "是否随Max自启"
 	menuItem mItemAddToolBarBtn "添加工具栏按钮"
+	menuItem mItemUpdateLog "更新记录"
 	subMenu "更新设置"
 	(
 		menuItem mItemCheckUpdate "检查更新"
@@ -351,7 +347,7 @@ rcmenu menuConfig
 
 	on mItemClose picked do 
 	(
-		try(destroydialog rolloutBulletKeyTools)catch()
+		try(destroydialog rolBsKeyTools)catch()
 		try(destroydialog rolFnKeys)catch()
 		try(destroydialog rolAddMyScripts)catch()
 	)
@@ -370,12 +366,14 @@ rcmenu menuConfig
 			if (SIOFile.Exists startupPath) do (fnDelFileDir startupPath)
 			arrDelPath = #(((getDir #Scripts)+ "\\BulletScripts"),((getDir #maxroot) + "\\UI_ln\\Icons\\cstoolIcons"))
 			for d in arrDelPath do (fnDelDir d)
-			try(destroydialog rolloutBulletKeyTools)catch()
+			try(destroydialog rolBsKeyTools)catch()
 			try(destroydialog rolFnKeys)catch()
 			try(destroydialog rolAddMyScripts)catch()
 			(messagebox "已清理干净，保留配置文件备用...    \r\n" beep:false title:"卸载成功！")
 		)
 	)
+
+	on mItemUpdateLog picked do (FileIn ((getDir #scripts) + "\\BulletScripts\\UpdateLog.ms"))
 )
 
 -------------------帧率,播放速度--------------------------------------------------------------
@@ -419,7 +417,7 @@ fn fnSetFps numFps =
 	framerate = numFps
 	valueFps = numFps
 	strCurrentFps = numFps as string + "FPS"
-	rolloutBulletKeyTools.btnSetFps.text = strCurrentFps 
+	rolBsKeyTools.btnSetFps.text = strCurrentFps 
 	slidertime -= 1
 	slidertime += 1
 )
@@ -457,7 +455,7 @@ fn fnSetSpeed numSpeed =
 (
 	timeConfiguration.playbackSpeed = numSpeed
 	fnRefPlaySpeedValue ()
-	rolloutBulletKeyTools.btnSetSpeed.text = valuePlaySpeed
+	rolBsKeyTools.btnSetSpeed.text = valuePlaySpeed
 )
 
 rcmenu menuSetFps
@@ -474,7 +472,7 @@ rcmenu menuSetFps
 		strCurrentFps = framerate as string + "FPS"
 		menuSetFps.menuCurrentFps.text = "当前: " + framerate as string + "FPS"
 		fnRefFps ()
-		rolloutBulletKeyTools.btnSetFps.text = strCurrentFps
+		rolBsKeyTools.btnSetFps.text = strCurrentFps
 	)
 
 	on menuSet60Fps picked do 
@@ -493,7 +491,7 @@ rcmenu menuSetFps
 	on menuCustomFps picked do
 	(
 		try (destroyDialog rolCustomFps) catch()
-		createdialog rolCustomFps 120 55 fgcolor:myfgColor \
+		createdialog rolCustomFps 120 55 fgcolor:myFgColor \
 		pos:[mouse.screenpos.x,mouse.screenpos.y]
 	)
 )
@@ -513,7 +511,7 @@ rcmenu menuSetSpeed
 	(
 		fnRefPlaySpeedValue ()
 		menuSetSpeed.menuCurrentSpeed.text = "当前: " + valuePlaySpeed
-		rolloutBulletKeyTools.btnSetSpeed.text = valuePlaySpeed
+		rolBsKeyTools.btnSetSpeed.text = valuePlaySpeed
 	)
 
 	on menuSet14Speed picked do 
@@ -651,14 +649,14 @@ rollout rolAddMyScripts "我的脚本" width:205 height:220
 			(myScript id:6 msName:"<＋＋>" dir:""), \
 			(myScript id:7 msName:"<＋＋>" dir:""), \
 			(myScript id:8 msName:"<＋＋>" dir:""))
-			local arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1, \
-			rolloutBulletKeyTools.btnMyScripts2, \
-			rolloutBulletKeyTools.btnMyScripts3, \
-			rolloutBulletKeyTools.btnMyScripts4, \
-			rolloutBulletKeyTools.btnMyScripts5, \
-			rolloutBulletKeyTools.btnMyScripts6, \
-			rolloutBulletKeyTools.btnMyScripts7, \
-			rolloutBulletKeyTools.btnMyScripts8)
+			local arrMyScriptTemp = #(rolBsKeyTools.btnMyScripts1, \
+			rolBsKeyTools.btnMyScripts2, \
+			rolBsKeyTools.btnMyScripts3, \
+			rolBsKeyTools.btnMyScripts4, \
+			rolBsKeyTools.btnMyScripts5, \
+			rolBsKeyTools.btnMyScripts6, \
+			rolBsKeyTools.btnMyScripts7, \
+			rolBsKeyTools.btnMyScripts8)
 			local arrBtnTemp = #(rolAddMyScripts.edtRenameMs1, \
 			rolAddMyScripts.edtRenameMs2, \
 			rolAddMyScripts.edtRenameMs3, \
@@ -789,14 +787,14 @@ rollout rolAddMyScripts "我的脚本" width:205 height:220
 		fnAddMsName 7 edtRenameMs7
 		fnAddMsName 8 edtRenameMs8
 
-		arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1, \
-		rolloutBulletKeyTools.btnMyScripts2, \
-		rolloutBulletKeyTools.btnMyScripts3, \
-		rolloutBulletKeyTools.btnMyScripts4, \
-		rolloutBulletKeyTools.btnMyScripts5, \
-		rolloutBulletKeyTools.btnMyScripts6, \
-		rolloutBulletKeyTools.btnMyScripts7, \
-		rolloutBulletKeyTools.btnMyScripts8)
+		arrMyScriptTemp = #(rolBsKeyTools.btnMyScripts1, \
+		rolBsKeyTools.btnMyScripts2, \
+		rolBsKeyTools.btnMyScripts3, \
+		rolBsKeyTools.btnMyScripts4, \
+		rolBsKeyTools.btnMyScripts5, \
+		rolBsKeyTools.btnMyScripts6, \
+		rolBsKeyTools.btnMyScripts7, \
+		rolBsKeyTools.btnMyScripts8)
 		for b = 1 to arrMyScriptTemp.count do 
 		(
 			if iniArrMyScripts[b] != undefined then
@@ -934,7 +932,7 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 -----------------------------------------------------------------
 
 -------------主UI-----------------------------------------------------------------
-rollout rolloutBulletKeyTools "" width:200 height:233
+rollout rolBsKeyTools "" width:200 height:233
 (
 	local strMainRol = ("BsKeyTools v" + curVerBsKeyTools + "-----右键设置")
 	---------------------------------UI--------------------------------------
@@ -959,23 +957,25 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		-- button btnSet5 "5f" width:35 pos:[90,67]
 		-- button btnSetAdd "+5f" width:35 pos:[125,67]
 		-- button btnSetOpposite "负" width:30 pos:[160,67]
-		checkbutton btnJudgeLinkKey "Link帧?" \
-		pos:[10,60] tooltip:"是否存在Link帧?" width:45 height:30 checked:false  
+		checkbutton btnJudgeLinkKey "Link?" highlightcolor:myCheckedColor \
+		pos:[10,60] tooltip:"是否存在Link帧?" width:35 height:30 checked:false  
 		button btnSelBeforeKeys "" \
-		pos:[55,60] width:40 height:30 toolTip:"选择滑条前面关键帧"  
+		pos:[45,60] width:35 height:30 toolTip:"选择滑条前面关键帧"  
 		button btnSelAllKeys "" \
-		pos:[95,60] width:45 height:30 toolTip:"选择所有关键帧"  
+		pos:[80,60] width:35 height:30 toolTip:"选择所有关键帧"  
 		button btnSelAfterKeys "" \
-		pos:[140,60] width:40 height:30 toolTip:"选择滑条后面关键帧"  
+		pos:[115,60] width:35 height:30 toolTip:"选择滑条后面关键帧"
+		checkbutton ckbShadowCut "剪影" highlightcolor:myCheckedColor \
+		pos:[150,60] width:40 height:30 toolTip:"切换剪影显示"
 		-- button btnMoveKeys " " width:30 height:30 \
 		-- pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~"  
-		checkbutton ckbFnBoxDisplay "BOX显" width:45 height:25  \
-		toolTip:"骨骼切换Box显示" pos:[10,92]
-		checkbutton ckbFreezeMesh "冻模型" width:45 height:25   \
-		toolTip:"冻结解冻模型" pos:[55,92]
-		checkbutton ckbHideBones "隐Bone" width:45 height:25   \
-		toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[100,92]
-		checkbutton ckbHideBiped "隐Bip" width:45 height:25   \
+		checkbutton ckbFnBoxDisplay "BOX显"  highlightcolor:myCheckedColor \
+		width:45 height:25 toolTip:"骨骼切换Box显示" pos:[10,92]
+		checkbutton ckbFreezeMesh "冻模型" highlightcolor:myCheckedColor \
+		toolTip:"冻结解冻模型" width:45 height:25 pos:[55,92]
+		checkbutton ckbHideBones "隐Bone" highlightcolor:myCheckedColor \
+		width:45 height:25 toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[100,92]
+		checkbutton ckbHideBiped "隐Bip" width:45 height:25 highlightcolor:myCheckedColor \
 		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[145,92]
 		button btnHotAnimBtn "命令集" pos:[10,117] width:45 height:25 \
 		tooltip:"动画相关3dsMax自带按钮集合"
@@ -985,8 +985,8 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		toolTip:"隐藏当前显示的未选中物体，右键可重新显示"
 		button btnFileOpen "时光机" pos:[145,117] width:45 height:25 \
 		tooltip:"快速打开max文件\r\n可收藏常用目录" 
-		checkButton ckbPlayBlocking "跳帧播" pos:[10,142] width:45 height:25 \
-		tooltip:"点击预览关键帧 Blocking 动画\r\n若有 Link 帧需要按下上面按钮" checked:false
+		checkButton ckbPlayBlocking "跳帧播" pos:[10,142] width:45 height:25 
+		highlightcolor:myCheckedColor tooltip:"点击预览关键帧 Blocking 动画\r\n若有 Link 帧需要按下上面按钮" checked:false
 		timer clock "PlayClock" interval:1 active:false
 		button btnSpringMagic "飘带解" pos:[55,142] width:45 height:25 \
 		tooltip:"左点新版,右点旧版" 
@@ -1007,70 +1007,81 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	
 	groupbox gbxMinTools "" pos:[200,5] width:130 height:220
 	
-		checkbutton ckbC1 "坚" width:30 height:20 \
+		checkbutton ckbC1 "坚" width:30 height:20 highlightcolor:myCheckedColor \
 		pos:[205,15] toolTip:"" border:false
-		checkbutton ckbC2 "持" width:30 height:20 \
+		checkbutton ckbC2 "持" width:30 height:20 highlightcolor:myCheckedColor \
 		pos:[235,15] toolTip:"" border:false
-		checkbutton ckbC3 "热" width:30 height:20 \
+		checkbutton ckbC3 "热" width:30 height:20 highlightcolor:myCheckedColor \
 		pos:[265,15] toolTip:"" border:false
-		checkbutton ckbC4 "爱" width:30 height:20 \
+		checkbutton ckbC4 "爱" width:30 height:20 highlightcolor:myCheckedColor \
 		pos:[295,15] toolTip:"" border:false
 
 		local btnHeight = 30
 		local btnWidth = 60
+		local btnPos = [999999,999999]
+		button btnTemp "待添加" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp2 "待添加" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
 		button btnColorTools "颜色渐变" width:btnWidth height:btnHeight visible:false \
-		tooltip:"做 Demo 素模或特效方便~" pos:[999999,999999]
-		button btnBoneTraj "Bone轨迹" width:btnWidth height:btnHeight visible:false \
-		toolTip:"左：切换显示Bone轨迹,\r\n右：清除所有Bone轨迹" pos:[999999,999999]
+		tooltip:"做 Demo 素模或特效方便~" pos:btnPos
+		checkbutton ckbIsoMesh "模型独显" width:btnWidth height:btnHeight visible:false \
+		toolTip:"单独显示模型预览" pos:btnPos highlightcolor:myCheckedColor 
 		button btnBipedTraj "Biped轨迹" width:btnWidth height:btnHeight visible:false \
-		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除添加的所有Biped轨迹~" pos:[999999,999999]
+		toolTip:"左：切换显示单个Biped轨迹,\r\n右：清除添加的所有Biped轨迹~" pos:btnPos
 		button btnFnFrame "整小数帧" width:btnWidth height:btnHeight visible:false \
-		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" pos:[999999,999999]
+		tooltip:"整数小数帧切换,\r\n平滑拖帧看卡顿" pos:btnPos
 		button btnSelByColor "同色选择" width:btnWidth height:btnHeight visible:false \
-		tooltip:"选择同颜色物体" pos:[999999,999999]
-		button btnFnTCB "欧拉互转" width:btnWidth height:btnHeight visible:false \
-		tooltip:"欧拉和TCB互转" pos:[999999,999999]
+		tooltip:"选择同颜色物体" pos:btnPos
+		button btnFnTCB "TCB/欧拉" width:btnWidth height:btnHeight visible:false \
+		tooltip:"欧拉和TCB互转" pos:btnPos
 		button btnEulerFilter "欧拉过滤" width:btnWidth height:btnHeight visible:false \
-		tooltip:"Bone骨骼过滤欧拉旋转" pos:[999999,999999]
-		button btnBoneTool "BoneOn" width:btnWidth height:btnHeight visible:false \
-		tooltip:"骨骼BoneOn切换" pos:[999999,999999]
+		tooltip:"Bone骨骼过滤欧拉旋转" pos:btnPos
+		button btnImageComp "构图辅助" width:btnWidth height:btnHeight visible:false \
+		tooltip:"各种经典分割视图以辅助构图" pos:btnPos
 		button btnDelOutKeys "清所有帧" width:btnWidth height:btnHeight visible:false \
-		toolTip:"清除所有帧\r\nLink帧请手动删" pos:[999999,999999]
+		toolTip:"清除所有帧\r\nLink帧请手动删" pos:btnPos
 		button btnCleanOutKeys "清无限帧" width:btnWidth height:btnHeight visible:false \
-		toolTip:"清范围外帧(无限帧)" pos:[999999,999999]
+		toolTip:"清范围外帧(无限帧)" pos:btnPos
 		button btnSelBiped "选择Biped" width:btnWidth height:btnHeight visible:false \
-		toolTip:"选择所有biped" pos:[999999,999999]
+		toolTip:"选择所有biped" pos:btnPos
 		button btnSelBone "选择Bone" width:btnWidth height:btnHeight  visible:false \
-		toolTip:"选择所有bone" pos:[999999,999999]
+		toolTip:"选择所有bone" pos:btnPos
 		button btnEndBone "增删末端" width:btnWidth height:btnHeight visible:false \
-		toolTip:"清除添加Bone末端" pos:[999999,999999]
+		toolTip:"添加选择的Bone末端，可回退\r\n右键清除（注意 \"tempBoneEndAll\" 层）" pos:btnPos
 		button btnQuickPrev "快速拍屏" width:btnWidth height:btnHeight visible:false \
-		toolTip:"左：快速拍屏预览\r\n右：打开预览文件夹" pos:[999999,999999]
+		toolTip:"左：快速拍屏预览\r\n右：打开预览文件夹" pos:btnPos
 		button btnFastAlign "快速对齐" width:btnWidth height:btnHeight visible:false \
-		toolTip:"功能待添加" pos:[999999,999999]
+		toolTip:"功能待添加" pos:btnPos
 		button btnFnKeyType "改滑动帧" width:btnWidth height:btnHeight visible:false \
-		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置" pos:[999999,999999]
-		button btnSkinTools "权重工具" width:btnWidth height:btnHeight visible:false \
-		toolTip:"功能待添加" pos:[999999,999999]
+		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置" pos:btnPos
+		button btnRenameTools "改名工具" width:btnWidth height:btnHeight visible:false \
+		toolTip:"超级重命名工具" pos:btnPos
 		button btnMeshTools "模型整理" width:btnWidth height:btnHeight visible:false \
-		toolTip:"功能待添加" pos:[999999,999999]
+		toolTip:"功能待添加" pos:btnPos
 		button btnAnimMirror "动画镜像" width:btnWidth height:btnHeight visible:false \
-		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化" pos:[999999,999999]
+		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化" pos:btnPos
 		checkbutton ckbFnMtlDisplay "素模切换" width:btnWidth height:btnHeight visible:false \
 		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:Clay显示开关(红色模型显示)\r\n暂不支持子材质和Vray材质..."
-		pos:[999999,999999]
-		button btnCutSequence "动画片断" width:btnWidth height:btnHeight visible:false \
-		toolTip:"功能待添加" pos:[999999,999999]
+		pos:btnPos highlightcolor:myCheckedColor 
+		button btnCutSequence "动画分段" width:btnWidth height:btnHeight visible:false \
+		toolTip:"为长动画分段动作区间" pos:btnPos
 		button btnMopherSlider "表情滑条" width:btnWidth height:btnHeight visible:false \
-		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~" pos:[999999,999999]
+		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~" pos:btnPos
 		button btnBipedScale "CS缩放" width:btnWidth height:btnHeight visible:false \
-		toolTip:"效果展示可用，导入引擎别用\r\n再次点击可解除" pos:[999999,999999]
+		toolTip:"效果展示可用，导入引擎别用\r\n再次点击可解除" pos:btnPos
 		button btnBatchExport "批量导出" width:btnWidth height:btnHeight visible:false \
-		toolTip:"批量导出" pos:[999999,999999]
+		toolTip:"批量导出" pos:btnPos
+		button btnCameraFromView "视角相机" width:btnWidth height:btnHeight visible:false \
+		toolTip:"根据自由视角创建相机" pos:btnPos
+		button btnMeshToBone "碎块加骨" width:btnWidth height:btnHeight visible:false \
+		toolTip:"破碎碎块快速加骨骼" pos:btnPos
+		button btnLightTable "运动重影" width:btnWidth height:btnHeight visible:false \
+		toolTip:"显示运动重影" pos:btnPos
 
 		local btnMsWidth = 72.5
 		checkbutton ckbSwitchMyScripts ">_<" pos:[5,230] width:35 height:20
-		tooltip:"切换自定义脚本按钮" border:true
+		tooltip:"切换自定义脚本按钮" border:true highlightcolor:myCheckedColor 
 		button btnMyScripts1 "<＋＋>" pos:[40,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[1].dir border:true visible:false
 		button btnMyScripts2 "<＋＋>" pos:[112.5,230] width:btnMsWidth height:20
@@ -1090,8 +1101,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 
 	groupbox gbxTips "" pos:[5,195] width:190 height:30
 	
-		label lblLink "✨2019.9[miHoYo_Bullet.S]✨" \
-		pos:[20,205] width:170 height:15
+		label lblLink "✨2019.9[miHoYo_Bullet.S]✨" pos:[25,205] width:160 height:15
 
 	local m_PBKeyTimeArray
 	local m_PBKeyMiliSecArray
@@ -1128,8 +1138,8 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	(
 		if switchToolPanel == 0 then
 		(
-			rolloutBulletKeyTools.width               = 200
-			rolloutBulletKeyTools.height              = 233
+			rolBsKeyTools.width               = 200
+			rolBsKeyTools.height              = 233
 			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
 			ckbSwitchMyScripts.visible                = false
 			btnMyScripts1.visible                     = false
@@ -1143,8 +1153,8 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		)
 		else
 		(
-			rolloutBulletKeyTools.width               = 335
-			rolloutBulletKeyTools.height              = 253
+			rolBsKeyTools.width               = 335
+			rolBsKeyTools.height              = 253
 			btnMagicBtn.text                          = "( = `▽`)"
 			ckbSwitchMyScripts.visible                = true
 			fnRefreshMsPanel ()
@@ -1156,8 +1166,8 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		fnRefreshMsPanel()
 		if switchToolPanel == 1 then
 		(
-			rolloutBulletKeyTools.width               = 200
-			rolloutBulletKeyTools.height              = 233
+			rolBsKeyTools.width               = 200
+			rolBsKeyTools.height              = 233
 			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
 			switchToolPanel                           = 0
 			ckbSwitchMyScripts.visible                = false
@@ -1172,41 +1182,60 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		)
 		else
 		(
-			rolloutBulletKeyTools.width               = 335
-			rolloutBulletKeyTools.height              = 253
+			rolBsKeyTools.width               = 335
+			rolBsKeyTools.height              = 253
 			btnMagicBtn.text                          = "( = `▽`)"
 			switchToolPanel                           = 1
 			ckbSwitchMyScripts.visible                = true
 		)
 	)
 
+	fn fnSortById arrSource arrSortID =
+	(
+		local arrTarget = #()
+		for i in arrSortID do 
+		(
+			append arrTarget arrSource[i]
+		)
+		return arrTarget
+	)
+
+	fn fnReloadToolsBtn =
+	(
+		arrSourToolC1 = #(rolBsKeyTools.btnColorTools,rolBsKeyTools.btnFastAlign,
+						rolBsKeyTools.btnImageComp,rolBsKeyTools.btnAnimMirror,
+						rolBsKeyTools.btnFnKeyType,rolBsKeyTools.btnBatchExport,
+						rolBsKeyTools.ckbIsoMesh,rolBsKeyTools.btnBipedTraj,
+						rolBsKeyTools.btnMeshTools,rolBsKeyTools.btnQuickPrev,
+						rolBsKeyTools.btnFnFrame,rolBsKeyTools.ckbFnMtlDisplay)
+		arrSourToolC2 = #(rolBsKeyTools.btnCutSequence,rolBsKeyTools.btnMopherSlider,
+						rolBsKeyTools.btnSelBiped,rolBsKeyTools.btnSelBone,
+						rolBsKeyTools.btnFnTCB,rolBsKeyTools.btnEulerFilter,
+						rolBsKeyTools.btnDelOutKeys,rolBsKeyTools.btnCleanOutKeys,
+						rolBsKeyTools.btnEndBone,rolBsKeyTools.btnRenameTools,
+						rolBsKeyTools.btnBipedScale,rolBsKeyTools.btnSelByColor)
+		arrSourToolC3 = #(rolBsKeyTools.btnCameraFromView,rolBsKeyTools.btnMeshToBone,
+						rolBsKeyTools.btnLightTable,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp)
+		arrSourToolC4 = #(rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
+						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
+						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
+						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
+						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
+						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2)
+		
+		fnLoadToolConfig()
+		arrToolC1 = fnSortById arrSourToolC1 iniToolC1
+		arrToolC2 = fnSortById arrSourToolC2 iniToolC2
+		arrToolC3 = fnSortById arrSourToolC3 iniToolC4
+		arrToolC4 = fnSortById arrSourToolC4 iniToolC4
+	)
+
 	fn fnSwitchToolsBtn idBtn =
 	(
-		arrToolC1 = #(rolloutBulletKeyTools.btnColorTools,\
-						rolloutBulletKeyTools.btnFastAlign,\
-						rolloutBulletKeyTools.btnSkinTools,\
-						rolloutBulletKeyTools.btnAnimMirror,\
-						rolloutBulletKeyTools.btnFnKeyType,\
-						rolloutBulletKeyTools.btnBatchExport,
-						rolloutBulletKeyTools.btnBoneTraj,\
-						rolloutBulletKeyTools.btnBipedTraj,\
-						rolloutBulletKeyTools.btnMeshTools,\
-						rolloutBulletKeyTools.btnQuickPrev,\
-						rolloutBulletKeyTools.btnFnFrame,\
-						rolloutBulletKeyTools.ckbFnMtlDisplay)
-		arrToolC2 = #(rolloutBulletKeyTools.btnCutSequence,\
-						rolloutBulletKeyTools.btnMopherSlider,\
-						rolloutBulletKeyTools.btnSelBiped,\
-						rolloutBulletKeyTools.btnSelBone,\
-						rolloutBulletKeyTools.btnFnTCB,\
-						rolloutBulletKeyTools.btnEulerFilter,\
-						rolloutBulletKeyTools.btnDelOutKeys,\
-						rolloutBulletKeyTools.btnCleanOutKeys,\
-						rolloutBulletKeyTools.btnEndBone,\
-						rolloutBulletKeyTools.btnBoneTool,\
-						rolloutBulletKeyTools.btnBipedScale,\
-						rolloutBulletKeyTools.btnSelByColor)
-
 		local arrBtnAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4
 
 		for b in arrBtnAll do (b.visible = false)
@@ -1230,7 +1259,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	fn fnSwitchToolBtnChecked Btn =
 	(
 		arrBtnTemp = #(ckbC1,ckbC2,ckbC3,ckbC4)
-		for i = 1 to 4 do
+		for i = 1 to arrBtnTemp.count do
 		(
 			if i != Btn then 
 			(
@@ -1607,7 +1636,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 			(
 				for i in (objects as array) where (i.ishidden == false) do 
 				(
-					if rolloutBulletKeyTools.btnJudgeLinkKey.checked == false then fnAddKyes i 0
+					if rolBsKeyTools.btnJudgeLinkKey.checked == false then fnAddKyes i 0
 					else 
 					fnAddKyes i 1  -----------根据是否勾选link处理收集帧
 				)
@@ -1616,7 +1645,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 			(
 				for i in (selection as array) where (i.ishidden == false) do 
 				(
-					if rolloutBulletKeyTools.btnJudgeLinkKey.checked == false then fnAddKyes i 0
+					if rolBsKeyTools.btnJudgeLinkKey.checked == false then fnAddKyes i 0
 					else 
 					fnAddKyes i 1  -----------根据是否勾选link处理收集帧
 				)
@@ -1626,8 +1655,8 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	
 	fn fnChangetRangeTime =   ------------关键帧数字随滑条改变
 	(
-		rolloutBulletKeyTools.spiStartTime.value = animationrange.start
-		rolloutBulletKeyTools.spiEndTime.value = animationrange.end
+		rolBsKeyTools.spiStartTime.value = animationrange.start
+		rolBsKeyTools.spiEndTime.value = animationrange.end
 	)
 
 	fn fnSelLinkKeys keyFirst KeyEnd symbol =  ---------------选择link帧方法
@@ -1655,14 +1684,14 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 			if arrKeysTime.count != 0 then
 			(
 				selectkeys $ keyFirst KeyEnd  -------------选中正常帧
-				if rolloutBulletKeyTools.btnJudgeLinkKey.checked == true then
+				if rolBsKeyTools.btnJudgeLinkKey.checked == true then
 				(
 					fnSelLinkKeys keyFirst KeyEnd symbol --------------选中link帧
 				)
 			)
 			else
 			(
-				if rolloutBulletKeyTools.btnJudgeLinkKey.checked == true then
+				if rolBsKeyTools.btnJudgeLinkKey.checked == true then
 				(
 					fnSelLinkKeys keyFirst KeyEnd symbol
 				)
@@ -1686,7 +1715,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	-- (
 	-- 	local arrTargetID  = #()
 	-- 	moveKeys obj offset #selection  ---先移动非link帧
-	-- 	if rolloutBulletKeyTools.btnJudgeLinkKey.checked == true then 
+	-- 	if rolBsKeyTools.btnJudgeLinkKey.checked == true then 
 	-- 	(
 	-- 		if classof obj.controller == Link_Constraint do
 	-- 		(
@@ -1837,14 +1866,15 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	-- 	)
 	-- )
 
-	fn fnAddTrajLayer =
+	fn fnAddTrajLayer strlayerName templayerTarget =
 	(
-		if (LayerManager.getLayerFromName "Biped_Trajectories") != undefined then
+		if (LayerManager.getLayerFromName strlayerName) != undefined then
 		(
-			layerTraj = LayerManager.getLayerFromName "Biped_Trajectories"
+			templayerTarget = LayerManager.getLayerFromName strlayerName
 		)
-		else layerTraj = LayerManager.newLayerFromName "Biped_Trajectories"
-		layerTraj.lock = on
+		else templayerTarget = LayerManager.newLayerFromName strlayerName
+		templayerTarget.lock = on
+		templayerTarget
 	)
 
 	fn fnAddBipedTraj tempBiped =
@@ -2050,14 +2080,14 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 
 	fn fnRefreshMyScripts =
 	(
-		arrMyScriptTemp = #(rolloutBulletKeyTools.btnMyScripts1, \
-		rolloutBulletKeyTools.btnMyScripts2, \
-		rolloutBulletKeyTools.btnMyScripts3, \
-		rolloutBulletKeyTools.btnMyScripts4, \
-		rolloutBulletKeyTools.btnMyScripts5, \
-		rolloutBulletKeyTools.btnMyScripts6, \
-		rolloutBulletKeyTools.btnMyScripts7, \
-		rolloutBulletKeyTools.btnMyScripts8)
+		arrMyScriptTemp = #(rolBsKeyTools.btnMyScripts1, \
+		rolBsKeyTools.btnMyScripts2, \
+		rolBsKeyTools.btnMyScripts3, \
+		rolBsKeyTools.btnMyScripts4, \
+		rolBsKeyTools.btnMyScripts5, \
+		rolBsKeyTools.btnMyScripts6, \
+		rolBsKeyTools.btnMyScripts7, \
+		rolBsKeyTools.btnMyScripts8)
 		for b = 1 to arrMyScriptTemp.count do 
 		(
 			if iniArrMyScripts[b] != undefined then
@@ -2071,7 +2101,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		)
 	)
 
-	on rolloutBulletKeyTools open do  ----打开脚本时操作
+	on rolBsKeyTools open do  ----打开脚本时操作
 	(
 		------刷新图标, 图标是max自带的,主要是懒得做
 		btnSelBeforeKeys.images = #("VCRControls_24i.bmp","VCRControls_24i.bmp",28,3,3,3,3,true,true) 
@@ -2082,15 +2112,16 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		-- dotnet.AddEventHandler myTimer #elapsed fnRefreshHelpText
 		-- myTimer.Start()
 		-- timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
-		-- iniPos = (GetDialogPos rolloutBulletKeyTools) 
-		fnSaveConfig ()  ---------------脚本位置赋值
+		-- iniPos = (GetDialogPos rolBsKeyTools) 
+		fnLoadConfig ()  ---------------脚本位置赋值
 		fnSetConfig ()  ----------------保存位置信息到ini文件
-		registerTimeCallback rolloutBulletKeyTools.fnChangetRangeTime  -------------帧范围改变添加回调
+		fnReloadToolsBtn()
+		registerTimeCallback rolBsKeyTools.fnChangetRangeTime  -------------帧范围改变添加回调
 		if(switchMSPanel == 0) then (ckbSwitchMyScripts.checked = false)
 		else (ckbSwitchMyScripts.checked = true)
 		fnRefPlaySpeedValue ()  -----判断播放速度
-		rolloutBulletKeyTools.btnSetFps.text   = strCurrentFps
-		rolloutBulletKeyTools.btnSetSpeed.text = valuePlaySpeed
+		rolBsKeyTools.btnSetFps.text   = strCurrentFps
+		rolBsKeyTools.btnSetSpeed.text = valuePlaySpeed
 		fnRefreshMagicBtn ()
 		-- if (switchToolPanel == 1) then
 		-- (
@@ -2104,43 +2135,43 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		(fnAutoCheckVersion curVerBsKeyTools verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools)
 	)
 	
-	on rolloutBulletKeyTools close do -- 关闭记忆浮动窗口位置
+	on rolBsKeyTools close do -- 关闭记忆浮动窗口位置
 	(
-		iniPos = (GetDialogPos rolloutBulletKeyTools)
+		iniPos = (GetDialogPos rolBsKeyTools)
 		fnSetConfig ()
 	)
 	-----------------------------------------------------------------------------------------
-	on rolloutBulletKeyTools rbuttondown pos do 
+	on rolBsKeyTools rbuttondown pos do 
 	(
 		popupMenu menuConfig pos:[mouse.screenpos.x + 20,mouse.screenpos.y]
 	)
 
-	on rolloutBulletKeyTools mbuttondown pos do 
+	on rolBsKeyTools mbuttondown pos do 
 	(
-		try (destroydialog rolloutBulletKeyTools) catch ()
+		try (destroydialog rolBsKeyTools) catch ()
 	)
 	
-	on rolloutBulletKeyTools lbuttondown posMou do
+	on rolBsKeyTools lbuttondown posMou do
 	(
 		posMouMoved = posMou
 		switchMouseState = on
 	)
 	
-	on rolloutBulletKeyTools lbuttonup posMou do
+	on rolBsKeyTools lbuttonup posMou do
 	(
 		switchMouseState = off
 	)
 	
-	on rolloutBulletKeyTools mouseMove pos do
+	on rolBsKeyTools mouseMove pos do
 	(
 		-- myTimer.Start()
 		if switchMouseState == on then
 		(
-			SetDialogPos rolloutBulletKeyTools (mouse.screenpos - posMouMoved)			
+			SetDialogPos rolBsKeyTools (mouse.screenpos - posMouMoved)			
 		)
 		if (uiClientOffsets == undefined) then 
 		(
-			uiClientOffsets = pos - (mouse.screenPos - (getDialogPos rolloutBulletKeyTools)) 
+			uiClientOffsets = pos - (mouse.screenPos - (getDialogPos rolBsKeyTools)) 
 		)
 	)
 	---------------------上面设置拖动脚本窗口,去掉标题栏后默认无法拖动---------------------
@@ -2266,26 +2297,33 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		FileIn ((getDir #scripts) + "\\BulletScripts" + "\\BsOpenTools.ms")
 	)
 
-	on btnBoneTraj pressed do ------显示bone的轨迹
+	on ckbIsoMesh changed state do
 	(
-		for i in (selection as array) where (classof i != Biped_Object) do
+		if state then
 		(
-			if i.showtrajectory == true then i.showtrajectory = false
-			else i.showtrajectory = true
+			hideByCategory.geometry = false
+			hideByCategory.shapes = true
+			hideByCategory.lights = true
+			hideByCategory.cameras = true
+			hideByCategory.helpers = true
+			hideByCategory.spacewarps = true
+			hideByCategory.particles = true
+			hideByCategory.bones = true
+		)
+		else 
+		(
+			hideByCategory.shapes = false
+			hideByCategory.lights = false
+			hideByCategory.cameras = false
+			hideByCategory.helpers = false
+			hideByCategory.spacewarps = false
+			hideByCategory.particles = false
+			hideByCategory.bones = false
 		)
 	)
-
-	on btnBoneTraj rightclick do   ----右键取消bone的轨迹显示
-	(
-		for i in (objects as array) where (classof i != Biped_Object) do
-		(
-			if i.showtrajectory == true then i.showtrajectory = false
-		)
-	)
-
 	on btnBipedTraj pressed do 
 	(
-		fnAddTrajLayer () ----是否创建轨迹层
+		layerTraj = (fnAddTrajLayer "Biped_Trajectories" layerTraj) ----是否创建轨迹层
 		if (selection.count > 1) then
 		(
 			for i in (selection as array) do
@@ -2357,7 +2395,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		if ((val != ".") and (val as time != undefined) and (val != "")) then
 		(------"."他也认为是数字...
 			keyMovedOffset = val as integer
-			rolloutBulletKeyTools.edtMoveKey.text = keyMovedOffset as string + "f"
+			rolBsKeyTools.edtMoveKey.text = keyMovedOffset as string + "f"
 		)
 		else messageBox "----------------------\r\n请输入正确帧数!"
 	)
@@ -2526,13 +2564,13 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		if state == false then
 		(
 			for o in geometry as array where (classof o == BoneGeometry and o.layer.ishidden != true) do o.isHidden = false
-			rolloutBulletKeyTools.ckbHideBones.text = "隐Bone"
+			rolBsKeyTools.ckbHideBones.text = "隐Bone"
 		)
 		else
 		(
 			arrHiddenBones = #()
 			for o in geometry as array where (classof o == BoneGeometry) do o.isHidden = true
-			rolloutBulletKeyTools.ckbHideBones.text = "显Bone"
+			rolBsKeyTools.ckbHideBones.text = "显Bone"
 		)
 	)
 	
@@ -2541,13 +2579,13 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		if state == false then
 		(
 			for o in geometry as array where (classof o == Biped_Object and o.layer.ishidden != true) do o.isHidden = false
-			rolloutBulletKeyTools.ckbHideBiped.text = "隐Bip"
+			rolBsKeyTools.ckbHideBiped.text = "隐Bip"
 		)
 		else
 		(
 			arrHiddenBones = #()
 			for o in geometry as array where (classof o == Biped_Object) do o.isHidden = true
-			rolloutBulletKeyTools.ckbHideBiped.text = "显Bip"
+			rolBsKeyTools.ckbHideBiped.text = "显Bip"
 		)
 	)
 
@@ -2555,7 +2593,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	(
 		if state == on then
 		(
-			rolloutBulletKeyTools.ckbFreezeMesh.text = "解模型"
+			rolBsKeyTools.ckbFreezeMesh.text = "解模型"
 			for o in objects where (((classof o == Editable_mesh) \
 			or (classof o == Editable_Poly) or (classof o == PolyMeshObject)) \
 			and (o.isHidden == false)) do
@@ -2566,7 +2604,7 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		)
 		else
 		(
-			rolloutBulletKeyTools.ckbFreezeMesh.text = "冻模型"
+			rolBsKeyTools.ckbFreezeMesh.text = "冻模型"
 			for o in objects where (((classof o == Editable_mesh) \
 			or (classof o == Editable_Poly) or (classof o == PolyMeshObject)) \
 			and (o.isHidden == false)) do
@@ -2681,21 +2719,13 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 		)
 	)
 
-	-- on btnBoneTool pressed do (macros.run "Animation Tools" "BoneAdjustmentTools")
-
-	on btnBoneTool pressed do 
-	(
-		for i in selection where classof i == BoneGeometry do
-		(
-			if i.boneEnable == false then i.boneEnable = true
-			else i.boneEnable = false
-		)
-	)
+	on btnImageComp pressed do 
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\ImageCompHelper.ms"))
 	
 	on btnFnKeyType pressed do 
 	(
 		try(destroydialog rolFnKeys)catch()
-		Createdialog rolFnKeys  fgcolor:myfgColor \
+		Createdialog rolFnKeys  fgcolor:myFgColor \
 		pos:[mouse.screenpos.x,mouse.screenpos.y]
 	)
 
@@ -2830,49 +2860,49 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	on btnMyScripts1 rightclick do 
 	(
 		try(destroydialog rolAddMyScripts)catch()
-		createDialog rolAddMyScripts fgcolor:myfgColor \
+		createDialog rolAddMyScripts fgcolor:myFgColor \
 		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
 	)
 	on btnMyScripts2 rightclick do 
 	(
 		try(destroydialog rolAddMyScripts)catch()
-		createDialog rolAddMyScripts fgcolor:myfgColor \
+		createDialog rolAddMyScripts fgcolor:myFgColor \
 		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
 	)
 	on btnMyScripts3 rightclick do 
 	(
 		try(destroydialog rolAddMyScripts)catch()
-		createDialog rolAddMyScripts fgcolor:myfgColor\
+		createDialog rolAddMyScripts fgcolor:myFgColor\
 		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
 	)
 	on btnMyScripts4 rightclick do 
 	(
 		try(destroydialog rolAddMyScripts)catch()
-		createDialog rolAddMyScripts fgcolor:myfgColor\
+		createDialog rolAddMyScripts fgcolor:myFgColor\
 		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
 	)
 	on btnMyScripts5 rightclick do 
 	(
 		try(destroydialog rolAddMyScripts)catch()
-		createDialog rolAddMyScripts fgcolor:myfgColor\
+		createDialog rolAddMyScripts fgcolor:myFgColor\
 		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
 	)
 	on btnMyScripts6 rightclick do 
 	(
 		try(destroydialog rolAddMyScripts)catch()
-		createDialog rolAddMyScripts fgcolor:myfgColor\
+		createDialog rolAddMyScripts fgcolor:myFgColor\
 		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
 	)
 	on btnMyScripts7 rightclick do 
 	(
 		try(destroydialog rolAddMyScripts)catch()
-		createDialog rolAddMyScripts fgcolor:myfgColor\
+		createDialog rolAddMyScripts fgcolor:myFgColor\
 		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
 	)
 	on btnMyScripts8 rightclick do 
 	(
 		try(destroydialog rolAddMyScripts)catch()
-		createDialog rolAddMyScripts fgcolor:myfgColor\
+		createDialog rolAddMyScripts fgcolor:myFgColor\
 		pos:[mouse.screenpos.x,mouse.screenpos.y + 20]
 	)
 
@@ -2951,8 +2981,83 @@ rollout rolloutBulletKeyTools "" width:200 height:233
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms")
 	popupMenu rcBsAnimBtnBox pos:[mouse.screenpos.x - 120,mouse.screenpos.y])
 
+	on ckbShadowCut changed state do
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\Silhouette.ms"))
+
+	on btnRenameTools pressed do
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\P_ObjectRenamer.ms"))
+
+	on btnCameraFromView pressed do
+	(
+		If (viewport.Gettype() == #view_persp_user) and (not theHold.Holding()) then 
+		(CreateCameraFromView(FreeCamera))
+		else (messagebox "请按“P”在自由视角创建，之后可能优化为任意视角~        \r\n" beep:false)
+	)
+
+	on btnMeshToBone pressed do 
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\AnimMeshToBonesAnim.ms"))
+
+	on btnLightTable pressed do 
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\LightTable.ms"))
+
+	on btnCutSequence pressed do 
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\AnimaRange.ms"))
+
+	on btnEndBone pressed do 
+	(
+		local tempLayerBoneEnd
+		if (LayerManager.getLayerFromName "tempBoneEndAll") != undefined then
+		(tempLayerBoneEnd = LayerManager.getLayerFromName "tempBoneEndAll")
+		else (tempLayerBoneEnd = LayerManager.newLayerFromName "tempBoneEndAll")
+		if selection.count != 0 then with undo on 
+		(
+			arrSel = selection as array
+			for i in 1 to arrSel.count do
+			(
+				tempChild = execute ("$'" + arrSel[i].name + "'/...*")
+				if (tempChild[tempChild.count] != undefined) then 
+				(
+					parentBone = tempChild[tempChild.count]
+				)
+				else (parentBone  = arrSel[i])
+				parentTrans = parentBone.transform
+				parentPos   = parentTrans.translation
+		
+				newBone = BoneSys.createBone parentPos (parentPos+6) parentBone.dir
+				newBone.transform = parentTrans
+				newBone.taper     = 90
+		
+				if iskindof arrSel[i] BoneGeometry==true do 
+				(
+					in coordSys Local move newBone [parentBone.length,0,0]
+					newBone.parent    = parentBone
+					newBone.width     = parentBone.width
+					newBone.height    = parentBone.height
+					newBone.length    = (parentBone.width+parentBone.height)/2
+					newBone.wirecolor = parentBone.wirecolor
+				)
+				append arrBoneEndAll newBone
+				tempLayerBoneEnd.addNode newBone
+			)
+			messageBox "注意：\r\n\r\n点确定完成添加，\r\n\r\n会创建新层存放末端，\r\n\r\n重启软件后无法回退，\r\n\r\n可点击右键或手动清除之前添加的末端，\r\n\r\n（在 tempBoneEndAll 层中）                                     "
+		)
+		else (messagebox "请选择要添加末端的 Bone 骨骼~          " beep:false)
+	)
+
+	on btnEndBone rightclick do with undo on
+	(
+		if (LayerManager.getLayerFromName "tempBoneEndAll") != undefined then
+		(
+			tempLayerBoneEnd = LayerManager.getLayerFromName "tempBoneEndAll"
+			tempLayerBoneEnd.nodes &arrLayerNodeTemp
+			for i in arrLayerNodeTemp do delete i
+			LayerManager.deleteLayerHierarchy "tempBoneEndAll" forceDelete:true
+			arrBoneEndAll = #()
+			messagebox "点确定清理添加的骨骼末端 (在 tempBoneEndAll 层中的骨骼) ~          "
+		)
+	)
 )
-Createdialog rolloutBulletKeyTools fgcolor:myfgColor pos:iniPos style:#()
+Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#()
 clearListener()  ---------清除侦听器
 
 (
@@ -2967,5 +3072,4 @@ clearListener()  ---------清除侦听器
 			catch(messagebox "打开BsKeyTools失败,\r\n建议重启Max或重新安装...          ")
 		)
 	)
-	
 )
