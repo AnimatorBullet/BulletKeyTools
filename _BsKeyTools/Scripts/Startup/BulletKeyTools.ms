@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-15 14:15:16
+ * @LastEditTime: 2021-02-16 16:58:25
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -14,7 +14,7 @@ try(destroydialog rolAddMyScripts)catch()
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
 
-global curVerBsKeyTools = "0.9.5"
+global curVerBsKeyTools = "0.9.6"
 global verUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/version.dat"
 global dlUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/_BsKeyTools%EF%BC%88%E8%A3%85%E5%AE%8C%E9%87%8D%E5%90%AFMAX,%E8%AF%AF%E6%9D%80%E8%AF%B7%E4%BF%A1%E4%BB%BB%EF%BC%89.exe"
 global dlFileBsKeyTools = (getdir #temp) + "\\_BsKeyTools（装完重启MAX,误杀请信任）.exe"
@@ -2978,8 +2978,10 @@ rollout rolBsKeyTools "" width:200 height:233
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\DTrajEdit.ms"))
 
 	on btnHotAnimBtn pressed do 
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms")
-	popupMenu rcBsAnimBtnBox pos:[mouse.screenpos.x - 120,mouse.screenpos.y])
+	(
+		if (FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms")) do
+		(popupMenu rcBsAnimBtnBox pos:[mouse.screenpos.x - 120,mouse.screenpos.y])
+	)
 
 	on ckbShadowCut changed state do
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\Silhouette.ms"))

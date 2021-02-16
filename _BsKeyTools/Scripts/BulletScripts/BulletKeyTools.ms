@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-15 14:15:16
+ * @LastEditTime: 2021-02-16 16:57:28
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -2978,8 +2978,10 @@ rollout rolBsKeyTools "" width:200 height:233
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\DTrajEdit.ms"))
 
 	on btnHotAnimBtn pressed do 
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms")
-	popupMenu rcBsAnimBtnBox pos:[mouse.screenpos.x - 120,mouse.screenpos.y])
+	(
+		if (FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms")) do
+		(popupMenu rcBsAnimBtnBox pos:[mouse.screenpos.x - 120,mouse.screenpos.y])
+	)
 
 	on ckbShadowCut changed state do
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\Silhouette.ms"))
