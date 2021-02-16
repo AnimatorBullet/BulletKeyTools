@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-16 16:58:25
+ * @LastEditTime: 2021-02-16 17:06:35
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -22,6 +22,7 @@ global dlFileBsKeyTools = (getdir #temp) + "\\_BsKeyTools（装完重启MAX,误�
 struct myScript (id,msName,dir)
 
 Global rolBsKeyTools
+Global rcBsAnimBtnBox
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPos  	--位置保存记录
 Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
@@ -2979,8 +2980,8 @@ rollout rolBsKeyTools "" width:200 height:233
 
 	on btnHotAnimBtn pressed do 
 	(
-		if (FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms")) do
-		(popupMenu rcBsAnimBtnBox pos:[mouse.screenpos.x - 120,mouse.screenpos.y])
+		FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms")
+		(popupMenu rcBsAnimBtnBox pos:[mouse.screenpos.x - 120,mouse.screenpos.y + 10])
 	)
 
 	on ckbShadowCut changed state do
