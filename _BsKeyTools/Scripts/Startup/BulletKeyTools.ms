@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-16 17:06:35
+ * @LastEditTime: 2021-02-18 17:23:50
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -3054,7 +3054,8 @@ rollout rolBsKeyTools "" width:200 height:233
 			tempLayerBoneEnd = LayerManager.getLayerFromName "tempBoneEndAll"
 			tempLayerBoneEnd.nodes &arrLayerNodeTemp
 			for i in arrLayerNodeTemp do delete i
-			LayerManager.deleteLayerHierarchy "tempBoneEndAll" forceDelete:true
+			(LayerManager.getLayer 0).current = true
+			LayerManager.deleteLayerByName "tempBoneEndAll"
 			arrBoneEndAll = #()
 			messagebox "点确定清理添加的骨骼末端 (在 tempBoneEndAll 层中的骨骼) ~          "
 		)
