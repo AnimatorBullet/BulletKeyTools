@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-18 17:23:50
+ * @LastEditTime: 2021-02-23 12:38:47
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -247,6 +247,7 @@ rcmenu menuConfig
 (
 	local myMs = (getDir #Scripts)+ "\\BulletScripts\\BulletKeyTools.ms"
 	local startupPath = (getDir #StartupScripts)+ "\\BulletKeyTools.ms"
+	menuItem mItemHelpDoc "【必看帮助文档】"
 	menuItem mItemIsStartup "是否随Max自启"
 	menuItem mItemAddToolBarBtn "添加工具栏按钮"
 	menuItem mItemUpdateLog "更新记录"
@@ -275,6 +276,9 @@ rcmenu menuConfig
 		else (mItemAddToolBarBtn.checked = false)
 		mItemAutoCheckUpdate.checked = iniAutoCheckUpdate
 	)
+
+	on mItemHelpDoc picked do 
+	(shellLaunch "https://www.notion.so/anibullet/BsKeyTools-17b5ba7c37ae45f6a69ce90f45fa0657" "")
 
 	on mItemBilibili picked do 
 	(shellLaunch "https://space.bilibili.com/2031113" "")
@@ -935,7 +939,7 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 -------------主UI-----------------------------------------------------------------
 rollout rolBsKeyTools "" width:200 height:233
 (
-	local strMainRol = ("BsKeyTools v" + curVerBsKeyTools + "-----右键设置")
+	local strMainRol = ("BsKeyTools_v" + curVerBsKeyTools + "-----中键关闭")
 	---------------------------------UI--------------------------------------
 	groupbox gbxMainUI strMainRol pos:[5,5] width:190 height:192
 	
@@ -1081,7 +1085,7 @@ rollout rolBsKeyTools "" width:200 height:233
 		toolTip:"显示运动重影" pos:btnPos
 
 		local btnMsWidth = 72.5
-		checkbutton ckbSwitchMyScripts ">_<" pos:[5,230] width:35 height:20
+		checkbutton ckbSwitchMyScripts "切换" pos:[5,230] width:35 height:20
 		tooltip:"切换自定义脚本按钮" border:true highlightcolor:myCheckedColor 
 		button btnMyScripts1 "<＋＋>" pos:[40,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[1].dir border:true visible:false
@@ -1100,9 +1104,10 @@ rollout rolBsKeyTools "" width:200 height:233
 		button btnMyScripts8 "<＋＋>" pos:[257.5,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[8].dir border:true visible:false
 
-	groupbox gbxTips "" pos:[5,195] width:190 height:30
+	groupbox gbxTips "" pos:[5,195] width:155 height:30
 	
-		label lblLink "✨2019.9[miHoYo_Bullet.S]✨" pos:[25,205] width:160 height:15
+		label lblLink "2019.9[miHoYo_Bullet.S]4869" pos:[10,205] width:145 height:15
+		button btnConfig "设置" pos:[165,202] width:30 height:22 border:true
 
 	local m_PBKeyTimeArray
 	local m_PBKeyMiliSecArray
@@ -2146,6 +2151,8 @@ rollout rolBsKeyTools "" width:200 height:233
 	(
 		popupMenu menuConfig pos:[mouse.screenpos.x + 20,mouse.screenpos.y]
 	)
+
+	on btnConfig pressed do (popupMenu menuConfig pos:[mouse.screenpos.x + 20,mouse.screenpos.y])
 
 	on rolBsKeyTools mbuttondown pos do 
 	(
