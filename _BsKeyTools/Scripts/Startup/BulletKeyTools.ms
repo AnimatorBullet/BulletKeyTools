@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-23 12:38:47
+ * @LastEditTime: 2021-03-01 10:48:54
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -278,7 +278,7 @@ rcmenu menuConfig
 	)
 
 	on mItemHelpDoc picked do 
-	(shellLaunch "https://www.notion.so/anibullet/BsKeyTools-17b5ba7c37ae45f6a69ce90f45fa0657" "")
+	(shellLaunch "https://www.notion.so/bullet4869/4e28c488d5474a9082e164b7c5b6926c" "")
 
 	on mItemBilibili picked do 
 	(shellLaunch "https://space.bilibili.com/2031113" "")
