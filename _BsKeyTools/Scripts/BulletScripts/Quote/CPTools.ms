@@ -1,37 +1,50 @@
+
 struct myCoolDialogs
-(
-	labelStr,
-
-	stringQuery = rollout stringQuery "输入命名"
-	(
-		local returnStr
-
-		label lblHeader
-		editText etInput text:"pose"
-
-		fn launch label: =
+ (
+ 	labelStr,
+ 
+ 	stringQuery = rollout stringQuery "输入命名"
+ 	(
+ 		local returnStr
+ 	
+ 		label lblHeader
+ 		editText etInput text:"_pose"
+ 
+ 		fn launch label: =
+ 		(
+ 			destroyDialog myCoolDialogs.stringQuery
+ 			if label != unsupplied then
+ 				myCoolDialogs.labelStr = label
+ 			else myCoolDialogs.labelStr = "Enter some text:"
+ 			createDialog myCoolDialogs.stringQuery modal:true
+ 			returnStr -- only put it here if the dialog is modal
+ 		)
+ 
+ 		on stringQuery open do
+ 		(
+ 			lblHeader.text = myCoolDialogs.labelStr
+ 			setFocus etInput
+ 		)
+ 
+ 		on etInput entered str do
+ 		(
+ 			destroyDialog myCoolDialogs.stringQuery
+ 			returnStr = str
+-- 			cptools.rloading.pressed()
+			
+			)
+		 
+		on stringQuery close do 
 		(
 			destroyDialog myCoolDialogs.stringQuery
-			if label != unsupplied then
-				myCoolDialogs.labelStr = label
-			else myCoolDialogs.labelStr = "Enter some text:"
-			createDialog myCoolDialogs.stringQuery modal:true
-			returnStr -- only put it here if the dialog is modal
-		)
+ 			
+			returnStr = "未命名_pose"
+-- 			cptools.rloading.pressed()
+		
+ 		)	
+ 	)
+ )
 
-		on stringQuery open do
-		(
-			lblHeader.text = myCoolDialogs.labelStr
-			setFocus etInput
-		)
-
-		on etInput entered str do
-		(
-			destroyDialog myCoolDialogs.stringQuery
-			returnStr = str
-		)
-	)
-)
 global stime           = animationrange.start
 global etime           = animationrange.end
 global start_frame     = animationrange.start
@@ -162,8 +175,8 @@ fn english = (
 
 (
 ---------------------------------------------------------------------------------------------打开文件加载
-makeDir  ((GetDir #export)+ @"\\cptools_data\\")------创建路径
-tempdata = ((GetDir #export)+@"\\cptools_data\\"+"temp.ini")-----指定文件
+makeDir  ((GetDir #export)+ "\\cptools_data\\")------创建路径
+tempdata = ((GetDir #export)+"\\cptools_data\\"+"temp.ini")-----指定文件
 testPath = doesFileExist tempdata------检测文件是否存在
 if testPath == true then (
 open_tempdata   = openFile tempdata------打开temp文件
@@ -310,8 +323,8 @@ language_btn.text    = language_a_lag
 lnk1.text            = lnk1_lag
 ---------------------------------------------------------------------------------------------打开文件加载
 
-makeDir  ((GetDir #export)+ @"\\cptools_data\\")------创建路径
-tempdata = ((GetDir #export)+@"\\cptools_data\\"+"temp.ini")-----指定文件
+makeDir  ((GetDir #export)+ "\\cptools_data\\")------创建路径
+tempdata = ((GetDir #export)+"\\cptools_data\\"+"temp.ini")-----指定文件
 testPath = doesFileExist tempdata------检测文件是否存在
 if testPath == true do (
 open_tempdata   = openFile tempdata------打开temp文件
@@ -323,7 +336,7 @@ close open_tempdata
 )
 ----------------------------------------------------------------------------------------------------------
 ---------------------------------------获得文件列表
-file_name_array = getFiles ((GetDir #export)+@"\\cptools_data\\"+"*pose*.bps")
+file_name_array = getFiles ((GetDir #export)+"\\cptools_data\\"+"*pose*.bps")
 
 for Fe in file_name_array do
 (
@@ -331,7 +344,7 @@ Bip_FilesName=getFilenameFile Fe
 testList.items = append testList.items (Bip_FilesName as string)
 )
 
-file_name_array = getFiles ((GetDir #export)+@"\\cptools_data\\"+"animation*.bps")
+file_name_array = getFiles ((GetDir #export)+"\\cptools_data\\"+"animation*.bps")
 
 for Fe in file_name_array do
 (
@@ -352,7 +365,7 @@ if testListAni.items.count > 0 and testListAni.selection > 0 then
 testListAni.items = #()
 )
 
-file_name_array = getFiles ((GetDir #export)+@"\\cptools_data\\"+"*pose*.bps")
+file_name_array = getFiles ((GetDir #export)+"\\cptools_data\\"+"*pose*.bps")
 
 for Fe in file_name_array do
 (
@@ -361,7 +374,7 @@ testList.items = append testList.items (Bip_FilesName as string)
 testList.selection = testList.items.count
 )
 
-file_name_array = getFiles ((GetDir #export)+@"\\cptools_data\\"+"animation*.bps")
+file_name_array = getFiles ((GetDir #export)+"\\cptools_data\\"+"animation*.bps")
 
 for Fe in file_name_array do
 (
@@ -377,8 +390,8 @@ on cptools close do
 --if wayneCheckBox.checked == false then(for f in getFiles ((GetDir #export)+ "\\cptools_data\\"+"*.bps") do deleteFile f)
 ---------------------------------------------------------------------------------------------退出文件加载
 	
-makeDir  ((GetDir #export)+ @"\\cptools_data\\")------创建路径
-tempdata = ((GetDir #export)+@"\\cptools_data\\"+"temp.ini")-----指定文件
+makeDir  ((GetDir #export)+ "\\cptools_data\\")------创建路径
+tempdata = ((GetDir #export)+"\\cptools_data\\"+"temp.ini")-----指定文件
 create_tempdata = createfile tempdata
 if wayneCheckBox.checked == true then formatdata = "wayneCheckBox.checked = true" else formatdata = "wayneCheckBox.checked = false"
 if language_btn.text  == "En" then forlagdata = "Language = true" else  forlagdata = "Language = false" 
@@ -450,8 +463,7 @@ if(rb_sel.state==1)then(
 	
 if(selection.count == 0 )then(messagebox messagebox_a_lag   title:messagebox_a_title_lag beep:false )else(	
 -----------------------------------------手动输入----------------------------------------------
-	
- struct myCoolDialogs
+struct myCoolDialogs
  (
  	labelStr,
  
@@ -460,7 +472,7 @@ if(selection.count == 0 )then(messagebox messagebox_a_lag   title:messagebox_a_t
  		local returnStr
  	
  		label lblHeader
- 		editText etInput text:"pose"
+ 		editText etInput text:"_pose"
  
  		fn launch label: =
  		(
@@ -482,19 +494,36 @@ if(selection.count == 0 )then(messagebox messagebox_a_lag   title:messagebox_a_t
  		(
  			destroyDialog myCoolDialogs.stringQuery
  			returnStr = str
- 		)
+-- 			cptools.rloading.pressed()
+			
+			)
+		 
+		on stringQuery close do 
+		(
+			destroyDialog myCoolDialogs.stringQuery
+ 			
+			returnStr = "未命名_pose"
+-- 			cptools.rloading.pressed()
+		
+ 		)	
  	)
  )
  myCoolDialogs = myCoolDialogs() -- as there are variables, an instance is needed
  result = myCoolDialogs.stringQuery.launch label:"回车确认命名"
+
+
 -----------------------------------------手动输入----------------------------------------------
 	
 testList.items = append testList.items (result+ (testList.items.count+1) as string +" ("+ ((currentTime as integer)/TicksPerFrame)  as string +")")
+
+-- rloading.pressed()
+-- cptools.rloading.pressed()
+
 testList.selection = testList.items.count
 
 ---------------------------------------------------------------------------------------
 tabtxt   = testList.selection		
-out_name = ((GetDir #export)+"\\cptools_data\\ "+ result +tabtxt as string +" ("+ ((currentTime as integer)/TicksPerFrame) as string +")"+".bps")
+out_name = ((GetDir #export)+"\\cptools_data\\"+ result +tabtxt as string +" ("+ ((currentTime as integer)/TicksPerFrame) as string +")"+".bps")
 out_file = createfile out_name
 
 -------------------------------------将选择重新排序
@@ -699,7 +728,7 @@ if(rb_sel.state==1)then(
 if testList.items.count > 0 and testList.selection > 0 then(
 		
 tabtxt       = testList.selected
-delete_name  = ((GetDir #export)+@"\\cptools_data\\"+ tabtxt as string +".bps")
+delete_name  = ((GetDir #export)+"\\cptools_data\\"+ tabtxt as string +".bps")
 
 delete_file  = deleteFile delete_name 
 if delete_file == undefined do ( messagebox messagebox_c_lag  beep:false Title:messagebox_a_title_lag  Return 0 )
@@ -715,7 +744,7 @@ if testListAni.items.count > 0 and testListAni.selection > 0 then(
 
 tabtxt       = testListAni.selected
 --print tabtxt	
-delete_name = ((GetDir #export)+@"\\cptools_data\\"+ tabtxt as string +".bps")
+delete_name = ((GetDir #export)+"\\cptools_data\\"+ tabtxt as string +".bps")
 delete_file = deletefile delete_name
 if delete_file == undefined do ( messagebox messagebox_d_lag  beep:false Title:messagebox_a_title_lag Return 0 )
 --print delete_name 
@@ -730,7 +759,7 @@ testListAni.selection = testListAni.items.count
 on testList selected i do
 (
 tabtxt = testList.items[i]
-in_sel = ((GetDir #export)+@"\\cptools_data\\"+ tabtxt as string +".bps")
+in_sel = ((GetDir #export)+"\\cptools_data\\"+ tabtxt as string +".bps")
 in_file = openFile in_sel
 if in_file == undefined do  ( messagebox messagebox_c_lag beep:false Title:messagebox_a_title_lag Return 0 )
 
@@ -752,7 +781,7 @@ close in_file
 on testListAni selected i do
 (
 tabtxt = testListAni.items[i]
-in_sel = ((GetDir #export)+@"\\cptools_data\\"+ tabtxt as string +".bps")
+in_sel = ((GetDir #export)+"\\cptools_data\\"+ tabtxt as string +".bps")
 in_file = openFile in_sel
 if in_file == undefined do ( messagebox messagebox_d_lag beep:false Title:messagebox_a_title_lag Return 0 )
 
@@ -803,7 +832,7 @@ if(rb_sel.state==1)then(
 if testList.items.count > 0 and testList.selection > 0 then(
 	
 tabtxt  = testList.selected	
-in_name =  ((GetDir #export)+@"\\cptools_data\\"+ tabtxt as string +".bps")
+in_name =  ((GetDir #export)+"\\cptools_data\\"+ tabtxt as string +".bps")
 in_file = openFile in_name
 if in_file == undefined  do  ( messagebox messagebox_c_lag  beep:false Title:messagebox_a_title_lag  Return 0 )
 --with animate on
@@ -865,7 +894,7 @@ if ac.text =="C" then ( start_frame = spn_start.value+ paste_offset.value;end_fr
 if (start_frame>=end_frame)then(messagebox messagebox_b_lag title:messagebox_a_title_lag beep:false )else(    --time
 	
 tabtxt  = testListAni.selected
-in_name =  ((GetDir #export)+@"\\cptools_data\\"+ tabtxt as string +".bps")
+in_name =  ((GetDir #export)+"\\cptools_data\\"+ tabtxt as string +".bps")
 in_file = openFile in_name
 if in_file == undefined do (messagebox messagebox_d_lag beep:false Title:messagebox_a_title_lag Return 0 )
 
