@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-08 12:46:18
+ * @LastEditTime: 2021-04-09 19:30:36
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -551,7 +551,6 @@ rcmenu menuSetSpeed
 	)
 )
 ------------------帧率,播放速度------------------------------------------------------------
-
 rollout rolAddMyScripts "我的脚本" width:205 height:220
 (
 	label lblRename "↓请输入命名↓" pos:[20,5]
@@ -1668,12 +1667,6 @@ rollout rolBsKeyTools "" width:200 height:228
 			)
 		)
 	)
-	
-	fn fnChangetRangeTime =   ------------关键帧数字随滑条改变
-	(
-		rolBsKeyTools.spiStartTime.value = animationrange.start
-		rolBsKeyTools.spiEndTime.value = animationrange.end
-	)
 
 	fn fnSelLinkKeys keyFirst KeyEnd symbol =  ---------------选择link帧方法
 	(
@@ -2132,7 +2125,6 @@ rollout rolBsKeyTools "" width:200 height:228
 		fnLoadConfig ()  ---------------脚本位置赋值
 		fnSetConfig ()  ----------------保存位置信息到ini文件
 		fnReloadToolsBtn()
-		registerTimeCallback rolBsKeyTools.fnChangetRangeTime  -------------帧范围改变添加回调
 		if(switchMSPanel == 0) then (ckbSwitchMyScripts.checked = false)
 		else (ckbSwitchMyScripts.checked = true)
 		fnRefPlaySpeedValue ()  -----判断播放速度
@@ -3074,6 +3066,12 @@ rollout rolBsKeyTools "" width:200 height:228
 	)
 )
 Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#()
+fn fnUpdateTimeRangeValues = 
+(
+	rolBsKeyTools.spiStartTime.value = (animationRange.start.frame as integer)   
+	rolBsKeyTools.spiEndTime.value = (animationRange.end.frame as integer)
+)
+callbacks.addScript #animationRangeChange "fnUpdateTimeRangeValues()" id:#UpdateTimeRangeValues
 clearListener()  ---------清除侦听器
 
 (
