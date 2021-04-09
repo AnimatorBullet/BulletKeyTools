@@ -17,3 +17,5 @@ else
 	lightTintColor=color 0 0 0
 	redrawViews()
 )
+deletekeys ambientColorController #allKeys
+deletekeys lightTintColorController #allKeys

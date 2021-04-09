@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-03-01 10:48:54
+ * @LastEditTime: 2021-04-08 12:46:18
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -22,7 +22,6 @@ global dlFileBsKeyTools = (getdir #temp) + "\\_BsKeyTools（装完重启MAX,误�
 struct myScript (id,msName,dir)
 
 Global rolBsKeyTools
-Global rcBsAnimBtnBox
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPos  	--位置保存记录
 Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
@@ -75,7 +74,6 @@ Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
 Global arrTraj            = #()  ---轨迹存放数组, 方便删除
 Global arrTempUnSelection = #()  ---隐藏未选中临时存放数组
-Global uiClientOffsets    = undefined
 Global menuSetFps
 Global menuSetSpeed
 Global SIOFile = dotNetClass "System.IO.File"
@@ -250,13 +248,15 @@ rcmenu menuConfig
 	menuItem mItemHelpDoc "【必看帮助文档】"
 	menuItem mItemIsStartup "是否随Max自启"
 	menuItem mItemAddToolBarBtn "添加工具栏按钮"
-	menuItem mItemUpdateLog "更新记录"
 	subMenu "更新设置"
 	(
 		menuItem mItemCheckUpdate "检查更新"
 		menuItem mItemForceUpdate "强制更新"
 		menuItem mItemAutoCheckUpdate "自动检测"
+		menuItem mItemUpdateLog "更新记录"
 	)
+	menuItem mItemScriptsPath "脚本目录"
+	menuItem mItemConfigFilePath "配置文件"
 	separator menuSepUninstall
 	menuItem mItemCleanVirus "杀毒方案"
 	menuItem mItemClose "关闭工具"
@@ -278,13 +278,16 @@ rcmenu menuConfig
 	)
 
 	on mItemHelpDoc picked do 
-	(shellLaunch "https://www.notion.so/bullet4869/4e28c488d5474a9082e164b7c5b6926c" "")
+	(shellLaunch "https://www.notion.so/bullet4869/BsKeyTools-17b5ba7c37ae45f6a69ce90f45fa0657" "")
 
 	on mItemBilibili picked do 
 	(shellLaunch "https://space.bilibili.com/2031113" "")
 
 	on mItemTwitter picked do 
 	(shellLaunch "https://twitter.com/aniBulletCom" "")
+
+	on mItemScriptsPath picked do 
+	(shellLaunch (getdir #Scripts) "")
 
 	on mItemQgroup picked do
 	(
@@ -299,6 +302,13 @@ rcmenu menuConfig
 		if (queryBox "是否跳转网页查看Max和Maya病毒解决方案合集?    " \
 		title:"是否跳转网页" beep:false) then
 		(shellLaunch "https://www.anibullet.com/post/6569.html" "")
+	)
+
+	on mItemConfigFilePath picked do
+	(
+		if (queryBox "是否打开配置文件目录？（配置文件：BulletConfig.ini）    " \
+		title:"是否打开" beep:false) then
+		(shellLaunch (getFilenamePath BulletConfig) "")
 	)
 
 	on mItemIsStartup picked do 
@@ -937,9 +947,9 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 -----------------------------------------------------------------
 
 -------------主UI-----------------------------------------------------------------
-rollout rolBsKeyTools "" width:200 height:233
+rollout rolBsKeyTools "" width:200 height:228
 (
-	local strMainRol = ("BsKeyTools_v" + curVerBsKeyTools + "-----中键关闭")
+	local strMainRol = ("BsKeyTools_v" + curVerBsKeyTools + "（中键关闭）")
 	---------------------------------UI--------------------------------------
 	groupbox gbxMainUI strMainRol pos:[5,5] width:190 height:192
 	
@@ -983,7 +993,7 @@ rollout rolBsKeyTools "" width:200 height:233
 		checkbutton ckbHideBiped "隐Bip" width:45 height:25 highlightcolor:myCheckedColor \
 		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[145,92]
 		button btnHotAnimBtn "命令集" pos:[10,117] width:45 height:25 \
-		tooltip:"动画相关3dsMax自带按钮集合"
+		tooltip:"动画相关3dsMax自带功能集合"
 		button btnTrajedit "轨迹线" pos:[55,117] width:45 height:25 \
 		tooltip:"动画轨迹工具个人优化版"
 		button btnHideUnSel "隐未选" pos:[100,117]width:45 height:25 \
@@ -1012,13 +1022,13 @@ rollout rolBsKeyTools "" width:200 height:233
 	
 	groupbox gbxMinTools "" pos:[200,5] width:130 height:220
 	
-		checkbutton ckbC1 "坚" width:30 height:20 highlightcolor:myCheckedColor \
+		checkbutton ckbC1 "坚" width:30 height:25 highlightcolor:myCheckedColor \
 		pos:[205,15] toolTip:"" border:false
-		checkbutton ckbC2 "持" width:30 height:20 highlightcolor:myCheckedColor \
+		checkbutton ckbC2 "持" width:30 height:25 highlightcolor:myCheckedColor \
 		pos:[235,15] toolTip:"" border:false
-		checkbutton ckbC3 "热" width:30 height:20 highlightcolor:myCheckedColor \
+		checkbutton ckbC3 "热" width:30 height:25 highlightcolor:myCheckedColor \
 		pos:[265,15] toolTip:"" border:false
-		checkbutton ckbC4 "爱" width:30 height:20 highlightcolor:myCheckedColor \
+		checkbutton ckbC4 "爱" width:30 height:25 highlightcolor:myCheckedColor \
 		pos:[295,15] toolTip:"" border:false
 
 		local btnHeight = 30
@@ -1106,7 +1116,7 @@ rollout rolBsKeyTools "" width:200 height:233
 
 	groupbox gbxTips "" pos:[5,195] width:155 height:30
 	
-		label lblLink "2019.9[miHoYo_Bullet.S]4869" pos:[10,205] width:145 height:15
+		label lblLink "2019.9[miHoYo_Bullet.S]" pos:[15,205] width:140 height:15
 		button btnConfig "设置" pos:[165,202] width:30 height:22 border:true
 
 	local m_PBKeyTimeArray
@@ -1145,7 +1155,7 @@ rollout rolBsKeyTools "" width:200 height:233
 		if switchToolPanel == 0 then
 		(
 			rolBsKeyTools.width               = 200
-			rolBsKeyTools.height              = 233
+			rolBsKeyTools.height              = 228
 			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
 			ckbSwitchMyScripts.visible                = false
 			btnMyScripts1.visible                     = false
@@ -1173,7 +1183,7 @@ rollout rolBsKeyTools "" width:200 height:233
 		if switchToolPanel == 1 then
 		(
 			rolBsKeyTools.width               = 200
-			rolBsKeyTools.height              = 233
+			rolBsKeyTools.height              = 228
 			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
 			switchToolPanel                           = 0
 			ckbSwitchMyScripts.visible                = false
@@ -2177,10 +2187,6 @@ rollout rolBsKeyTools "" width:200 height:233
 		(
 			SetDialogPos rolBsKeyTools (mouse.screenpos - posMouMoved)			
 		)
-		if (uiClientOffsets == undefined) then 
-		(
-			uiClientOffsets = pos - (mouse.screenPos - (getDialogPos rolBsKeyTools)) 
-		)
 	)
 	---------------------上面设置拖动脚本窗口,去掉标题栏后默认无法拖动---------------------
 	on btnSelBiped pressed do ----选择biped
@@ -2987,8 +2993,7 @@ rollout rolBsKeyTools "" width:200 height:233
 
 	on btnHotAnimBtn pressed do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms")
-		(popupMenu rcBsAnimBtnBox pos:[mouse.screenpos.x - 120,mouse.screenpos.y + 10])
+		FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimButton.ms")
 	)
 
 	on ckbShadowCut changed state do
