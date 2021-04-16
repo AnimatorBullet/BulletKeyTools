@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-09 19:30:36
+ * @LastEditTime: 2021-04-16 15:16:09
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -79,6 +79,72 @@ Global menuSetSpeed
 Global SIOFile = dotNetClass "System.IO.File"
 Global SIODir = dotNetClass "System.IO.Directory"
 -- Global myTimer = dotnetobject "System.Timers.Timer" 500 autoreset:true
+-----------分屏判断--------------------------------------------------------------------------
+-- Struct MonitorInfoStruct 
+-- (
+--     MonitorOps,
+--     Primary,
+--     Secondary,
+--     Count,
+--     SecondMonitorPresent,
+--     PrimaryBounds,
+--     SecondaryBounds,
+--     PrimaryWorkingArea,
+--     SecondaryWorkingArea,
+    
+--     on create do 
+--     (
+-- 		MonitorOps = (dotnetclass "System.Windows.Forms.Screen")		
+-- 		Count = MonitorOps.AllScreens.count
+-- 		SecondMonitorPresent = if Count > 1 then true else false
+-- 		Primary = MonitorOps.primaryscreen
+		
+-- 		if Primary != undefined then 
+-- 		(
+-- 			PrimaryWorkingArea= [MonitorOps.primaryscreen.WorkingArea.Width,MonitorOps.primaryscreen.WorkingArea.Height]
+-- 			PrimaryBounds= [MonitorOps.primaryscreen.bounds.Width, MonitorOps.primaryscreen.bounds.Height]
+-- 		)
+		
+-- 		If SecondMonitorPresent then 
+-- 		(
+-- 			Secondary = MonitorOps.AllScreens[1]
+-- 			SecondaryWorkingArea= [MonitorOps.AllScreens[1].WorkingArea.Width,MonitorOps.AllScreens[1].WorkingArea.Height]	
+-- 			SecondaryBounds= [MonitorOps.AllScreens[1].bounds.Width,MonitorOps.AllScreens[1].bounds.Height]			
+-- 		)
+--     )		
+-- )
+-- fn GetMaxScreen =
+-- (
+--         winS = getMAXWindowPos()
+--         winE = winS + getMAXWindowSize()
+--         screens = (DotNetClass "System.Windows.Forms.Screen").AllScreens
+--         maxScreen = undefined
+--         maxScreenIntArea = 0
+--         for s in screens do
+--         (
+--                 scrS = [s.bounds.left, s.bounds.top]
+--                 scrE = [s.bounds.right, s.bounds.bottom]
+--                 resS = [(amax winS[1] scrS[1]), (amax winS[2] scrS[2])]
+--                 resE = [(amin winE[1] scrE[1]), (amin winE[2] scrE[2])]
+--                 if resE[1] <= resS[1] then continue
+--                 if resE[2] <= resS[2] then continue
+--                 local a = (resE[1] - resS[1]) * (resE[2] - resS[2])
+--                 if a > maxScreenIntArea then
+--                 (
+--                         maxScreenIntArea = a
+--                         maxScreen = s
+--                 )
+--         )
+--         return maxScreen
+-- )
+-- fn fnGetOpenPos = 
+-- (
+-- 	Monitor = GetMaxScreen()
+			
+-- 	posw = Monitor.WorkingArea.Width
+-- 	posh = Monitor.WorkingArea.Height
+-- 	[posw/2,posh/2]
+-- )
 ------------------全局变量-------------------------------------------------------------------
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
@@ -99,7 +165,7 @@ fn fnLoadToolConfig =
 )
 fn fnLoadConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
-	iniPos             = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" (mouse.screenpos as string)
+	iniPos             = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" (0 as string)
 	switchToolPanel    = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
 	switchMSPanel      = fnGetConfig switchMSPanel "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
 	idBtn              = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
@@ -299,14 +365,14 @@ rcmenu menuConfig
 
 	on mItemCleanVirus picked do
 	(
-		if (queryBox "是否跳转网页查看Max和Maya病毒解决方案合集?    " \
+		if (queryBox "是否跳转网页查看Max和Maya病毒解决方案合集?              " \
 		title:"是否跳转网页" beep:false) then
 		(shellLaunch "https://www.anibullet.com/post/6569.html" "")
 	)
 
 	on mItemConfigFilePath picked do
 	(
-		if (queryBox "是否打开配置文件目录？（配置文件：BulletConfig.ini）    " \
+		if (queryBox "是否打开配置文件目录？（配置文件：BulletConfig.ini）              " \
 		title:"是否打开" beep:false) then
 		(shellLaunch (getFilenamePath BulletConfig) "")
 	)
@@ -991,8 +1057,8 @@ rollout rolBsKeyTools "" width:200 height:228
 		width:45 height:25 toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[100,92]
 		checkbutton ckbHideBiped "隐Bip" width:45 height:25 highlightcolor:myCheckedColor \
 		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[145,92]
-		button btnHotAnimBtn "命令集" pos:[10,117] width:45 height:25 \
-		tooltip:"动画相关3dsMax自带功能集合"
+		button btnImageComp "构图框" pos:[10,117] width:45 height:25 \
+		tooltip:"各种经典分割视图以辅助构图"
 		button btnTrajedit "轨迹线" pos:[55,117] width:45 height:25 \
 		tooltip:"动画轨迹工具个人优化版"
 		button btnHideUnSel "隐未选" pos:[100,117]width:45 height:25 \
@@ -1051,8 +1117,8 @@ rollout rolBsKeyTools "" width:200 height:228
 		tooltip:"欧拉和TCB互转" pos:btnPos
 		button btnEulerFilter "欧拉过滤" width:btnWidth height:btnHeight visible:false \
 		tooltip:"Bone骨骼过滤欧拉旋转" pos:btnPos
-		button btnImageComp "构图辅助" width:btnWidth height:btnHeight visible:false \
-		tooltip:"各种经典分割视图以辅助构图" pos:btnPos
+		button btnHotAnimBtn "自带命令" width:btnWidth height:btnHeight visible:false \
+		tooltip:"动画相关3dsMax自带功能整合" pos:btnPos
 		button btnDelOutKeys "清所有帧" width:btnWidth height:btnHeight visible:false \
 		toolTip:"清除所有帧\r\nLink帧请手动删" pos:btnPos
 		button btnCleanOutKeys "清无限帧" width:btnWidth height:btnHeight visible:false \
@@ -1115,7 +1181,7 @@ rollout rolBsKeyTools "" width:200 height:228
 
 	groupbox gbxTips "" pos:[5,195] width:155 height:30
 	
-		label lblLink "2019.9[miHoYo_Bullet.S]" pos:[15,205] width:140 height:15
+		label lblLink "2019.9[miHoYo_Bullet.S]" pos:[15,207] width:140 height:15
 		button btnConfig "设置" pos:[165,202] width:30 height:22 border:true
 
 	local m_PBKeyTimeArray
@@ -1218,7 +1284,7 @@ rollout rolBsKeyTools "" width:200 height:228
 	fn fnReloadToolsBtn =
 	(
 		arrSourToolC1 = #(rolBsKeyTools.btnColorTools,rolBsKeyTools.btnFastAlign,
-						rolBsKeyTools.btnImageComp,rolBsKeyTools.btnAnimMirror,
+						rolBsKeyTools.btnHotAnimBtn,rolBsKeyTools.btnAnimMirror,
 						rolBsKeyTools.btnFnKeyType,rolBsKeyTools.btnBatchExport,
 						rolBsKeyTools.ckbIsoMesh,rolBsKeyTools.btnBipedTraj,
 						rolBsKeyTools.btnMeshTools,rolBsKeyTools.btnQuickPrev,
@@ -3065,7 +3131,9 @@ rollout rolBsKeyTools "" width:200 height:228
 		)
 	)
 )
-Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#()
+if (iniPos != 0) then (Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#())
+else (Createdialog rolBsKeyTools fgcolor:myFgColor style:#())
+
 fn fnUpdateTimeRangeValues = 
 (
 	rolBsKeyTools.spiStartTime.value = (animationRange.start.frame as integer)   
