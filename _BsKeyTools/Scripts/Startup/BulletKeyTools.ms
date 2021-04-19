@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-16 15:16:09
+ * @LastEditTime: 2021-04-19 14:29:54
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1181,7 +1181,7 @@ rollout rolBsKeyTools "" width:200 height:228
 
 	groupbox gbxTips "" pos:[5,195] width:155 height:30
 	
-		label lblLink "2019.9[miHoYo_Bullet.S]" pos:[15,207] width:140 height:15
+		label lblLink "2019.9[miHoYo_Bullet.S]" pos:[15,206] width:140 height:15
 		button btnConfig "设置" pos:[165,202] width:30 height:22 border:true
 
 	local m_PBKeyTimeArray
@@ -3063,8 +3063,11 @@ rollout rolBsKeyTools "" width:200 height:228
 	on btnCameraFromView pressed do
 	(
 		If (viewport.Gettype() == #view_persp_user) and (not theHold.Holding()) then 
-		(CreateCameraFromView(FreeCamera))
-		else (messagebox "请按“P”在自由视角创建，之后可能优化为任意视角~        \r\n" beep:false)
+		(
+			if ((maxVersion())[1] < 18000) then (macros.run "Lights and Cameras" "Camera_CreateFromView")
+			else(macros.run "Lights and Cameras" "StandardCamera_CreateFromView")
+		)
+		else (messagebox "请按“P”在自由视角创建，之后可能优化为任意视角~                \r\n" beep:false)
 	)
 
 	on btnMeshToBone pressed do 
