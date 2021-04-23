@@ -51,9 +51,10 @@
 -- v 2_2 keyframe ghosts - selection.count=0 not hiding
 --		  todo: pressets
 -- v 2_3 delete LT data button in help menu
+-- v 2_3_1 删除重影移至面板外面，新增渲染可见勾选项
 (
 global SanLightTable
-global SanLightTable_version="2_3"
+global SanLightTable_version="2_3_1"
 global SanLightTable_help
 try 
 	(
@@ -446,6 +447,11 @@ fn fn_SanLightTable_dialog_pos named_ini =
 		
 fn fn_onions_create oni_numb= 
 	(
+		local arrGhostLight = $'ghost_*'
+		for o in arrGhostLight do
+		(
+			o.renderable = SanLightTable.ckbRenderGhost.state
+		)
 		if SanLightTable.open==true and SanLightTable.ch_onion_enable.checked==true do 
 			(
 				if (oni_numb>0 and oni_numb<11 and SanLightTable.ch_before.checked==true) or (oni_numb>=11 and oni_numb<=20 and SanLightTable.ch_after.checked==true) do 
@@ -954,18 +960,23 @@ fn fn_recreate_onions_with_new_parametres =
 				fn_clean_array ()
 				
 				try 
+				(
+					for i=1 to 20 do 
 					(
-						for i=1 to 20 do 
-							(
-								local expr_hide="SanLightTable.ckb"+(i as string)+".checked"
-								if (execute expr_hide)!=false do 
-									(
-										fn_onions_create i
-										)
-								)
-						) catch ()
-				redrawViews()
-				)
+						local expr_hide="SanLightTable.ckb"+(i as string)+".checked"
+						if (execute expr_hide)!=false do 
+						(
+							fn_onions_create i
+						)
+					)
+				) catch ()
+			redrawViews()
+			)
+			local arrGhostLight = $'ghost_*'
+			for o in arrGhostLight do
+			(
+				o.renderable = SanLightTable.ckbRenderGhost.state
+			)
 		)
 		
 fn fn_lock_before = 
@@ -1053,8 +1064,9 @@ rollout SanLightTable ("[运动重影]_LightTable_v "+SanLightTable_version) wid
 	checkButton ch_before "前" pos:[24,8] width:48 height:24 checked:true highlightcolor: ch_colors
 	checkButton ch_after "后" pos:[464,8] width:48 height:24 checked:true highlightcolor: ch_colors
 	
-	button bt_add "重影高亮!" pos:[192,240] width:136 height:48 tooltip: "鼠标左击 = 所选物体显示重影\r\nCtrl+鼠标左击 = 添加所选物体显示重影\r\n鼠标右击 = 选中显示重影的物体"
-	
+	button bt_add "重影高亮" pos:[192,240] width:136 height:24 tooltip: "鼠标左击 = 所选物体显示重影\r\nCtrl+鼠标左击 = 添加所选物体显示重影\r\n鼠标右击 = 选中显示重影的物体"
+	button btnCleanGhost "删除重影" pos:[192,264] width:136 height:24
+
 	checkbutton ckb10 "10" pos:[8,40] width:24 height:24
 	checkbutton ckb9 "9" pos:[32,40] width:24 height:24
 	checkbutton ckb8 "8" pos:[56,40] width:24 height:24
@@ -1081,12 +1093,43 @@ rollout SanLightTable ("[运动重影]_LightTable_v "+SanLightTable_version) wid
 	radioButtons rdo_mode_frame "" pos:[85,240] width:82 height:48 labels:#("帧", "关键帧 (step)", "关键帧 (spline)") columns:1
 	button bt_help "?" pos:[0,1] width:16 height:15 toolTip:"鼠标左击 = 帮助\r\nCtrl+鼠标左击 = 打开 .config 设置文件的目录\r\nShift+鼠标左击 = 打开设置文件\r\nRight+鼠标左击 = “播放时显示重影”开关切换"
 
+	checkbox ckbRenderGhost "渲染可见" pos:[336,254] width:96 height:16 checked:false visible: true
 	checkbox ch_hide_on_play "播放时隐藏" pos:[336,272] width:96 height:16 checked:true visible: true 
 	checkButton ch_shaded "平面材质"  pos:[440,252] width:72 height:20 highlightcolor: ch_colors tooltip: "显示平面材质重影" --visible: false 
 	checkButton ch_alpha "不透明贴图"  pos:[440,272] width:72 height:20 highlightcolor: ch_colors tooltip: "在重影上使用材质不透明度贴图\r\n仅对Standard材质有效" --visible: false
 -- ) 
 -- createdialog SanLightTable
-	
+	on ckbRenderGhost changed state do
+	(
+		local arrGhostLight = $'ghost_*'
+		for o in arrGhostLight do
+		(
+			o.renderable = state
+		)
+	)
+
+	on btnCleanGhost pressed do 
+	(
+		deleteAppData rootnode SanLightTable_id_obj
+		try 
+		(
+			for i=1 to 20 do 
+			(
+				local expr="onions_arr_"+(i as string)
+				local arr=(execute expr)
+				delete arr
+				execute (expr+"=#()")
+			)
+			if SanLightTable_layer.current==true do 
+			(
+				SanLightTable_layer_0.current=true
+			)
+			LayerManager.deleteLayerByName "0 (LightTable_ghosts)"
+			onion_obj_arr=#()
+			redrawViews()
+		) catch ()
+	)
+
 	on SanLightTable open do with undo off animate off
 		(
 -- 			if (filterstring (gw.getDriverString()) " ")[1]=="Nitrous" do 

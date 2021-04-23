@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-19 14:29:54
+ * @LastEditTime: 2021-04-23 12:37:10
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -3137,12 +3137,12 @@ rollout rolBsKeyTools "" width:200 height:228
 if (iniPos != 0) then (Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#())
 else (Createdialog rolBsKeyTools fgcolor:myFgColor style:#())
 
-fn fnUpdateTimeRangeValues = 
+fn fnUpdateTimeRange = 
 (
 	rolBsKeyTools.spiStartTime.value = (animationRange.start.frame as integer)   
 	rolBsKeyTools.spiEndTime.value = (animationRange.end.frame as integer)
 )
-callbacks.addScript #animationRangeChange "fnUpdateTimeRangeValues()" id:#UpdateTimeRangeValues
+callbacks.addScript #animationRangeChange "fnUpdateTimeRange()" id:#UpdateTimeRange
 clearListener()  ---------清除侦听器
 
 (

@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-02-18 17:23:50
+ * @LastEditTime: 2021-04-19 14:29:54
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -22,7 +22,6 @@ global dlFileBsKeyTools = (getdir #temp) + "\\_BsKeyTools（装完重启MAX,误�
 struct myScript (id,msName,dir)
 
 Global rolBsKeyTools
-Global rcBsAnimBtnBox
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPos  	--位置保存记录
 Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
@@ -75,12 +74,77 @@ Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
 Global arrTraj            = #()  ---轨迹存放数组, 方便删除
 Global arrTempUnSelection = #()  ---隐藏未选中临时存放数组
-Global uiClientOffsets    = undefined
 Global menuSetFps
 Global menuSetSpeed
 Global SIOFile = dotNetClass "System.IO.File"
 Global SIODir = dotNetClass "System.IO.Directory"
 -- Global myTimer = dotnetobject "System.Timers.Timer" 500 autoreset:true
+-----------分屏判断--------------------------------------------------------------------------
+-- Struct MonitorInfoStruct 
+-- (
+--     MonitorOps,
+--     Primary,
+--     Secondary,
+--     Count,
+--     SecondMonitorPresent,
+--     PrimaryBounds,
+--     SecondaryBounds,
+--     PrimaryWorkingArea,
+--     SecondaryWorkingArea,
+    
+--     on create do 
+--     (
+-- 		MonitorOps = (dotnetclass "System.Windows.Forms.Screen")		
+-- 		Count = MonitorOps.AllScreens.count
+-- 		SecondMonitorPresent = if Count > 1 then true else false
+-- 		Primary = MonitorOps.primaryscreen
+		
+-- 		if Primary != undefined then 
+-- 		(
+-- 			PrimaryWorkingArea= [MonitorOps.primaryscreen.WorkingArea.Width,MonitorOps.primaryscreen.WorkingArea.Height]
+-- 			PrimaryBounds= [MonitorOps.primaryscreen.bounds.Width, MonitorOps.primaryscreen.bounds.Height]
+-- 		)
+		
+-- 		If SecondMonitorPresent then 
+-- 		(
+-- 			Secondary = MonitorOps.AllScreens[1]
+-- 			SecondaryWorkingArea= [MonitorOps.AllScreens[1].WorkingArea.Width,MonitorOps.AllScreens[1].WorkingArea.Height]	
+-- 			SecondaryBounds= [MonitorOps.AllScreens[1].bounds.Width,MonitorOps.AllScreens[1].bounds.Height]			
+-- 		)
+--     )		
+-- )
+-- fn GetMaxScreen =
+-- (
+--         winS = getMAXWindowPos()
+--         winE = winS + getMAXWindowSize()
+--         screens = (DotNetClass "System.Windows.Forms.Screen").AllScreens
+--         maxScreen = undefined
+--         maxScreenIntArea = 0
+--         for s in screens do
+--         (
+--                 scrS = [s.bounds.left, s.bounds.top]
+--                 scrE = [s.bounds.right, s.bounds.bottom]
+--                 resS = [(amax winS[1] scrS[1]), (amax winS[2] scrS[2])]
+--                 resE = [(amin winE[1] scrE[1]), (amin winE[2] scrE[2])]
+--                 if resE[1] <= resS[1] then continue
+--                 if resE[2] <= resS[2] then continue
+--                 local a = (resE[1] - resS[1]) * (resE[2] - resS[2])
+--                 if a > maxScreenIntArea then
+--                 (
+--                         maxScreenIntArea = a
+--                         maxScreen = s
+--                 )
+--         )
+--         return maxScreen
+-- )
+-- fn fnGetOpenPos = 
+-- (
+-- 	Monitor = GetMaxScreen()
+			
+-- 	posw = Monitor.WorkingArea.Width
+-- 	posh = Monitor.WorkingArea.Height
+-- 	[posw/2,posh/2]
+-- )
 ------------------全局变量-------------------------------------------------------------------
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
@@ -101,7 +165,7 @@ fn fnLoadToolConfig =
 )
 fn fnLoadConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
-	iniPos             = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" (mouse.screenpos as string)
+	iniPos             = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" (0 as string)
 	switchToolPanel    = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
 	switchMSPanel      = fnGetConfig switchMSPanel "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
 	idBtn              = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
@@ -247,15 +311,18 @@ rcmenu menuConfig
 (
 	local myMs = (getDir #Scripts)+ "\\BulletScripts\\BulletKeyTools.ms"
 	local startupPath = (getDir #StartupScripts)+ "\\BulletKeyTools.ms"
+	menuItem mItemHelpDoc "【必看帮助文档】"
 	menuItem mItemIsStartup "是否随Max自启"
 	menuItem mItemAddToolBarBtn "添加工具栏按钮"
-	menuItem mItemUpdateLog "更新记录"
 	subMenu "更新设置"
 	(
 		menuItem mItemCheckUpdate "检查更新"
 		menuItem mItemForceUpdate "强制更新"
 		menuItem mItemAutoCheckUpdate "自动检测"
+		menuItem mItemUpdateLog "更新记录"
 	)
+	menuItem mItemScriptsPath "脚本目录"
+	menuItem mItemConfigFilePath "配置文件"
 	separator menuSepUninstall
 	menuItem mItemCleanVirus "杀毒方案"
 	menuItem mItemClose "关闭工具"
@@ -276,11 +343,17 @@ rcmenu menuConfig
 		mItemAutoCheckUpdate.checked = iniAutoCheckUpdate
 	)
 
+	on mItemHelpDoc picked do 
+	(shellLaunch "https://www.notion.so/bullet4869/BsKeyTools-17b5ba7c37ae45f6a69ce90f45fa0657" "")
+
 	on mItemBilibili picked do 
 	(shellLaunch "https://space.bilibili.com/2031113" "")
 
 	on mItemTwitter picked do 
 	(shellLaunch "https://twitter.com/aniBulletCom" "")
+
+	on mItemScriptsPath picked do 
+	(shellLaunch (getdir #Scripts) "")
 
 	on mItemQgroup picked do
 	(
@@ -292,9 +365,16 @@ rcmenu menuConfig
 
 	on mItemCleanVirus picked do
 	(
-		if (queryBox "是否跳转网页查看Max和Maya病毒解决方案合集?    " \
+		if (queryBox "是否跳转网页查看Max和Maya病毒解决方案合集?              " \
 		title:"是否跳转网页" beep:false) then
 		(shellLaunch "https://www.anibullet.com/post/6569.html" "")
+	)
+
+	on mItemConfigFilePath picked do
+	(
+		if (queryBox "是否打开配置文件目录？（配置文件：BulletConfig.ini）              " \
+		title:"是否打开" beep:false) then
+		(shellLaunch (getFilenamePath BulletConfig) "")
 	)
 
 	on mItemIsStartup picked do 
@@ -537,7 +617,6 @@ rcmenu menuSetSpeed
 	)
 )
 ------------------帧率,播放速度------------------------------------------------------------
-
 rollout rolAddMyScripts "我的脚本" width:205 height:220
 (
 	label lblRename "↓请输入命名↓" pos:[20,5]
@@ -933,9 +1012,9 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 -----------------------------------------------------------------
 
 -------------主UI-----------------------------------------------------------------
-rollout rolBsKeyTools "" width:200 height:233
+rollout rolBsKeyTools "" width:200 height:228
 (
-	local strMainRol = ("BsKeyTools v" + curVerBsKeyTools + "-----右键设置")
+	local strMainRol = ("BsKeyTools_v" + curVerBsKeyTools + "（中键关闭）")
 	---------------------------------UI--------------------------------------
 	groupbox gbxMainUI strMainRol pos:[5,5] width:190 height:192
 	
@@ -978,8 +1057,8 @@ rollout rolBsKeyTools "" width:200 height:233
 		width:45 height:25 toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[100,92]
 		checkbutton ckbHideBiped "隐Bip" width:45 height:25 highlightcolor:myCheckedColor \
 		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[145,92]
-		button btnHotAnimBtn "命令集" pos:[10,117] width:45 height:25 \
-		tooltip:"动画相关3dsMax自带按钮集合"
+		button btnImageComp "构图框" pos:[10,117] width:45 height:25 \
+		tooltip:"各种经典分割视图以辅助构图"
 		button btnTrajedit "轨迹线" pos:[55,117] width:45 height:25 \
 		tooltip:"动画轨迹工具个人优化版"
 		button btnHideUnSel "隐未选" pos:[100,117]width:45 height:25 \
@@ -1008,13 +1087,13 @@ rollout rolBsKeyTools "" width:200 height:233
 	
 	groupbox gbxMinTools "" pos:[200,5] width:130 height:220
 	
-		checkbutton ckbC1 "坚" width:30 height:20 highlightcolor:myCheckedColor \
+		checkbutton ckbC1 "坚" width:30 height:25 highlightcolor:myCheckedColor \
 		pos:[205,15] toolTip:"" border:false
-		checkbutton ckbC2 "持" width:30 height:20 highlightcolor:myCheckedColor \
+		checkbutton ckbC2 "持" width:30 height:25 highlightcolor:myCheckedColor \
 		pos:[235,15] toolTip:"" border:false
-		checkbutton ckbC3 "热" width:30 height:20 highlightcolor:myCheckedColor \
+		checkbutton ckbC3 "热" width:30 height:25 highlightcolor:myCheckedColor \
 		pos:[265,15] toolTip:"" border:false
-		checkbutton ckbC4 "爱" width:30 height:20 highlightcolor:myCheckedColor \
+		checkbutton ckbC4 "爱" width:30 height:25 highlightcolor:myCheckedColor \
 		pos:[295,15] toolTip:"" border:false
 
 		local btnHeight = 30
@@ -1038,8 +1117,8 @@ rollout rolBsKeyTools "" width:200 height:233
 		tooltip:"欧拉和TCB互转" pos:btnPos
 		button btnEulerFilter "欧拉过滤" width:btnWidth height:btnHeight visible:false \
 		tooltip:"Bone骨骼过滤欧拉旋转" pos:btnPos
-		button btnImageComp "构图辅助" width:btnWidth height:btnHeight visible:false \
-		tooltip:"各种经典分割视图以辅助构图" pos:btnPos
+		button btnHotAnimBtn "自带命令" width:btnWidth height:btnHeight visible:false \
+		tooltip:"动画相关3dsMax自带功能整合" pos:btnPos
 		button btnDelOutKeys "清所有帧" width:btnWidth height:btnHeight visible:false \
 		toolTip:"清除所有帧\r\nLink帧请手动删" pos:btnPos
 		button btnCleanOutKeys "清无限帧" width:btnWidth height:btnHeight visible:false \
@@ -1081,7 +1160,7 @@ rollout rolBsKeyTools "" width:200 height:233
 		toolTip:"显示运动重影" pos:btnPos
 
 		local btnMsWidth = 72.5
-		checkbutton ckbSwitchMyScripts ">_<" pos:[5,230] width:35 height:20
+		checkbutton ckbSwitchMyScripts "切换" pos:[5,230] width:35 height:20
 		tooltip:"切换自定义脚本按钮" border:true highlightcolor:myCheckedColor 
 		button btnMyScripts1 "<＋＋>" pos:[40,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[1].dir border:true visible:false
@@ -1100,9 +1179,10 @@ rollout rolBsKeyTools "" width:200 height:233
 		button btnMyScripts8 "<＋＋>" pos:[257.5,230] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[8].dir border:true visible:false
 
-	groupbox gbxTips "" pos:[5,195] width:190 height:30
+	groupbox gbxTips "" pos:[5,195] width:155 height:30
 	
-		label lblLink "✨2019.9[miHoYo_Bullet.S]✨" pos:[25,205] width:160 height:15
+		label lblLink "2019.9[miHoYo_Bullet.S]" pos:[15,206] width:140 height:15
+		button btnConfig "设置" pos:[165,202] width:30 height:22 border:true
 
 	local m_PBKeyTimeArray
 	local m_PBKeyMiliSecArray
@@ -1140,7 +1220,7 @@ rollout rolBsKeyTools "" width:200 height:233
 		if switchToolPanel == 0 then
 		(
 			rolBsKeyTools.width               = 200
-			rolBsKeyTools.height              = 233
+			rolBsKeyTools.height              = 228
 			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
 			ckbSwitchMyScripts.visible                = false
 			btnMyScripts1.visible                     = false
@@ -1168,7 +1248,7 @@ rollout rolBsKeyTools "" width:200 height:233
 		if switchToolPanel == 1 then
 		(
 			rolBsKeyTools.width               = 200
-			rolBsKeyTools.height              = 233
+			rolBsKeyTools.height              = 228
 			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
 			switchToolPanel                           = 0
 			ckbSwitchMyScripts.visible                = false
@@ -1204,7 +1284,7 @@ rollout rolBsKeyTools "" width:200 height:233
 	fn fnReloadToolsBtn =
 	(
 		arrSourToolC1 = #(rolBsKeyTools.btnColorTools,rolBsKeyTools.btnFastAlign,
-						rolBsKeyTools.btnImageComp,rolBsKeyTools.btnAnimMirror,
+						rolBsKeyTools.btnHotAnimBtn,rolBsKeyTools.btnAnimMirror,
 						rolBsKeyTools.btnFnKeyType,rolBsKeyTools.btnBatchExport,
 						rolBsKeyTools.ckbIsoMesh,rolBsKeyTools.btnBipedTraj,
 						rolBsKeyTools.btnMeshTools,rolBsKeyTools.btnQuickPrev,
@@ -1652,12 +1732,6 @@ rollout rolBsKeyTools "" width:200 height:233
 				)
 			)
 		)
-	)
-	
-	fn fnChangetRangeTime =   ------------关键帧数字随滑条改变
-	(
-		rolBsKeyTools.spiStartTime.value = animationrange.start
-		rolBsKeyTools.spiEndTime.value = animationrange.end
 	)
 
 	fn fnSelLinkKeys keyFirst KeyEnd symbol =  ---------------选择link帧方法
@@ -2117,7 +2191,6 @@ rollout rolBsKeyTools "" width:200 height:233
 		fnLoadConfig ()  ---------------脚本位置赋值
 		fnSetConfig ()  ----------------保存位置信息到ini文件
 		fnReloadToolsBtn()
-		registerTimeCallback rolBsKeyTools.fnChangetRangeTime  -------------帧范围改变添加回调
 		if(switchMSPanel == 0) then (ckbSwitchMyScripts.checked = false)
 		else (ckbSwitchMyScripts.checked = true)
 		fnRefPlaySpeedValue ()  -----判断播放速度
@@ -2147,6 +2220,8 @@ rollout rolBsKeyTools "" width:200 height:233
 		popupMenu menuConfig pos:[mouse.screenpos.x + 20,mouse.screenpos.y]
 	)
 
+	on btnConfig pressed do (popupMenu menuConfig pos:[mouse.screenpos.x + 20,mouse.screenpos.y])
+
 	on rolBsKeyTools mbuttondown pos do 
 	(
 		try (destroydialog rolBsKeyTools) catch ()
@@ -2169,10 +2244,6 @@ rollout rolBsKeyTools "" width:200 height:233
 		if switchMouseState == on then
 		(
 			SetDialogPos rolBsKeyTools (mouse.screenpos - posMouMoved)			
-		)
-		if (uiClientOffsets == undefined) then 
-		(
-			uiClientOffsets = pos - (mouse.screenPos - (getDialogPos rolBsKeyTools)) 
 		)
 	)
 	---------------------上面设置拖动脚本窗口,去掉标题栏后默认无法拖动---------------------
@@ -2980,8 +3051,7 @@ rollout rolBsKeyTools "" width:200 height:233
 
 	on btnHotAnimBtn pressed do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimBtnBox.ms")
-		(popupMenu rcBsAnimBtnBox pos:[mouse.screenpos.x - 120,mouse.screenpos.y + 10])
+		FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimButton.ms")
 	)
 
 	on ckbShadowCut changed state do
@@ -2993,8 +3063,11 @@ rollout rolBsKeyTools "" width:200 height:233
 	on btnCameraFromView pressed do
 	(
 		If (viewport.Gettype() == #view_persp_user) and (not theHold.Holding()) then 
-		(CreateCameraFromView(FreeCamera))
-		else (messagebox "请按“P”在自由视角创建，之后可能优化为任意视角~        \r\n" beep:false)
+		(
+			if ((maxVersion())[1] < 18000) then (macros.run "Lights and Cameras" "Camera_CreateFromView")
+			else(macros.run "Lights and Cameras" "StandardCamera_CreateFromView")
+		)
+		else (messagebox "请按“P”在自由视角创建，之后可能优化为任意视角~                \r\n" beep:false)
 	)
 
 	on btnMeshToBone pressed do 
@@ -3061,7 +3134,15 @@ rollout rolBsKeyTools "" width:200 height:233
 		)
 	)
 )
-Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#()
+if (iniPos != 0) then (Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#())
+else (Createdialog rolBsKeyTools fgcolor:myFgColor style:#())
+
+fn fnUpdateTimeRangeValues = 
+(
+	rolBsKeyTools.spiStartTime.value = (animationRange.start.frame as integer)   
+	rolBsKeyTools.spiEndTime.value = (animationRange.end.frame as integer)
+)
+callbacks.addScript #animationRangeChange "fnUpdateTimeRangeValues()" id:#UpdateTimeRangeValues
 clearListener()  ---------清除侦听器
 
 (
