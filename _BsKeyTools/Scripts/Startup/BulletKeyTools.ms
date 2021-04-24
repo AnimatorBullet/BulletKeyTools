@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-24 23:57:08
+ * @LastEditTime: 2021-04-25 00:37:38
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1138,6 +1138,8 @@ rollout rolBsKeyTools "" width:200 height:228
 		toolTip:"显示运动重影" pos:btnPos
 		button btnWinbox "窗口找回" width:btnWidth height:btnHeight visible:false \
 		toolTip:"方便找回曲线编辑器等窗口(多屏导致窗口丢失)" pos:btnPos
+		button btnHideBipedTwists "隐 Twist" width:btnWidth height:btnHeight visible:false \
+		toolTip:"隐藏所有Biped自带Twists" pos:btnPos
 
 		local btnMsWidth = 72.5
 		checkbutton ckbSwitchMyScripts "切换" pos:[5,230] width:35 height:20
@@ -1277,7 +1279,7 @@ rollout rolBsKeyTools "" width:200 height:228
 						rolBsKeyTools.btnBipedScale,rolBsKeyTools.btnSelByColor)
 		arrSourToolC3 = #(rolBsKeyTools.btnCameraFromView,rolBsKeyTools.btnMeshToBone,
 						rolBsKeyTools.btnLightTable,rolBsKeyTools.btnWinbox,
-						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnHideBipedTwists,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp)
@@ -2153,6 +2155,38 @@ rollout rolBsKeyTools "" width:200 height:228
 				)
 				else arrMyScriptTemp[b].text = "<未定脚本>"
 			)
+		)
+	)
+
+	fn fnGetAllBipedTwist =
+	(
+		arrBipedRootAll = $'Bip00?'
+		arrBipedTwistAll = #()
+		for r in arrBipedRootAll do
+		(
+			nn = biped.maxTwistNodes r
+			nl = biped.maxTwistLinks r
+			ts = biped.getTwistStartId r
+			
+			for i = ts to ts+nn-1 do
+			(
+				anode = biped.getNode r i
+				if anode != undefined do
+				(
+				for j = 1 to nl do
+					(
+						alink = biped.getNode r i link:j
+						if alink != undefined do
+						(
+							appendIfUnique arrBipedTwistAll alink
+						)
+					)
+				)
+			)
+		)
+		for j in arrBipedTwistAll where j != undefined do
+		(
+			j.isHidden = not (j.isHidden)
 		)
 	)
 
@@ -3115,6 +3149,9 @@ rollout rolBsKeyTools "" width:200 height:228
 			messagebox "点确定清理添加的骨骼末端 (在 tempBoneEndAll 层中的骨骼) ~          "
 		)
 	)
+
+	on btnHideBipedTwists pressed do (fnGetAllBipedTwist())
+
 )
 if (iniPos != 0) then (Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#())
 else (Createdialog rolBsKeyTools fgcolor:myFgColor style:#())
