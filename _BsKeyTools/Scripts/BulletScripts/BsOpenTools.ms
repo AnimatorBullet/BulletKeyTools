@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-12 13:12:04
+ * @LastEditTime: 2021-04-25 01:17:49
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -188,17 +188,19 @@ rollout rolBsOpenTools "" width:340 height:345
 	groupbox grpMain "时光机_v0.3-----------------中键关闭,右击上层目录" \
 	width:330 height:340 pos:[5,0]
 	editText edtBrowseFolder "" text:"" labelOnTop:true align:#right \
-	height:20 fieldWidth:230 pos:[70,20] readOnly:true 
+	height:20 fieldWidth:210 pos:[70,22] readOnly:true 
 	button btnOpenAddress "..." align:#right tooltip:"选择打开目录" \
-	height:20 width:30 pos:[37,20] 
+	height:22 width:30 pos:[37,20] 
+	button btnPrevFolder "↑" tooltip:"返回上层目录，也可右击面板空白处" \
+	height:25 width:25 pos:[280,20] border:false
 	button btnOpenCurrentDir "打开" tooltip:"打开当前文件夹" \
-	height:20 width:30 pos:[300,20] border:false
+	height:25 width:25 pos:[305,20] border:false
 	-- button btnRemoveFolder "━" align:#left \
 	-- height:20 width:25 pos:[10,20] tooltip:"删除选中的收藏目录"
 	-- button btnAddFolder "✚" align:#left border:false \
 	-- height:20 width:20 pos:[35,20] tooltip:"新增常用目录"
 	button btnRefreshFolder "R" align:#left \
-	height:20 width:25 pos:[10,20] tooltip:"左：刷新当前文件目录\r\n右：重置场景"
+	height:22 width:25 pos:[10,20] tooltip:"左：刷新当前文件目录\r\n右：重置场景"
 	button btnLikedFolder "↓添加常用↓" border:false \
 	height:23 width:70 pos:[10,43] tooltip:"新增常用目录，右击选中条目删除"
 	dropdownlist ddlLikedFolder "" align:#left selection:1 \
@@ -460,11 +462,12 @@ rollout rolBsOpenTools "" width:340 height:345
 	
 	on rolBsOpenTools open do 
 	(
-		-- sldSetWidth.value         = iniWidthOpenTools
-		-- rolBsOpenTools.width      = iniWidthOpenTools
-		btnRefreshFolder.images   = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,3,3,3,3,true,false)
-		-- ckbLockWidth.images       = #("LockButtonExt_i.bmp","LockButtonExt_i.bmp",2,1,1,2,2,true,false)
-		btnOpenCurrentDir.images   = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,5,5,5,5,true,false)
+		-- sldSetWidth.value        = iniWidthOpenTools
+		-- rolBsOpenTools.width     = iniWidthOpenTools
+		btnRefreshFolder.images  = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,3,3,3,3,true,false)
+		-- ckbLockWidth.images      = #("LockButtonExt_i.bmp","LockButtonExt_i.bmp",2,1,1,2,2,true,false)
+		btnOpenCurrentDir.images = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,5,5,5,5,true,false)
+		btnPrevFolder.images     = #("MergeAnim_24i.bmp","MergeAnim_24i.bmp",4,1,1,1,1,false,false)
 
 		fnRefreshAddress ()
 		fnRefreshList maxFilePath type: arrFileType[rdoFileType.state]
@@ -522,6 +525,12 @@ rollout rolBsOpenTools "" width:340 height:345
 	(
 		fnRefreshAddress ()
 		fnRefreshList edtBrowseFolder.text type:arrFileType[rdoFileType.state]
+	)
+
+	on btnPrevFolder pressed do 
+	(
+		tempLastFolder = fnGetLastFolder edtBrowseFolder.text
+		fnRefreshList tempLastFolder type:arrFileType[rdoFileType.state]
 	)
 
 	on btnRefreshFolder rightclick do 

@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2020-12-29 01:12:45
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-01-10 16:05:48
+ * @LastEditTime: 2021-04-25 01:19:08
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -611,15 +611,15 @@ rollout rolRefTools ("[参考工具]-BsRefTools_v" + currentVersion)  width:340 
 	groupbox grpMain "" \
 	width:330 height:327 pos:[5,0]
 	editText edtBrowseFolder "" text:"" labelOnTop:true align:#right \
-	height:20 fieldWidth:215 pos:[63,12] readOnly:true 
-	button btnLastFolder "↑" height:20 width:20 pos:[10,12] border:true \
+	height:20 fieldWidth:210 pos:[70,12] readOnly:true 
+	button btnLastFolder "↑" height:25 width:25 pos:[280,10] border:false \
 	tooltip:"返回上层目录，也可右击文件或工具空白处"
 	button btnOpenAddress "..." align:#right tooltip:"选择打开目录" \
-	height:20 width:30 pos:[30,12] border:true
+	height:22 width:30 pos:[35,12] border:true
 	button btnOpenCurrentDir "打开" tooltip:"打开当前文件夹" \
-	height:20 width:25 pos:[305,12] border:false
-	button btnRefreshFolder "R" align:#left border:false \
-	height:20 width:25 pos:[279,12] tooltip:"左：刷新列表\r\n右：重置场景"
+	height:25 width:25 pos:[305,10] border:false
+	button btnRefreshFolder "R" align:#left border:true \
+	height:22 width:25 pos:[10,12] tooltip:"左：刷新列表\r\n右：重置场景"
 	
 	label labelSearch "↓词缀筛选↓" width:70 height:25 pos:[15,65]	
 	edittext edtFilterStr "" width:150 height:17 pos:[80,40] toolTip:"关键词筛选"
@@ -824,8 +824,9 @@ rollout rolRefTools ("[参考工具]-BsRefTools_v" + currentVersion)  width:340 
 
     on rolRefTools open do 
     (
-        btnRefreshFolder.images   = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,3,3,3,3,true,false)
-        btnOpenCurrentDir.images   = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,5,5,5,5,true,false)
+        btnRefreshFolder.images  = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,3,3,3,3,true,false)
+        btnOpenCurrentDir.images = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,5,5,5,5,true,false)
+		btnLastFolder.images     = #("MergeAnim_24i.bmp","MergeAnim_24i.bmp",4,1,1,1,1,false,false)
         fnSaveConfig ()  ---------------脚本位置等赋值
 		fnSetConfig ()  ----------------保存位置信息到ini文件
 		fnRefreshFilterItems ()
