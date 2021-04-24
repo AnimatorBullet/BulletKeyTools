@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-25 00:37:38
+ * @LastEditTime: 2021-04-25 01:22:41
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1139,7 +1139,7 @@ rollout rolBsKeyTools "" width:200 height:228
 		button btnWinbox "窗口找回" width:btnWidth height:btnHeight visible:false \
 		toolTip:"方便找回曲线编辑器等窗口(多屏导致窗口丢失)" pos:btnPos
 		button btnHideBipedTwists "隐 Twist" width:btnWidth height:btnHeight visible:false \
-		toolTip:"隐藏所有Biped自带Twists" pos:btnPos
+		toolTip:"隐藏所有Biped自带Twists，再点显示" pos:btnPos
 
 		local btnMsWidth = 72.5
 		checkbutton ckbSwitchMyScripts "切换" pos:[5,230] width:35 height:20
