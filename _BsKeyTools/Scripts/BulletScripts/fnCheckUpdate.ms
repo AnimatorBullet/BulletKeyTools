@@ -24,7 +24,7 @@ fn fnCheckUpdate currentVer verURL dlURL dlFile isForceUpdate:false =
         if LaterVersion_installed do (messageBox  ("您已安装最新版本：" + onlineVersion + "\r\n\r\n若本地版本不对应请稍后重试~        ") title:"最新版本" beep:false;result = OK)
 
         if not LaterVersion_installed AND (queryBox ("远程最新版本为: " + onlineVersion + "\r\n本地当前版本为: " + currentVer + \
-            "\r\n\r\n是否立即下载更新并安装脚本?\r\n注意:可在设置中开关自动检测更新!\r\n\r\n(建议只更新正式版,beta仅供测试不保证稳定)        ") title:"是否更新脚本") do 
+            "\r\n\r\n是否立即下载更新并安装脚本?\r\n注意:可在设置中开关自动检测更新!\r\n\r\n(建议只更新正式版,beta仅供测试不保证稳定)\r\n(回退默认安装最新版前一版本)                                      ") title:"是否更新脚本") do 
         (
             local Root = symbolicPaths.getPathValue "$Max"  --max根目录
 

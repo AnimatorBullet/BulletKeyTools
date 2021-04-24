@@ -3,13 +3,14 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-23 12:37:10
+ * @LastEditTime: 2021-04-24 23:57:08
 * @Email: animator.bullet@foxmail.com
 */
 
 try(destroydialog rolBsKeyTools)catch()
 try(destroydialog rolFnKeys)catch()
 try(destroydialog rolAddMyScripts)catch()
+try(destroydialog rolCustomFps)catch()
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
@@ -320,6 +321,7 @@ rcmenu menuConfig
 		menuItem mItemForceUpdate "强制更新"
 		menuItem mItemAutoCheckUpdate "自动检测"
 		menuItem mItemUpdateLog "更新记录"
+		menuItem mItemUndoVersion "回退版本"
 	)
 	menuItem mItemScriptsPath "脚本目录"
 	menuItem mItemConfigFilePath "配置文件"
@@ -419,6 +421,13 @@ rcmenu menuConfig
 	on mItemForceUpdate picked do 
 	(fnCheckUpdate curVerBsKeyTools verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools isForceUpdate:true)
 
+	on mItemUndoVersion picked do 
+	(
+		local dlUrlPreviousVersion = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/_PreviousVersion.exe"
+		local dlFilePreviousVersion = (getdir #temp) + "\\_PreviousVersion.exe"
+		fnCheckUpdate curVerBsKeyTools verUrlBsKeyTools dlUrlPreviousVersion dlFilePreviousVersion isForceUpdate:true
+	)
+
 	on mItemAutoCheckUpdate picked do 
 	(
 		if (mItemAutoCheckUpdate.checked == true) then (mItemAutoCheckUpdate.checked = false)
@@ -454,13 +463,62 @@ rcmenu menuConfig
 		)
 	)
 
-	on mItemUpdateLog picked do (FileIn ((getDir #scripts) + "\\BulletScripts\\UpdateLog.ms"))
+	on mItemUpdateLog picked do (shellLaunch "https://www.notion.so/bullet4869/4e28c488d5474a9082e164b7c5b6926c" "")
 )
 
 -------------------帧率,播放速度--------------------------------------------------------------
 Global valueFps
 Global valuePlaySpeed = ""
 Global strCurrentFps = framerate as string + "FPS"
+
+fn fnRefFps =
+(
+	local arrMenuSetFps = #(menuSetFps.menuSet60Fps,menuSetFps.menuSet30Fps, \
+							menuSetFps.menuSet24Fps,menuSetFps.menuCustomFps)
+	for i in arrMenuSetFps do i.checked = false
+	case of
+	(
+		(framerate == 60):(menuSetFps.menuSet60Fps.checked = true)
+		(framerate == 30):(menuSetFps.menuSet30Fps.checked = true)
+		(framerate == 24):(menuSetFps.menuSet24Fps.checked = true)
+		default:(menuSetFps.menuCustomFps.checked = true)
+	)
+	menuSetFps.menuCurrentFps.text = "当前: " + framerate as string + "FPS"
+	strCurrentFps = framerate as string + "FPS"
+	rolBsKeyTools.btnSetFps.text = strCurrentFps
+)
+
+fn fnSetFps numFps =
+(
+	framerate = numFps
+	valueFps = numFps
+	fnRefFps ()
+	slidertime -= 1
+	slidertime += 1
+)
+
+fn fnRefPlaySpeedValue =
+(
+	local arrMenuSetSpeed = #(menuSetSpeed.menuSet14Speed,menuSetSpeed.menuSet12Speed, \
+		menuSetSpeed.menuSet1Speed,menuSetSpeed.menuSet2Speed,menuSetSpeed.menuSet4Speed)
+		for i in arrMenuSetSpeed do i.checked = false
+	case of
+	(
+		(timeConfiguration.playbackSpeed == 1):(valuePlaySpeed = "-1/4x-";menuSetSpeed.menuSet14Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 2):(valuePlaySpeed = "-1/2x-";menuSetSpeed.menuSet12Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 3):(valuePlaySpeed = "- 1x -";menuSetSpeed.menuSet1Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 4):(valuePlaySpeed = "- 2x -";menuSetSpeed.menuSet2Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 5):(valuePlaySpeed = "- 4x -";menuSetSpeed.menuSet4Speed.checked =true)
+	)
+	rolBsKeyTools.btnSetSpeed.text = valuePlaySpeed
+	menuSetSpeed.menuCurrentSpeed.text = "当前: " + valuePlaySpeed
+)
+
+fn fnSetSpeed numSpeed =
+(
+	timeConfiguration.playbackSpeed = numSpeed
+	fnRefPlaySpeedValue ()
+)
 
 rollout rolCustomFps ""
 (
@@ -488,55 +546,10 @@ rollout rolCustomFps ""
 	(
 		framerate = valueFps
 		labTips.text = "当前:" + framerate as string + "FPS"
+		fnRefFps ()
 		slidertime -= 1
 		slidertime += 1
 	)
-)
-
-fn fnSetFps numFps =
-(
-	framerate = numFps
-	valueFps = numFps
-	strCurrentFps = numFps as string + "FPS"
-	rolBsKeyTools.btnSetFps.text = strCurrentFps 
-	slidertime -= 1
-	slidertime += 1
-)
-
-fn fnRefFps =
-(
-	local arrMenuSetFps = #(menuSetFps.menuSet60Fps,menuSetFps.menuSet30Fps, \
-							menuSetFps.menuSet24Fps,menuSetFps.menuCustomFps)
-	for i in arrMenuSetFps do i.checked = false
-	case of
-	(
-		(framerate == 60):(menuSetFps.menuSet60Fps.checked = true)
-		(framerate == 30):(menuSetFps.menuSet30Fps.checked = true)
-		(framerate == 24):(menuSetFps.menuSet24Fps.checked = true)
-		default:(menuSetFps.menuCustomFps.checked = true)
-	)
-)
-
-fn fnRefPlaySpeedValue =
-(
-	local arrMenuSetSpeed = #(menuSetSpeed.menuSet14Speed,menuSetSpeed.menuSet12Speed, \
-		menuSetSpeed.menuSet1Speed,menuSetSpeed.menuSet2Speed,menuSetSpeed.menuSet4Speed)
-		for i in arrMenuSetSpeed do i.checked = false
-	case of
-	(
-		(timeConfiguration.playbackSpeed == 1):(valuePlaySpeed = "-1/4x-";menuSetSpeed.menuSet14Speed.checked =true)
-		(timeConfiguration.playbackSpeed == 2):(valuePlaySpeed = "-1/2x-";menuSetSpeed.menuSet12Speed.checked =true)
-		(timeConfiguration.playbackSpeed == 3):(valuePlaySpeed = "- 1x -";menuSetSpeed.menuSet1Speed.checked =true)
-		(timeConfiguration.playbackSpeed == 4):(valuePlaySpeed = "- 2x -";menuSetSpeed.menuSet2Speed.checked =true)
-		(timeConfiguration.playbackSpeed == 5):(valuePlaySpeed = "- 4x -";menuSetSpeed.menuSet4Speed.checked =true)
-	)
-)
-
-fn fnSetSpeed numSpeed =
-(
-	timeConfiguration.playbackSpeed = numSpeed
-	fnRefPlaySpeedValue ()
-	rolBsKeyTools.btnSetSpeed.text = valuePlaySpeed
 )
 
 rcmenu menuSetFps
@@ -548,26 +561,11 @@ rcmenu menuSetFps
 	separator menuSepCustom
 	menuItem menuCustomFps "自定义帧率"
 
-	on menuSetFps open do 
-	(
-		strCurrentFps = framerate as string + "FPS"
-		menuSetFps.menuCurrentFps.text = "当前: " + framerate as string + "FPS"
-		fnRefFps ()
-		rolBsKeyTools.btnSetFps.text = strCurrentFps
-	)
+	on menuSetFps open do (fnRefFps ())
 
-	on menuSet60Fps picked do 
-	(
-		fnSetFps 60
-	)
-	on menuSet30Fps picked do
-	(
-		fnSetFps 30
-	)
-	on menuSet24Fps picked do 
-	(
-		fnSetFps 24
-	)
+	on menuSet60Fps picked do (fnSetFps 60)
+	on menuSet30Fps picked do(fnSetFps 30)
+	on menuSet24Fps picked do (fnSetFps 24)
 
 	on menuCustomFps picked do
 	(
@@ -588,33 +586,13 @@ rcmenu menuSetSpeed
 	menuItem menuSet2Speed "- 2x -"
 	menuItem menuSet4Speed "- 4x -"
 
-	on menuSetSpeed open do 
-	(
-		fnRefPlaySpeedValue ()
-		menuSetSpeed.menuCurrentSpeed.text = "当前: " + valuePlaySpeed
-		rolBsKeyTools.btnSetSpeed.text = valuePlaySpeed
-	)
+	on menuSetSpeed open do (fnRefPlaySpeedValue ())
 
-	on menuSet14Speed picked do 
-	(
-		fnSetSpeed 1
-	)
-	on menuSet12Speed picked do
-	(
-		fnSetSpeed 2
-	)
-	on menuSet1Speed picked do 
-	(
-		fnSetSpeed 3
-	)
-	on menuSet2Speed picked do 
-	(
-		fnSetSpeed 4
-	)
-	on menuSet4Speed picked do 
-	(
-		fnSetSpeed 5
-	)
+	on menuSet14Speed picked do (fnSetSpeed 1)
+	on menuSet12Speed picked do(fnSetSpeed 2)
+	on menuSet1Speed picked do (fnSetSpeed 3)
+	on menuSet2Speed picked do (fnSetSpeed 4)
+	on menuSet4Speed picked do (fnSetSpeed 5)
 )
 ------------------帧率,播放速度------------------------------------------------------------
 rollout rolAddMyScripts "我的脚本" width:205 height:220
@@ -1158,6 +1136,8 @@ rollout rolBsKeyTools "" width:200 height:228
 		toolTip:"破碎碎块快速加骨骼" pos:btnPos
 		button btnLightTable "运动重影" width:btnWidth height:btnHeight visible:false \
 		toolTip:"显示运动重影" pos:btnPos
+		button btnWinbox "窗口找回" width:btnWidth height:btnHeight visible:false \
+		toolTip:"方便找回曲线编辑器等窗口(多屏导致窗口丢失)" pos:btnPos
 
 		local btnMsWidth = 72.5
 		checkbutton ckbSwitchMyScripts "切换" pos:[5,230] width:35 height:20
@@ -1296,7 +1276,7 @@ rollout rolBsKeyTools "" width:200 height:228
 						rolBsKeyTools.btnEndBone,rolBsKeyTools.btnRenameTools,
 						rolBsKeyTools.btnBipedScale,rolBsKeyTools.btnSelByColor)
 		arrSourToolC3 = #(rolBsKeyTools.btnCameraFromView,rolBsKeyTools.btnMeshToBone,
-						rolBsKeyTools.btnLightTable,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnLightTable,rolBsKeyTools.btnWinbox,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
@@ -2194,8 +2174,7 @@ rollout rolBsKeyTools "" width:200 height:228
 		if(switchMSPanel == 0) then (ckbSwitchMyScripts.checked = false)
 		else (ckbSwitchMyScripts.checked = true)
 		fnRefPlaySpeedValue ()  -----判断播放速度
-		rolBsKeyTools.btnSetFps.text   = strCurrentFps
-		rolBsKeyTools.btnSetSpeed.text = valuePlaySpeed
+		fnRefFps ()
 		fnRefreshMagicBtn ()
 		-- if (switchToolPanel == 1) then
 		-- (
@@ -3060,6 +3039,9 @@ rollout rolBsKeyTools "" width:200 height:228
 	on btnRenameTools pressed do
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\P_ObjectRenamer.ms"))
 
+	on btnWinbox pressed do
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\WinBox.ms"))
+
 	on btnCameraFromView pressed do
 	(
 		If (viewport.Gettype() == #view_persp_user) and (not theHold.Holding()) then 
@@ -3143,6 +3125,8 @@ fn fnUpdateTimeRange =
 	rolBsKeyTools.spiEndTime.value = (animationRange.end.frame as integer)
 )
 callbacks.addScript #animationRangeChange "fnUpdateTimeRange()" id:#UpdateTimeRange
+callbacks.addScript #filePostOpen "fnRefFps()" id:#UpdateFps
+
 clearListener()  ---------清除侦听器
 
 (

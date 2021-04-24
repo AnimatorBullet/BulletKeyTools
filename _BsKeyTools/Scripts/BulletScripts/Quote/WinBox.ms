@@ -18,7 +18,7 @@ Struct LR_WindowBoxIconArrayStruct
     
         on create do 
         (
-        AssetDir = ((getdir #scripts) + "\\LoneRobot\\Assets\\Icons\\")			
+        AssetDir = (((getDir #scripts) + "\\BulletScripts\\Res") + "\\LoneRobot\\Assets\\Icons\\")			
         Base64Array = #("iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABkSURBVDhPY2AYNGAqA4PBLHaG/yCMy1EweZBaDDUgyf85KWCMzRBC8gzICtANwSeH4hJsConWDDMJXQPMW7i8hjW8sBmCL3DxBii+gCXadqINoSgQKY5GQgmFkDwDxUl5wDIlAJDs1e2XYdTMAAAAAElFTkSuQmCC",
                                     "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAB+SURBVDhPY2DAAyztPf7jk8crB9IMwyQbgqyZbENAtlLkBbKcDdMEtHkTFm9sQpJHDVx0f4L46ADZOyjq0W2C+f3mnUf/kTHMAGzqwYGFbsOjpy//I2OcLsDmL5DiN28/oGB0AwglIryBSHIMka2B7IRElaRMUWbCmeKwBAYATcmjtayLrD4AAAAASUVORK5CYII=",
                                         "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAC6SURBVDhPrZNNCsJADEa790Su3HoKFdSN7QE8gmuXXsBTeBSh4H9ptaVSa+kQm4gfKgjT1MAj80HyyGacdqdLTXB4mWu+WNaGd0XQBFwgZ9QsXLD2d6QBAn9zpNY0BpxtgGC7D2R5tsqlv/K79PvNMxAcTuHHBZxtgCAIL6QBguickAYI4iSl3nBS4UrnbAME6TWj/sgjY4x0zk/Zb3gGguyWV4suDcaedM42QHAvCtIAQVka0vCXz/QAti/6k/G1yaEAAAAASUVORK5CYII=")
@@ -65,9 +65,9 @@ Struct MonitorInfoStruct
 
 -- build the icons, unless they already exist. 
 LR_WindowBoxIconArrayStruct()	
-rollout WindowBox "WindowBox" width:520 height:0
+rollout WindowBox "WindowBox【找回窗口】" width:520 height:0
 (	
-    local AssetDir = ((getdir #scripts) + "\\LoneRobot\\Assets\\Icons\\")						
+    local AssetDir = (((getDir #scripts) + "\\BulletScripts\\Res") + "\\LoneRobot\\Assets\\Icons\\")						
     local WindowIcon 
     local CloseIcon 
     local ResetIcon		
@@ -159,7 +159,7 @@ rollout WindowBox "WindowBox" width:520 height:0
                     format "Error:% Line:% Column:% %\n" err.ErrorNumber err.Line \											  
                                                             err.Column err.ErrorText to:errs 
                 )
-                MessageBox (errs as string) title: "Errors encountered while compiling VB code"
+                MessageBox (errs as string) title: "编译VB代码时遇到的错误"
                 return undefined
             ) 	
         return compilerResults.CompiledAssembly.CreateInstance "DialogWindowOps"
@@ -316,11 +316,11 @@ rollout WindowBox "WindowBox" width:520 height:0
         ResetIcon =   (dotNetclass "System.Drawing.image").fromfile (AssetDir + @"WBmove.png")	
 
         ResizeColBanner.backcolor =  colorclass.fromargb 51 83 102
-        ResizeColBanner.text = "Double-click the window icon on the left to reset window to screen top left"
+        ResizeColBanner.text = "双击左侧的窗口图标或右侧四方箭头图标可将窗口重置为屏幕左上方"
         ResizeColBanner.forecolor = colorclass.lightgray
         ResizeColBanner.textalign = ContAlign.middleleft
         ResizeColBanner.padding =dotNetobject "System.Windows.Forms.padding" 6 4 10 4		
-        ResizeColBanner.font = dotNetObject "System.Drawing.Font" "Verdana" 7.0 ((dotNetClass "System.Drawing.FontStyle").bold)
+        ResizeColBanner.font = dotNetObject "System.Drawing.Font" "Verdana" 9.0 ((dotNetClass "System.Drawing.FontStyle").bold)
 
         InitDataGrid data		
     )
