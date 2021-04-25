@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-25 01:17:49
+ * @LastEditTime: 2021-04-25 14:28:35
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -16,7 +16,7 @@ global dateTime = (dotNetClass "System.DateTime").Now
 global arrDayWeek = #("日", "一", "二", "三", "四", "五", "六")
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPosOpenTools
--- Global iniWidthOpenTools  = 340
+Global iniWidthOpenTools  = 340
 Global iniDesktop         = (itemsFolder name:"Desktop" dir:"")
 -- Global iniRefPicDir			= (itemsFolder name:"RefPicDir" dir:"")
 Global posMouMove         = [0,0]
@@ -80,7 +80,7 @@ fn fnSaveConfig =  --引用上面方法提出需要的参数
 	iniSelectedID     = fnGetConfig iniSelectedID "BsOpenToolsSet" "SelectedID" (iniSelectedID as string)
 	iniLikedFolder    = fnGetConfig iniLikedFolder "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
 	iniFilterPrefix   = fnGetConfig iniFilterPrefix "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)
-	-- iniWidthOpenTools = fnGetConfig iniWidthOpenTools "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
+	iniWidthOpenTools = fnGetConfig iniWidthOpenTools "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
 	iniDesktop        = fnGetConfig iniDesktop "BsOpenToolsSet"  "Desktop" (iniDesktop as string)
 	-- iniRefPicDir        = fnGetConfig iniRefPicDir "BsOpenToolsSet"  "RefPicDir" (iniRefPicDir as string)
 )
@@ -91,7 +91,7 @@ fn fnSetConfig =  --保存参数,脚本位置
 	SetINISetting BulletConfig "BsOpenToolsSet"  "SelectedID" (iniSelectedID as string)
 	SetINISetting BulletConfig "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
 	SetINISetting BulletConfig "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)
-	-- SetINISetting BulletConfig "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
+	SetINISetting BulletConfig "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
 	SetINISetting BulletConfig "BsOpenToolsSet"  "Desktop" (iniDesktop as string)
 	-- SetINISetting BulletConfig "BsOpenToolsSet"  "RefPicDir" (iniRefPicDir as string)
 )
@@ -183,10 +183,10 @@ rollout rolAddItem "添加" width:340 height:80
 	)
 )
 
-rollout rolBsOpenTools "" width:340 height:345
+rollout rolBsOpenTools "" width:340 height:365
 (
 	groupbox grpMain "时光机_v0.3-----------------中键关闭,右击上层目录" \
-	width:330 height:340 pos:[5,0]
+	width:330 height:360 pos:[5,0]
 	editText edtBrowseFolder "" text:"" labelOnTop:true align:#right \
 	height:20 fieldWidth:210 pos:[70,22] readOnly:true 
 	button btnOpenAddress "..." align:#right tooltip:"选择打开目录" \
@@ -210,31 +210,31 @@ rollout rolBsOpenTools "" width:340 height:345
 	button btnFilterPrefix "✚过滤词缀✚" border:false \
 	height:23 width:70 pos:[10,95] tooltip:"左：添加过滤\r\n右：取消过滤\r\n选中过滤列表\r\n右击删除条目"
 	listBox ltbFilterPrefix "" align:#left selection:0 \
-	height:6 width:70 pos:[10,120]
+	height:8 width:70 pos:[10,120]
 	radioButtons rdoFileType "" columns:5 offsets:#([14,0],[14,0],[14,0],[14,0]) \
 	pos:[82,48] labels:#(".max",".fbx",".bip",".ms") 
 
 	-- button btnRefPicDir "图片参考" border:false \
 	-- height:25 width:70 pos:[10,182] tooltip:"左：打开参考，右：创建Plane"
 	button btnRecentFileDir "最近打开" border:false \
-	height:25 width:70 pos:[10,208] tooltip:"最近打开文件"
+	height:25 width:70 pos:[10,230] tooltip:"最近打开文件"
 	button btnDesktopDir "桌面自定" border:false \
-	height:25 width:70 pos:[10,234] tooltip:"自定文件夹，默认桌面，右键可设"
+	height:25 width:70 pos:[10,255] tooltip:"自定文件夹，默认桌面，右键可设"
 	button btnScriptsDir "脚本目录" border:false \
-	height:25 width:70 pos:[10,260] tooltip:"脚本文件夹\r\n左：根目录\r\n右：自启目录"
+	height:25 width:70 pos:[10,280] tooltip:"脚本文件夹\r\n左：根目录\r\n右：自启目录"
 	button btnAutobackDir "自动保存" border:false \
-	height:25 width:70 pos:[10,286] tooltip:"自动保存目录"
+	height:25 width:70 pos:[10,305] tooltip:"自动保存目录"
 	-- button btnPreviewDir "<轮回梦境>" border:false \
 	-- height:25 width:70 pos:[10,310] tooltip:"左：预览视频默认文件夹\r\n右：快速拍屏渲染预览动画"
-	groupBox grpDate "" width:330 height:30 pos:[5,310]
-	label lblCountTips "" height:15 width:80 pos:[15,320]
-	label lblDateTime "" height:15 width:130 pos:[120,320] 
+	groupBox grpDate "" width:330 height:30 pos:[5,330]
+	label lblCountTips "" height:15 width:80 pos:[15,340]
+	label lblDateTime "" height:15 width:130 pos:[120,340] 
 	HyperLink lnkLink "miHoYo_Bullet.S" color:myfgColor hovercolor:myClickColor visitedcolor:myClickColor \
-	pos:[245,320] address:"https://space.bilibili.com/2031113"
-	-- checkbutton ckbLockWidth "🔒" pos:[86,312] width:20 height:20 border:false \
-	-- toolTip:"是否解锁宽度调节\r\n右：重置宽度" checked:false
-	-- slider sldSetWidth "" pos:[113,312] range:[300,500,iniWidthOpenTools] ticks:0 \
-	-- width:182 type:#integer toolTip:"调节面板宽度,以显示更多字" enabled:false
+	pos:[245,340] address:"https://space.bilibili.com/2031113"
+	checkbutton ckbLockWidth "🔒" pos:[86,312] width:20 height:20 border:false \
+	toolTip:"是否解锁宽度调节\r\n右：重置宽度" checked:false
+	slider sldSetWidth "" pos:[113,312] range:[340,540,iniWidthOpenTools] ticks:0 \
+	width:222 type:#integer toolTip:"调节面板宽度,以显示更多字" enabled:false
 	-- label labLogo "-------------------------  TECH OTAKUS SAVE THE WORLD -" pos:[12,365]
 	------------------------------------------------- ↑ UI -------------------------------------
 	
@@ -462,12 +462,12 @@ rollout rolBsOpenTools "" width:340 height:345
 	
 	on rolBsOpenTools open do 
 	(
-		-- sldSetWidth.value        = iniWidthOpenTools
-		-- rolBsOpenTools.width     = iniWidthOpenTools
+		sldSetWidth.value        = iniWidthOpenTools
+		rolBsOpenTools.width     = iniWidthOpenTools
 		btnRefreshFolder.images  = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,3,3,3,3,true,false)
-		-- ckbLockWidth.images      = #("LockButtonExt_i.bmp","LockButtonExt_i.bmp",2,1,1,2,2,true,false)
+		ckbLockWidth.images      = #("LockButtonExt_i.bmp","LockButtonExt_i.bmp",2,1,1,2,2,true,false)
 		btnOpenCurrentDir.images = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,5,5,5,5,true,false)
-		btnPrevFolder.images     = #("MergeAnim_24i.bmp","MergeAnim_24i.bmp",4,1,1,1,1,false,false)
+		btnPrevFolder.images     = #("MergeAnim_24i.bmp","MergeAnim_24i.bmp",4,1,1,1,1,false,true)
 
 		fnRefreshAddress ()
 		fnRefreshList maxFilePath type: arrFileType[rdoFileType.state]
@@ -485,7 +485,7 @@ rollout rolBsOpenTools "" width:340 height:345
 	(
 		iniPosOpenTools   = (GetDialogPos rolBsOpenTools)
 		iniSelectedID     = rolBsOpenTools.ddlLikedFolder.selection
-		-- iniWidthOpenTools = rolBsOpenTools.width
+		iniWidthOpenTools = rolBsOpenTools.width
 		fnSetConfig ()
 	)
 
@@ -519,7 +519,35 @@ rollout rolBsOpenTools "" width:340 height:345
 			SetDialogPos rolBsOpenTools (mouse.screenpos - posMouMove)			
 		)
 	)
+
+	on rolBsOpenTools resized pos do
+	(
+		grpMain.width          = rolBsOpenTools.width - 10
+		grpDate.width          = rolBsOpenTools.width - 10
+		edtBrowseFolder.width  = rolBsOpenTools.width - 130
+		ltbFilesList.width     = rolBsOpenTools.width - 95
+		btnOpenCurrentDir.pos  = [rolBsOpenTools.width - 35,20]
+		btnPrevFolder.pos      = [rolBsOpenTools.width - 60,20]
+
+	)
 	------------------------------------------------------------------------------
+
+	on ckbLockWidth changed state do 
+	(
+		if state == on then sldSetWidth.enabled = true 
+		else sldSetWidth.enabled = false
+	)
+
+	on ckbLockWidth rightclick do
+	(
+		rolBsOpenTools.width = 340
+		sldSetWidth.value    = 340
+	)
+
+	on sldSetWidth changed ticks do
+	(
+		rolBsOpenTools.width = ticks
+	)
 
 	on btnRefreshFolder pressed do 
 	(
