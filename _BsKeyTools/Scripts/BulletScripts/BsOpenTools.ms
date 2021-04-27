@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-25 14:28:35
+ * @LastEditTime: 2021-04-27 13:06:26
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -185,7 +185,7 @@ rollout rolAddItem "添加" width:340 height:80
 
 rollout rolBsOpenTools "" width:340 height:365
 (
-	groupbox grpMain "时光机_v0.3-----------------中键关闭,右击上层目录" \
+	groupbox grpMain "时光机_v0.4---------中键关闭,右击上层目录" \
 	width:330 height:360 pos:[5,0]
 	editText edtBrowseFolder "" text:"" labelOnTop:true align:#right \
 	height:20 fieldWidth:210 pos:[70,22] readOnly:true 
@@ -764,9 +764,8 @@ rollout rolBsOpenTools "" width:340 height:365
 		lblCountTips.text = "文件：" + arrRecentFiles.count as string
 	)
 )
-CreateDialog rolBsOpenTools pos:iniPosOpenTools fgcolor:myfgColor \
-style:#() lockHeight:true
-
+if (iniPosOpenTools != 0) then (Createdialog rolBsOpenTools fgcolor:myFgColor pos:iniPosOpenTools style:#() lockHeight:true)
+else (Createdialog rolBsOpenTools fgcolor:myFgColor style:#() lockHeight:true)
 ------------------------toolbar----------------------------------------------------
 macroScript BsOpenTools
 category:"_[BulletTools]"
