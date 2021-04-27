@@ -7,8 +7,9 @@ global myCheckedColor ----fnGetColorTheme.ms
 
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPosAnimButtonTools
-Global posAnimButtonMouMove         = [0,0]
-Global switchAnimButtonMouState     = false
+Global posAnimButtonMouMove     = [0,0]
+Global switchAnimButtonMouState = false
+global iniAnimButtonSelected    = 1
 
 fn fnGetColorTheme =
 (
@@ -41,7 +42,8 @@ fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方�
 )
 fn fnSaveConfig =  --引用上面方法提出需要的参数
 (----提出脚本位置
-    iniPosAnimButtonTools   = fnGetConfig iniPosAnimButtonTools "BsAnimButtonSet" "PosAnimButton" (mouse.screenpos as string)
+    iniPosAnimButtonTools = fnGetConfig iniPosAnimButtonTools "BsAnimButtonSet" "PosAnimButton" (mouse.screenpos as string)
+    iniAnimButtonSelected = fnGetConfig iniAnimButtonSelected "BsAnimButtonSet" "AnimButtonSelected" "1"
 )
 fnSaveConfig () --初始执行一遍
 fn fnSetConfig =  --保存参数,脚本位置
@@ -71,30 +73,17 @@ rollout rolAnimBtn5 "系统"
 (
     
 )
-rollout rolAnimBtn6 "系统"
-(
-    
-)
 
-arrRolAnimBtn1 = #(
+arrRolAnimBtn = #(
     #("☘︎模型☘︎",#(rolAnimBtn1)),
     #("☕︎蒙皮☕︎",#(rolAnimBtn2)),
-    #("✜约束✜",#(rolAnimBtn3))
-)
-arrRolAnimBtn2 = #(
-    #("⚔︎动画⚔︎",#(rolAnimBtn4)),
-    #("✈︎系统✈︎",#(rolAnimBtn5)),
-    #("✈︎系统✈︎",#(rolAnimBtn6))
-)
-arrRolAnimBtn = #(arrRolAnimBtn1,arrRolAnimBtn2)
+    #("✜动画✜",#(rolAnimBtn3)),
+    #("✈︎系统✈︎",#(rolAnimBtn4))
+)	
 
 rcmenu RCmenuConfig
 (
-    menuItem mHelp "帮助"
     menuItem mAbout "📺 miHoYo_Bullet.S"
-
-	on mHelp picked do 
-	(shellLaunch "https://www.notion.so/bullet4869/BsKeyTools-17b5ba7c37ae45f6a69ce90f45fa0657" "")
 
     on mAbout picked do 
     (shellLaunch "https://space.bilibili.com/2031113" "")
@@ -104,17 +93,21 @@ rollout rolBsAnimButton  "BsAnimButton_v1.0"
 (
     local LastSubRollout = 1
 
-    dotNetControl dotnetTabCon "System.Windows.Forms.TabControl" height:70 width:200 align:#center pos:[0,0]
-    -- edittext lblBilibili "" pos:[0,480] readonly:true width:305 height:15 text:"https://space.bilibili.com/2031113"
-    subRollout subRolMainUI width:925 height:500 align:#center pos:[200,0]
+    dotNetControl dotnetTabCon "System.Windows.Forms.TabControl" height:20 width:285 align:#center pos:[0,0]
+    button btnExit "✖" width:20 height:20 pos:[980,0]  border:false
+    button btnHelp "？" width:20 height:20 pos:[960,0]  border:false
+    subRollout subRolMainUI width:1000 height:85 align:#center pos:[0,20]
     
+    on btnHelp pressed do 
+    (shellLaunch "https://www.notion.so/bullet4869/BsKeyTools-17b5ba7c37ae45f6a69ce90f45fa0657" "")
+
     on dotnetTabCon Selected itm do
     (
         if LastSubRollout != (itm.TabPageIndex+1) do --处理相同tab情况
         (
-            for subroll in arrRolAnimBtn1[LastSubRollout][2] do
+            for subroll in arrRolAnimBtn[LastSubRollout][2] do
                 removeSubRollout subRolMainUI subroll
-            for subroll in arrRolAnimBtn1[LastSubRollout = itm.TabPageIndex+1][2] do	
+            for subroll in arrRolAnimBtn[LastSubRollout = itm.TabPageIndex+1][2] do	
                 addSubRollout subRolMainUI subroll
         ) 
     )
@@ -123,15 +116,17 @@ rollout rolBsAnimButton  "BsAnimButton_v1.0"
     (
         fnSaveConfig ()  ---------------脚本位置等赋值
 		fnSetConfig ()  ----------------保存位置信息到ini文件
-        dotnetTabCon.Alignment = dotnetTabCon.Alignment.left
+        -- dotnetTabCon.Appearance = dotnetTabCon.Appearance.Buttons
+        dotnetTabCon.dock     = dotnetTabCon.dock.Fill
         dotnetTabCon.Drawmode = dotnetTabCon.Drawmode.OwnerDrawFixed
         dotnetTabCon.SizeMode = dotnetTabCon.SizeMode.Fixed
-        dotnetTabCon.ItemSize = dotNetobject "System.Drawing.Size" 20 70
-        for aTab in arrRolAnimBtn1 do
+        dotnetTabCon.ItemSize = dotNetobject "System.Drawing.Size" 70 20
+        
+        for aTab in arrRolAnimBtn do
         (
             dotnetTabCon.TabPages.add aTab[1]
         )
-        for subroll in arrRolAnimBtn1[1][2] do addSubRollout subRolMainUI subroll			
+        for subroll in arrRolAnimBtn[1][2] do addSubRollout subRolMainUI subroll			
     )
 
 	on rolBsAnimButton close do -- 关闭记忆浮动窗口位置
@@ -172,5 +167,5 @@ rollout rolBsAnimButton  "BsAnimButton_v1.0"
 )
 -- createDialog rolBsAnimButton 1000 100 fgcolor:myFgColor menu:RCmenuConfig
 if (iniPosAnimButtonTools != 0) then 
-(Createdialog rolBsAnimButton 1000 105 fgcolor:myFgColor pos:iniPosAnimButtonTools style:#())
-else (Createdialog rolBsAnimButton 1000 105 fgcolor:myFgColor style:#())
+(Createdialog rolBsAnimButton 1000 85 fgcolor:myFgColor pos:iniPosAnimButtonTools style:#())
+else (Createdialog rolBsAnimButton 1000 85 fgcolor:myFgColor style:#())
