@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-25 01:22:41
+ * @LastEditTime: 2021-04-26 14:45:17
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1140,6 +1140,8 @@ rollout rolBsKeyTools "" width:200 height:228
 		toolTip:"方便找回曲线编辑器等窗口(多屏导致窗口丢失)" pos:btnPos
 		button btnHideBipedTwists "隐 Twist" width:btnWidth height:btnHeight visible:false \
 		toolTip:"隐藏所有Biped自带Twists，再点显示" pos:btnPos
+		button btnDelDecimalKeys "删小数帧" width:btnWidth height:btnHeight visible:false \
+		toolTip:"删除所有小数帧" pos:btnPos
 
 		local btnMsWidth = 72.5
 		checkbutton ckbSwitchMyScripts "切换" pos:[5,230] width:35 height:20
@@ -1279,7 +1281,7 @@ rollout rolBsKeyTools "" width:200 height:228
 						rolBsKeyTools.btnBipedScale,rolBsKeyTools.btnSelByColor)
 		arrSourToolC3 = #(rolBsKeyTools.btnCameraFromView,rolBsKeyTools.btnMeshToBone,
 						rolBsKeyTools.btnLightTable,rolBsKeyTools.btnWinbox,
-						rolBsKeyTools.btnHideBipedTwists,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnHideBipedTwists,rolBsKeyTools.btnDelDecimalKeys,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp)
@@ -1422,7 +1424,52 @@ rollout rolBsKeyTools "" width:200 height:228
 					)
 				)
 			)
-			else deleteKeys o #selection   ---清理非biped帧
+			else (deleteKeys o #selection)   ---清理非biped帧
+		)
+	)
+
+	fn fnDelAllDecimalKeys arrAllKey = 
+	(
+		local arrDelKeyIndex = #()
+		for i in arrAllKey do ----获取小数帧的帧数
+		(
+			if (int(i) as time) != i then appendIfUnique arrDelKeyIndex i
+		)
+		for o in objects do 
+		(
+			deselectKeys o --取消之前选择的帧防止误删
+			for k in arrDelKeyIndex do
+			(
+				case of 
+				(
+					(classof o.controller == Vertical_Horizontal_Turn): --删除Biped质心小数帧
+					(
+						selectkeys o.controller.vertical k
+						selectkeys o.controller.horizontal k
+						if (((sysinfo.GetMaxLanguage())[3]=="CHS") and ((maxVersion())[1] < 20000)) then 
+						(selectkeys o.controller.flip k)
+						else(selectkeys o.controller.turning k)
+						biped.deleteKeys o.controller.vertical #selection
+						biped.deleteKeys o.controller.horizontal #selection
+						if (((sysinfo.GetMaxLanguage())[3]=="CHS") and ((maxVersion())[1] < 20000)) then 
+						(biped.deleteKeys o.controller.flip #selection)
+						else(biped.deleteKeys o.controller.turning #selection)
+					)
+					(classof o.controller == BipSlave_Control):
+					(
+						selectkeys o.controller k
+						biped.deleteKeys o.controller #selection  --清理biped正常小数帧
+						subanimBipedScale = GetSubAnim o.controller[1] 1
+						if ((subanimBipedScale != undefined) and \
+						(GetSubAnimName subanimBipedScale 1 == #ScaleXYZ)) then  --清理biped的缩放小数针
+						(
+							selectkeys subanimBipedScale.controller k
+							deleteKeys subanimBipedScale.controller #selection
+						)
+					)
+					default:(selectkeys o k;deleteKeys o #selection)   ---清理非biped帧
+				)
+			)
 		)
 	)
 
@@ -3133,7 +3180,7 @@ rollout rolBsKeyTools "" width:200 height:228
 			)
 			messageBox "注意：\r\n\r\n点确定完成添加，\r\n\r\n会创建新层存放末端，\r\n\r\n重启软件后无法回退，\r\n\r\n可点击右键或手动清除之前添加的末端，\r\n\r\n（在 tempBoneEndAll 层中）                                     "
 		)
-		else (messagebox "请选择要添加末端的 Bone 骨骼~          " beep:false)
+		else (messagebox "请选择要添加末端的 Bone 骨骼~                    " beep:false)
 	)
 
 	on btnEndBone rightclick do with undo on
@@ -3151,6 +3198,13 @@ rollout rolBsKeyTools "" width:200 height:228
 	)
 
 	on btnHideBipedTwists pressed do (fnGetAllBipedTwist())
+
+	on btnDelDecimalKeys pressed do 
+	(
+		fnCollectKeys ()
+		fnDelAllDecimalKeys arrBlockingKeys
+		(messagebox "已清理所有小数帧，Link帧请自行清理                    " beep:false)
+	)
 
 )
 if (iniPos != 0) then (Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#())
