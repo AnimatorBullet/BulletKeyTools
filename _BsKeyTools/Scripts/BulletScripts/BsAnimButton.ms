@@ -22,6 +22,8 @@ rollout rolBsAnimButton  "BsAnimButton_v1.0"
     dotNetControl dotnetTabCon "System.Windows.Forms.TabControl" height:20 width:285 align:#center pos:[0,0]
     button btnExit "✖" width:20 height:20 pos:[980,0]  border:false
     button btnHelp "？" width:20 height:20 pos:[960,0]  border:false
+
+    button 
     
     local arrAnimBtn1 = #()
     local arrAnimBtn2 = #()

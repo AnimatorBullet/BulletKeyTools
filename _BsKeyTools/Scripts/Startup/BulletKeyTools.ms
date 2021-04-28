@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-28 13:40:17
+ * @LastEditTime: 2021-04-28 19:39:39
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -12,9 +12,9 @@ try(destroydialog rolFnKeys)catch()
 try(destroydialog rolAddMyScripts)catch()
 try(destroydialog rolCustomFps)catch()
 
-try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
-try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
-try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
 stLoadConfig.fnLoadConfigBsKeyTools ()
 
 global curVerBsKeyTools = "0.9.6"
@@ -1069,6 +1069,8 @@ rollout rolBsKeyTools "" width:200 height:228
 		toolTip:"隐藏所有Biped自带Twists，再点显示" pos:btnPos
 		button btnDelDecimalKeys "删小数帧" width:btnWidth height:btnHeight visible:false \
 		toolTip:"删除所有小数帧" pos:btnPos
+		button btnRescaleWU "蒙皮缩放" width:btnWidth height:btnHeight visible:false \
+		toolTip:"删除所有小数帧" pos:btnPos
 
 		local btnMsWidth = 72.5
 		checkbutton ckbSwitchMyScripts "切换" pos:[5,230] width:35 height:20
@@ -1209,7 +1211,7 @@ rollout rolBsKeyTools "" width:200 height:228
 		arrSourToolC3 = #(rolBsKeyTools.btnCameraFromView,rolBsKeyTools.btnMeshToBone,
 						rolBsKeyTools.btnLightTable,rolBsKeyTools.btnWinbox,
 						rolBsKeyTools.btnHideBipedTwists,rolBsKeyTools.btnDelDecimalKeys,
-						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnRescaleWU,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp)
 		arrSourToolC4 = #(rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
@@ -2340,20 +2342,24 @@ rollout rolBsKeyTools "" width:200 height:228
 
 	on btnCSTools pressed do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\cstools.ms")
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\cstools.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
 	)
 	on btnSpringMagic pressed do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_New.mse")
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_New.mse"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
 	)
 	on btnSpringMagic rightclick do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_Old.mse")
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_Old.mse"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
 	)
 
 	on btnFileOpen pressed do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts" + "\\BsOpenTools.ms")
+		try(FileIn ((getDir #scripts) + "\\BulletScripts" + "\\BsOpenTools.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
 	)
 
 	on ckbIsoMesh changed state do
@@ -2779,7 +2785,10 @@ rollout rolBsKeyTools "" width:200 height:228
 	)
 
 	on btnImageComp pressed do 
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\ImageCompHelper.ms"))
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\ImageCompHelper.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+	)
 	
 	on btnFnKeyType pressed do 
 	(
@@ -2837,18 +2846,21 @@ rollout rolBsKeyTools "" width:200 height:228
 
 	on btnMopherSlider pressed do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\MorphSliders_11.ms")
-		macros.run "Tools" "MorphSliders"
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\MorphSliders_11.ms")
+		macros.run "Tools" "MorphSliders")
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
 	)
 
 	on btnLayerManager pressed do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\LayerManagerAlternative.ms")
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\LayerManagerAlternative.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
 	)
 
 	on btnAnimMirror pressed do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\动画镜像工具.mse")
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\动画镜像工具.mse"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
 	)
 
 	on btnMyScripts1 pressed do 
@@ -3025,30 +3037,52 @@ rollout rolBsKeyTools "" width:200 height:228
 	)
 
 	on btnColorTools pressed do 
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\ProColor.ms"))
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\ProColor.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+	)
 
 	on btnAnimCopyPaste pressed do 
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\CPTools.ms"))
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\CPTools.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+	)
 
 	on btnPoseTool pressed do 
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\BsRefTools.ms"))
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsRefTools.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+	)
 
 	on btnTrajedit pressed do 
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\DTrajEdit.ms"))
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\DTrajEdit.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+	)
 
 	on btnHotAnimBtn pressed do 
 	(
-		FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimButton.ms")
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimButton.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
 	)
 
 	on ckbShadowCut changed state do
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\Silhouette.ms"))
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\Silhouette.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+	)
 
 	on btnRenameTools pressed do
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\P_ObjectRenamer.ms"))
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\P_ObjectRenamer.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+	)
 
 	on btnWinbox pressed do
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\WinBox.ms"))
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\WinBox.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+	)
 
 	on btnCameraFromView pressed do
 	(
@@ -3061,13 +3095,22 @@ rollout rolBsKeyTools "" width:200 height:228
 	)
 
 	on btnMeshToBone pressed do 
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\AnimMeshToBonesAnim.ms"))
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\AnimMeshToBonesAnim.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+	)
 
 	on btnLightTable pressed do 
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\LightTable.ms"))
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\LightTable.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+	)
 
 	on btnCutSequence pressed do 
-	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\AnimaRange.ms"))
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\AnimaRange.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+	)
 
 	on btnEndBone pressed do 
 	(
@@ -3131,6 +3174,12 @@ rollout rolBsKeyTools "" width:200 height:228
 		fnCollectKeys ()
 		fnDelAllDecimalKeys arrBlockingKeys
 		(messagebox "已清理所有小数帧，Link帧请自行清理                    " beep:false)
+	)
+
+	on btnRescaleWU pressed do 
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\RescaleWU.ms"))
+		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
 	)
 
 )
