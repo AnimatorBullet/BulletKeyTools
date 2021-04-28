@@ -3,16 +3,19 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-19 14:29:54
+ * @LastEditTime: 2021-04-28 13:40:17
 * @Email: animator.bullet@foxmail.com
 */
 
 try(destroydialog rolBsKeyTools)catch()
 try(destroydialog rolFnKeys)catch()
 try(destroydialog rolAddMyScripts)catch()
+try(destroydialog rolCustomFps)catch()
 
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
+stLoadConfig.fnLoadConfigBsKeyTools ()
 
 global curVerBsKeyTools = "0.9.6"
 global verUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/version.dat"
@@ -22,28 +25,6 @@ global dlFileBsKeyTools = (getdir #temp) + "\\_BsKeyTools（装完重启MAX,误�
 struct myScript (id,msName,dir)
 
 Global rolBsKeyTools
-Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
-Global iniPos  	--位置保存记录
-Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
-(myScript id:2 msName:"<＋＋>" dir:""), \
-(myScript id:3 msName:"<＋＋>" dir:""), \
-(myScript id:4 msName:"<＋＋>" dir:""), \
-(myScript id:5 msName:"<＋＋>" dir:""), \
-(myScript id:6 msName:"<＋＋>" dir:""), \
-(myScript id:7 msName:"<＋＋>" dir:""), \
-(myScript id:8 msName:"<＋＋>" dir:""))
-Global idBtn              = 1
-global iniAutoCheckUpdate = true
-Global switchToolPanel    = 0
-global switchMSPanel      = 0
-Global iniToolC1          = #(1,2,3,4,5,6,7,8,9,10,11,12)
-Global iniToolC2          = #(1,2,3,4,5,6,7,8,9,10,11,12)
-Global iniToolC3          = #(1,2,3,4,5,6,7,8,9,10,11,12)
-Global iniToolC4          = #(1,2,3,4,5,6,7,8,9,10,11,12)
---------👆保存的设置参数------------------------------------------------------------
-global myFgColor
-global myClickColor
-global myCheckedColor ----fnGetColorTheme.ms
 Global posMouMoved       = [0,0]
 Global switchMouseState  = false
 Global switchSelKeyRange = 0
@@ -146,59 +127,6 @@ Global SIODir = dotNetClass "System.IO.Directory"
 -- 	[posw/2,posh/2]
 -- )
 ------------------全局变量-------------------------------------------------------------------
-
-fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
-(
-	attr = (GetINISetting BulletConfig nameAttrClass nameAttr) as string  --先提取文件中的记录
-	if (nameAttr == "ArrMyScripts")then
-	(
-		attr = substituteString attr "dir:" "dir:@"
-	)
-	if attr == "" then attr = (execute valueAttr) else (attr = execute attr)  --判断记录为空与否得到需要的记录参数
-)
-fn fnLoadToolConfig =
-(
-	iniToolC1 = fnGetConfig iniToolC1 "BulletKeyToolsSet"  "iniToolC1" (iniToolC1 as string)
-	iniToolC2 = fnGetConfig iniToolC2 "BulletKeyToolsSet"  "iniToolC2" (iniToolC2 as string)
-	iniToolC3 = fnGetConfig iniToolC3 "BulletKeyToolsSet"  "iniToolC3" (iniToolC3 as string)
-	iniToolC4 = fnGetConfig iniToolC4 "BulletKeyToolsSet"  "iniToolC4" (iniToolC4 as string)
-)
-fn fnLoadConfig =  --引用上面方法提出需要的参数
-(----提出脚本位置
-	iniPos             = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" (0 as string)
-	switchToolPanel    = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
-	switchMSPanel      = fnGetConfig switchMSPanel "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
-	idBtn              = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
-	iniArrMyScripts    = fnGetConfig iniArrMyScripts "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
-	iniAutoCheckUpdate = fnGetConfig iniAutoCheckUpdate "BulletKeyToolsSet"  "AutoCheckUpdate" (iniAutoCheckUpdate as string)
-	fnLoadToolConfig()
-	if (iniArrMyScripts.count != 8) then
-	(
-		iniArrMyScripts = #((myScript id:1 msName:"<＋＋>" dir:""), \
-		(myScript id:2 msName:"<＋＋>" dir:""), \
-		(myScript id:3 msName:"<＋＋>" dir:""), \
-		(myScript id:4 msName:"<＋＋>" dir:""), \
-		(myScript id:5 msName:"<＋＋>" dir:""), \
-		(myScript id:6 msName:"<＋＋>" dir:""), \
-		(myScript id:7 msName:"<＋＋>" dir:""), \
-		(myScript id:8 msName:"<＋＋>" dir:""))
-	)
-)
-fnLoadConfig () --初始执行一遍
-fn fnSetConfig =  --保存参数,脚本位置
-(
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "Pos" (iniPos as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "idBtn" (idBtn as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "AutoCheckUpdate" (iniAutoCheckUpdate as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC1" (iniToolC1 as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC2" (iniToolC2 as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC3" (iniToolC3 as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC4" (iniToolC4 as string)
-)
----------------配合BulletTools工具的ini文件保存位置信息-----------------
 
 -------------------右键面板空白处设置---------------------------------------------------------
 fn fnDelFileDir targetDel =  --删除文件
@@ -320,6 +248,7 @@ rcmenu menuConfig
 		menuItem mItemForceUpdate "强制更新"
 		menuItem mItemAutoCheckUpdate "自动检测"
 		menuItem mItemUpdateLog "更新记录"
+		menuItem mItemUndoVersion "回退版本"
 	)
 	menuItem mItemScriptsPath "脚本目录"
 	menuItem mItemConfigFilePath "配置文件"
@@ -419,6 +348,13 @@ rcmenu menuConfig
 	on mItemForceUpdate picked do 
 	(fnCheckUpdate curVerBsKeyTools verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools isForceUpdate:true)
 
+	on mItemUndoVersion picked do 
+	(
+		local dlUrlPreviousVersion = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/_PreviousVersion.exe"
+		local dlFilePreviousVersion = (getdir #temp) + "\\_PreviousVersion.exe"
+		fnCheckUpdate curVerBsKeyTools verUrlBsKeyTools dlUrlPreviousVersion dlFilePreviousVersion isForceUpdate:true
+	)
+
 	on mItemAutoCheckUpdate picked do 
 	(
 		if (mItemAutoCheckUpdate.checked == true) then (mItemAutoCheckUpdate.checked = false)
@@ -454,13 +390,62 @@ rcmenu menuConfig
 		)
 	)
 
-	on mItemUpdateLog picked do (FileIn ((getDir #scripts) + "\\BulletScripts\\UpdateLog.ms"))
+	on mItemUpdateLog picked do (shellLaunch "https://www.notion.so/bullet4869/4e28c488d5474a9082e164b7c5b6926c" "")
 )
 
 -------------------帧率,播放速度--------------------------------------------------------------
 Global valueFps
 Global valuePlaySpeed = ""
 Global strCurrentFps = framerate as string + "FPS"
+
+fn fnRefFps =
+(
+	local arrMenuSetFps = #(menuSetFps.menuSet60Fps,menuSetFps.menuSet30Fps, \
+							menuSetFps.menuSet24Fps,menuSetFps.menuCustomFps)
+	for i in arrMenuSetFps do i.checked = false
+	case of
+	(
+		(framerate == 60):(menuSetFps.menuSet60Fps.checked = true)
+		(framerate == 30):(menuSetFps.menuSet30Fps.checked = true)
+		(framerate == 24):(menuSetFps.menuSet24Fps.checked = true)
+		default:(menuSetFps.menuCustomFps.checked = true)
+	)
+	menuSetFps.menuCurrentFps.text = "当前: " + framerate as string + "FPS"
+	strCurrentFps = framerate as string + "FPS"
+	rolBsKeyTools.btnSetFps.text = strCurrentFps
+)
+
+fn fnSetFps numFps =
+(
+	framerate = numFps
+	valueFps = numFps
+	fnRefFps ()
+	slidertime -= 1
+	slidertime += 1
+)
+
+fn fnRefPlaySpeedValue =
+(
+	local arrMenuSetSpeed = #(menuSetSpeed.menuSet14Speed,menuSetSpeed.menuSet12Speed, \
+		menuSetSpeed.menuSet1Speed,menuSetSpeed.menuSet2Speed,menuSetSpeed.menuSet4Speed)
+		for i in arrMenuSetSpeed do i.checked = false
+	case of
+	(
+		(timeConfiguration.playbackSpeed == 1):(valuePlaySpeed = "-1/4x-";menuSetSpeed.menuSet14Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 2):(valuePlaySpeed = "-1/2x-";menuSetSpeed.menuSet12Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 3):(valuePlaySpeed = "- 1x -";menuSetSpeed.menuSet1Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 4):(valuePlaySpeed = "- 2x -";menuSetSpeed.menuSet2Speed.checked =true)
+		(timeConfiguration.playbackSpeed == 5):(valuePlaySpeed = "- 4x -";menuSetSpeed.menuSet4Speed.checked =true)
+	)
+	rolBsKeyTools.btnSetSpeed.text = valuePlaySpeed
+	menuSetSpeed.menuCurrentSpeed.text = "当前: " + valuePlaySpeed
+)
+
+fn fnSetSpeed numSpeed =
+(
+	timeConfiguration.playbackSpeed = numSpeed
+	fnRefPlaySpeedValue ()
+)
 
 rollout rolCustomFps ""
 (
@@ -488,55 +473,10 @@ rollout rolCustomFps ""
 	(
 		framerate = valueFps
 		labTips.text = "当前:" + framerate as string + "FPS"
+		fnRefFps ()
 		slidertime -= 1
 		slidertime += 1
 	)
-)
-
-fn fnSetFps numFps =
-(
-	framerate = numFps
-	valueFps = numFps
-	strCurrentFps = numFps as string + "FPS"
-	rolBsKeyTools.btnSetFps.text = strCurrentFps 
-	slidertime -= 1
-	slidertime += 1
-)
-
-fn fnRefFps =
-(
-	local arrMenuSetFps = #(menuSetFps.menuSet60Fps,menuSetFps.menuSet30Fps, \
-							menuSetFps.menuSet24Fps,menuSetFps.menuCustomFps)
-	for i in arrMenuSetFps do i.checked = false
-	case of
-	(
-		(framerate == 60):(menuSetFps.menuSet60Fps.checked = true)
-		(framerate == 30):(menuSetFps.menuSet30Fps.checked = true)
-		(framerate == 24):(menuSetFps.menuSet24Fps.checked = true)
-		default:(menuSetFps.menuCustomFps.checked = true)
-	)
-)
-
-fn fnRefPlaySpeedValue =
-(
-	local arrMenuSetSpeed = #(menuSetSpeed.menuSet14Speed,menuSetSpeed.menuSet12Speed, \
-		menuSetSpeed.menuSet1Speed,menuSetSpeed.menuSet2Speed,menuSetSpeed.menuSet4Speed)
-		for i in arrMenuSetSpeed do i.checked = false
-	case of
-	(
-		(timeConfiguration.playbackSpeed == 1):(valuePlaySpeed = "-1/4x-";menuSetSpeed.menuSet14Speed.checked =true)
-		(timeConfiguration.playbackSpeed == 2):(valuePlaySpeed = "-1/2x-";menuSetSpeed.menuSet12Speed.checked =true)
-		(timeConfiguration.playbackSpeed == 3):(valuePlaySpeed = "- 1x -";menuSetSpeed.menuSet1Speed.checked =true)
-		(timeConfiguration.playbackSpeed == 4):(valuePlaySpeed = "- 2x -";menuSetSpeed.menuSet2Speed.checked =true)
-		(timeConfiguration.playbackSpeed == 5):(valuePlaySpeed = "- 4x -";menuSetSpeed.menuSet4Speed.checked =true)
-	)
-)
-
-fn fnSetSpeed numSpeed =
-(
-	timeConfiguration.playbackSpeed = numSpeed
-	fnRefPlaySpeedValue ()
-	rolBsKeyTools.btnSetSpeed.text = valuePlaySpeed
 )
 
 rcmenu menuSetFps
@@ -548,26 +488,11 @@ rcmenu menuSetFps
 	separator menuSepCustom
 	menuItem menuCustomFps "自定义帧率"
 
-	on menuSetFps open do 
-	(
-		strCurrentFps = framerate as string + "FPS"
-		menuSetFps.menuCurrentFps.text = "当前: " + framerate as string + "FPS"
-		fnRefFps ()
-		rolBsKeyTools.btnSetFps.text = strCurrentFps
-	)
+	on menuSetFps open do (fnRefFps ())
 
-	on menuSet60Fps picked do 
-	(
-		fnSetFps 60
-	)
-	on menuSet30Fps picked do
-	(
-		fnSetFps 30
-	)
-	on menuSet24Fps picked do 
-	(
-		fnSetFps 24
-	)
+	on menuSet60Fps picked do (fnSetFps 60)
+	on menuSet30Fps picked do(fnSetFps 30)
+	on menuSet24Fps picked do (fnSetFps 24)
 
 	on menuCustomFps picked do
 	(
@@ -588,33 +513,13 @@ rcmenu menuSetSpeed
 	menuItem menuSet2Speed "- 2x -"
 	menuItem menuSet4Speed "- 4x -"
 
-	on menuSetSpeed open do 
-	(
-		fnRefPlaySpeedValue ()
-		menuSetSpeed.menuCurrentSpeed.text = "当前: " + valuePlaySpeed
-		rolBsKeyTools.btnSetSpeed.text = valuePlaySpeed
-	)
+	on menuSetSpeed open do (fnRefPlaySpeedValue ())
 
-	on menuSet14Speed picked do 
-	(
-		fnSetSpeed 1
-	)
-	on menuSet12Speed picked do
-	(
-		fnSetSpeed 2
-	)
-	on menuSet1Speed picked do 
-	(
-		fnSetSpeed 3
-	)
-	on menuSet2Speed picked do 
-	(
-		fnSetSpeed 4
-	)
-	on menuSet4Speed picked do 
-	(
-		fnSetSpeed 5
-	)
+	on menuSet14Speed picked do (fnSetSpeed 1)
+	on menuSet12Speed picked do(fnSetSpeed 2)
+	on menuSet1Speed picked do (fnSetSpeed 3)
+	on menuSet2Speed picked do (fnSetSpeed 4)
+	on menuSet4Speed picked do (fnSetSpeed 5)
 )
 ------------------帧率,播放速度------------------------------------------------------------
 rollout rolAddMyScripts "我的脚本" width:205 height:220
@@ -1158,6 +1063,12 @@ rollout rolBsKeyTools "" width:200 height:228
 		toolTip:"破碎碎块快速加骨骼" pos:btnPos
 		button btnLightTable "运动重影" width:btnWidth height:btnHeight visible:false \
 		toolTip:"显示运动重影" pos:btnPos
+		button btnWinbox "窗口找回" width:btnWidth height:btnHeight visible:false \
+		toolTip:"方便找回曲线编辑器等窗口(多屏导致窗口丢失)" pos:btnPos
+		button btnHideBipedTwists "隐 Twist" width:btnWidth height:btnHeight visible:false \
+		toolTip:"隐藏所有Biped自带Twists，再点显示" pos:btnPos
+		button btnDelDecimalKeys "删小数帧" width:btnWidth height:btnHeight visible:false \
+		toolTip:"删除所有小数帧" pos:btnPos
 
 		local btnMsWidth = 72.5
 		checkbutton ckbSwitchMyScripts "切换" pos:[5,230] width:35 height:20
@@ -1296,8 +1207,8 @@ rollout rolBsKeyTools "" width:200 height:228
 						rolBsKeyTools.btnEndBone,rolBsKeyTools.btnRenameTools,
 						rolBsKeyTools.btnBipedScale,rolBsKeyTools.btnSelByColor)
 		arrSourToolC3 = #(rolBsKeyTools.btnCameraFromView,rolBsKeyTools.btnMeshToBone,
-						rolBsKeyTools.btnLightTable,rolBsKeyTools.btnTemp,
-						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnLightTable,rolBsKeyTools.btnWinbox,
+						rolBsKeyTools.btnHideBipedTwists,rolBsKeyTools.btnDelDecimalKeys,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp)
@@ -1440,7 +1351,52 @@ rollout rolBsKeyTools "" width:200 height:228
 					)
 				)
 			)
-			else deleteKeys o #selection   ---清理非biped帧
+			else (deleteKeys o #selection)   ---清理非biped帧
+		)
+	)
+
+	fn fnDelAllDecimalKeys arrAllKey = 
+	(
+		local arrDelKeyIndex = #()
+		for i in arrAllKey do ----获取小数帧的帧数
+		(
+			if (int(i) as time) != i then appendIfUnique arrDelKeyIndex i
+		)
+		for o in objects do 
+		(
+			deselectKeys o --取消之前选择的帧防止误删
+			for k in arrDelKeyIndex do
+			(
+				case of 
+				(
+					(classof o.controller == Vertical_Horizontal_Turn): --删除Biped质心小数帧
+					(
+						selectkeys o.controller.vertical k
+						selectkeys o.controller.horizontal k
+						if (((sysinfo.GetMaxLanguage())[3]=="CHS") and ((maxVersion())[1] < 20000)) then 
+						(selectkeys o.controller.flip k)
+						else(selectkeys o.controller.turning k)
+						biped.deleteKeys o.controller.vertical #selection
+						biped.deleteKeys o.controller.horizontal #selection
+						if (((sysinfo.GetMaxLanguage())[3]=="CHS") and ((maxVersion())[1] < 20000)) then 
+						(biped.deleteKeys o.controller.flip #selection)
+						else(biped.deleteKeys o.controller.turning #selection)
+					)
+					(classof o.controller == BipSlave_Control):
+					(
+						selectkeys o.controller k
+						biped.deleteKeys o.controller #selection  --清理biped正常小数帧
+						subanimBipedScale = GetSubAnim o.controller[1] 1
+						if ((subanimBipedScale != undefined) and \
+						(GetSubAnimName subanimBipedScale 1 == #ScaleXYZ)) then  --清理biped的缩放小数针
+						(
+							selectkeys subanimBipedScale.controller k
+							deleteKeys subanimBipedScale.controller #selection
+						)
+					)
+					default:(selectkeys o k;deleteKeys o #selection)   ---清理非biped帧
+				)
+			)
 		)
 	)
 
@@ -2176,6 +2132,38 @@ rollout rolBsKeyTools "" width:200 height:228
 		)
 	)
 
+	fn fnGetAllBipedTwist =
+	(
+		arrBipedRootAll = $'Bip00?'
+		arrBipedTwistAll = #()
+		for r in arrBipedRootAll do
+		(
+			nn = biped.maxTwistNodes r
+			nl = biped.maxTwistLinks r
+			ts = biped.getTwistStartId r
+			
+			for i = ts to ts+nn-1 do
+			(
+				anode = biped.getNode r i
+				if anode != undefined do
+				(
+				for j = 1 to nl do
+					(
+						alink = biped.getNode r i link:j
+						if alink != undefined do
+						(
+							appendIfUnique arrBipedTwistAll alink
+						)
+					)
+				)
+			)
+		)
+		for j in arrBipedTwistAll where j != undefined do
+		(
+			j.isHidden = not (j.isHidden)
+		)
+	)
+
 	on rolBsKeyTools open do  ----打开脚本时操作
 	(
 		------刷新图标, 图标是max自带的,主要是懒得做
@@ -2188,14 +2176,13 @@ rollout rolBsKeyTools "" width:200 height:228
 		-- myTimer.Start()
 		-- timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
 		-- iniPos = (GetDialogPos rolBsKeyTools) 
-		fnLoadConfig ()  ---------------脚本位置赋值
-		fnSetConfig ()  ----------------保存位置信息到ini文件
+		stLoadConfig.fnLoadConfigBsKeyTools ()  ---------------脚本位置赋值
+		stSetConfig.fnSetConfigBsKeyTools ()  ----------------保存位置信息到ini文件
 		fnReloadToolsBtn()
 		if(switchMSPanel == 0) then (ckbSwitchMyScripts.checked = false)
 		else (ckbSwitchMyScripts.checked = true)
 		fnRefPlaySpeedValue ()  -----判断播放速度
-		rolBsKeyTools.btnSetFps.text   = strCurrentFps
-		rolBsKeyTools.btnSetSpeed.text = valuePlaySpeed
+		fnRefFps ()
 		fnRefreshMagicBtn ()
 		-- if (switchToolPanel == 1) then
 		-- (
@@ -2212,7 +2199,7 @@ rollout rolBsKeyTools "" width:200 height:228
 	on rolBsKeyTools close do -- 关闭记忆浮动窗口位置
 	(
 		iniPos = (GetDialogPos rolBsKeyTools)
-		fnSetConfig ()
+		stSetConfig.fnSetConfigBsKeyTools ()
 	)
 	-----------------------------------------------------------------------------------------
 	on rolBsKeyTools rbuttondown pos do 
@@ -3060,6 +3047,9 @@ rollout rolBsKeyTools "" width:200 height:228
 	on btnRenameTools pressed do
 	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\P_ObjectRenamer.ms"))
 
+	on btnWinbox pressed do
+	(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\WinBox.ms"))
+
 	on btnCameraFromView pressed do
 	(
 		If (viewport.Gettype() == #view_persp_user) and (not theHold.Holding()) then 
@@ -3117,7 +3107,7 @@ rollout rolBsKeyTools "" width:200 height:228
 			)
 			messageBox "注意：\r\n\r\n点确定完成添加，\r\n\r\n会创建新层存放末端，\r\n\r\n重启软件后无法回退，\r\n\r\n可点击右键或手动清除之前添加的末端，\r\n\r\n（在 tempBoneEndAll 层中）                                     "
 		)
-		else (messagebox "请选择要添加末端的 Bone 骨骼~          " beep:false)
+		else (messagebox "请选择要添加末端的 Bone 骨骼~                    " beep:false)
 	)
 
 	on btnEndBone rightclick do with undo on
@@ -3133,16 +3123,28 @@ rollout rolBsKeyTools "" width:200 height:228
 			messagebox "点确定清理添加的骨骼末端 (在 tempBoneEndAll 层中的骨骼) ~          "
 		)
 	)
+
+	on btnHideBipedTwists pressed do (fnGetAllBipedTwist())
+
+	on btnDelDecimalKeys pressed do 
+	(
+		fnCollectKeys ()
+		fnDelAllDecimalKeys arrBlockingKeys
+		(messagebox "已清理所有小数帧，Link帧请自行清理                    " beep:false)
+	)
+
 )
 if (iniPos != 0) then (Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#())
 else (Createdialog rolBsKeyTools fgcolor:myFgColor style:#())
 
-fn fnUpdateTimeRangeValues = 
+fn fnUpdateTimeRange = 
 (
 	rolBsKeyTools.spiStartTime.value = (animationRange.start.frame as integer)   
 	rolBsKeyTools.spiEndTime.value = (animationRange.end.frame as integer)
 )
-callbacks.addScript #animationRangeChange "fnUpdateTimeRangeValues()" id:#UpdateTimeRangeValues
+callbacks.addScript #animationRangeChange "fnUpdateTimeRange()" id:#UpdateTimeRange
+callbacks.addScript #filePostOpen "fnRefFps()" id:#UpdateFps
+
 clearListener()  ---------清除侦听器
 
 (

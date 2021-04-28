@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-27 13:06:26
+ * @LastEditTime: 2021-04-28 13:40:33
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -11,17 +11,21 @@
 try(destroydialog rolBsOpenTools)catch()
 try(destroydialog rolAddItem)catch()
 
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
+catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))
+catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
+stLoadConfig.fnLoadConfigBsOpenTools ()
+
 struct itemsFolder (name,dir)
 global dateTime = (dotNetClass "System.DateTime").Now
 global arrDayWeek = #("日", "一", "二", "三", "四", "五", "六")
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
-Global iniPosOpenTools
-Global iniWidthOpenTools  = 340
-Global iniDesktop         = (itemsFolder name:"Desktop" dir:"")
+
 -- Global iniRefPicDir			= (itemsFolder name:"RefPicDir" dir:"")
 Global posMouMove         = [0,0]
 Global switchMouState     = false
-Global iniSelectedID      = 1
+
 Global arrFolders         = #()
 Global arrFoldersName     = #()
 Global arrFiles           = #()
@@ -30,73 +34,12 @@ Global dirLiked           = ""
 Global dirOpened          = ""
 Global arrDirItems        = #()
 Global arrPreItems        = #()
-Global iniLikedFolder     = #()
-Global iniFilterPrefix    = #()
 Global arrRecentFiles     = #()
 Global arrRecentFilesName = #()
 Global arrFileType        = #(".max",".fbx",".bip",".ms*")
 Global rolBsOpenTools
 Global fnRefreshList
 Global tempLastFolder
-global myfgColor
-global myClickColor
-
-fn fnGetColorTheme =
-(
-	local curColorThemeFile = colorMan.getFileName()
-	if (curColorThemeFile != undefined) then
-	(
-		if (matchpattern curColorThemeFile pattern:"*light*") then
-		(
-			myfgColor    = (color 65 105 225)
-			myClickColor = (color 0 139 139)
-		)
-		else
-		(
-			myfgColor    = (color 219 209 72)
-			myClickColor = (color 0 255 127)
-		)
-	)
-	else
-	(
-		myfgColor    = (color 219 209 72)
-		myClickColor = (color 0 255 127)
-	)
-)
-fnGetColorTheme() ----获取当前主题是深色还是浅色,来更改文字颜色
-
-fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
-(
-	attr = (GetINISetting BulletConfig nameAttrClass nameAttr) as string  --先提取文件中的记录
-	if ((nameAttr == "LikedFolder") or (nameAttr == "Desktop"))then
-	(
-		attr = substituteString attr "dir:" "dir:@"
-	)
-	if attr == "" then attr = (execute valueAttr) else (attr = execute attr)  --判断记录为空与否得到需要的记录参数
-)
-fn fnSaveConfig =  --引用上面方法提出需要的参数
-(----提出脚本位置
-	iniPosOpenTools   = fnGetConfig iniPosOpenTools "BsOpenToolsSet" "PosOpenTools" (mouse.screenpos as string)
-	iniSelectedID     = fnGetConfig iniSelectedID "BsOpenToolsSet" "SelectedID" (iniSelectedID as string)
-	iniLikedFolder    = fnGetConfig iniLikedFolder "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
-	iniFilterPrefix   = fnGetConfig iniFilterPrefix "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)
-	iniWidthOpenTools = fnGetConfig iniWidthOpenTools "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
-	iniDesktop        = fnGetConfig iniDesktop "BsOpenToolsSet"  "Desktop" (iniDesktop as string)
-	-- iniRefPicDir        = fnGetConfig iniRefPicDir "BsOpenToolsSet"  "RefPicDir" (iniRefPicDir as string)
-)
-fnSaveConfig () --初始执行一遍
-fn fnSetConfig =  --保存参数,脚本位置
-(
-	SetINISetting BulletConfig "BsOpenToolsSet"  "PosOpenTools" (iniPosOpenTools as string)
-	SetINISetting BulletConfig "BsOpenToolsSet"  "SelectedID" (iniSelectedID as string)
-	SetINISetting BulletConfig "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
-	SetINISetting BulletConfig "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)
-	SetINISetting BulletConfig "BsOpenToolsSet"  "WidthOpenTools" (iniWidthOpenTools as string)
-	SetINISetting BulletConfig "BsOpenToolsSet"  "Desktop" (iniDesktop as string)
-	-- SetINISetting BulletConfig "BsOpenToolsSet"  "RefPicDir" (iniRefPicDir as string)
-)
-
----------------配合BulletTools工具的ini文件保存位置信息----------------------------------
 
 rollout rolAddItem "添加" width:340 height:80
 (
@@ -472,8 +415,8 @@ rollout rolBsOpenTools "" width:340 height:365
 		fnRefreshAddress ()
 		fnRefreshList maxFilePath type: arrFileType[rdoFileType.state]
 		lblCountTips.text = "文件：" + arrFiles.count as string
-		fnSaveConfig ()  ---------------脚本位置等赋值
-		fnSetConfig ()  ----------------保存位置信息到ini文件
+		stLoadConfig.fnLoadConfigBsOpenTools ()  ---------------脚本位置等赋值
+		stSetConfig.fnSetConfigBsOpenTools ()  ----------------保存位置信息到ini文件
 		fnRefLikedFolderItems ()
 		ltbFilterPrefix.selection = 0
 		fnRefreshFilterItems ()
@@ -486,7 +429,7 @@ rollout rolBsOpenTools "" width:340 height:365
 		iniPosOpenTools   = (GetDialogPos rolBsOpenTools)
 		iniSelectedID     = rolBsOpenTools.ddlLikedFolder.selection
 		iniWidthOpenTools = rolBsOpenTools.width
-		fnSetConfig ()
+		stSetConfig.fnSetConfigBsOpenTools ()
 	)
 
 	on rolBsOpenTools mbuttondown pos do 

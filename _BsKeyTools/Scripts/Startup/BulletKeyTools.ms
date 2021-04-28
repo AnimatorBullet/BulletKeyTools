@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-26 14:45:17
+ * @LastEditTime: 2021-04-28 13:40:17
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -12,8 +12,10 @@ try(destroydialog rolFnKeys)catch()
 try(destroydialog rolAddMyScripts)catch()
 try(destroydialog rolCustomFps)catch()
 
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
+stLoadConfig.fnLoadConfigBsKeyTools ()
 
 global curVerBsKeyTools = "0.9.6"
 global verUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/version.dat"
@@ -23,28 +25,6 @@ global dlFileBsKeyTools = (getdir #temp) + "\\_BsKeyTools（装完重启MAX,误�
 struct myScript (id,msName,dir)
 
 Global rolBsKeyTools
-Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
-Global iniPos  	--位置保存记录
-Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
-(myScript id:2 msName:"<＋＋>" dir:""), \
-(myScript id:3 msName:"<＋＋>" dir:""), \
-(myScript id:4 msName:"<＋＋>" dir:""), \
-(myScript id:5 msName:"<＋＋>" dir:""), \
-(myScript id:6 msName:"<＋＋>" dir:""), \
-(myScript id:7 msName:"<＋＋>" dir:""), \
-(myScript id:8 msName:"<＋＋>" dir:""))
-Global idBtn              = 1
-global iniAutoCheckUpdate = true
-Global switchToolPanel    = 0
-global switchMSPanel      = 0
-Global iniToolC1          = #(1,2,3,4,5,6,7,8,9,10,11,12)
-Global iniToolC2          = #(1,2,3,4,5,6,7,8,9,10,11,12)
-Global iniToolC3          = #(1,2,3,4,5,6,7,8,9,10,11,12)
-Global iniToolC4          = #(1,2,3,4,5,6,7,8,9,10,11,12)
---------👆保存的设置参数------------------------------------------------------------
-global myFgColor
-global myClickColor
-global myCheckedColor ----fnGetColorTheme.ms
 Global posMouMoved       = [0,0]
 Global switchMouseState  = false
 Global switchSelKeyRange = 0
@@ -147,59 +127,6 @@ Global SIODir = dotNetClass "System.IO.Directory"
 -- 	[posw/2,posh/2]
 -- )
 ------------------全局变量-------------------------------------------------------------------
-
-fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
-(
-	attr = (GetINISetting BulletConfig nameAttrClass nameAttr) as string  --先提取文件中的记录
-	if (nameAttr == "ArrMyScripts")then
-	(
-		attr = substituteString attr "dir:" "dir:@"
-	)
-	if attr == "" then attr = (execute valueAttr) else (attr = execute attr)  --判断记录为空与否得到需要的记录参数
-)
-fn fnLoadToolConfig =
-(
-	iniToolC1 = fnGetConfig iniToolC1 "BulletKeyToolsSet"  "iniToolC1" (iniToolC1 as string)
-	iniToolC2 = fnGetConfig iniToolC2 "BulletKeyToolsSet"  "iniToolC2" (iniToolC2 as string)
-	iniToolC3 = fnGetConfig iniToolC3 "BulletKeyToolsSet"  "iniToolC3" (iniToolC3 as string)
-	iniToolC4 = fnGetConfig iniToolC4 "BulletKeyToolsSet"  "iniToolC4" (iniToolC4 as string)
-)
-fn fnLoadConfig =  --引用上面方法提出需要的参数
-(----提出脚本位置
-	iniPos             = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" (0 as string)
-	switchToolPanel    = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
-	switchMSPanel      = fnGetConfig switchMSPanel "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
-	idBtn              = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
-	iniArrMyScripts    = fnGetConfig iniArrMyScripts "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
-	iniAutoCheckUpdate = fnGetConfig iniAutoCheckUpdate "BulletKeyToolsSet"  "AutoCheckUpdate" (iniAutoCheckUpdate as string)
-	fnLoadToolConfig()
-	if (iniArrMyScripts.count != 8) then
-	(
-		iniArrMyScripts = #((myScript id:1 msName:"<＋＋>" dir:""), \
-		(myScript id:2 msName:"<＋＋>" dir:""), \
-		(myScript id:3 msName:"<＋＋>" dir:""), \
-		(myScript id:4 msName:"<＋＋>" dir:""), \
-		(myScript id:5 msName:"<＋＋>" dir:""), \
-		(myScript id:6 msName:"<＋＋>" dir:""), \
-		(myScript id:7 msName:"<＋＋>" dir:""), \
-		(myScript id:8 msName:"<＋＋>" dir:""))
-	)
-)
-fnLoadConfig () --初始执行一遍
-fn fnSetConfig =  --保存参数,脚本位置
-(
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "Pos" (iniPos as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "idBtn" (idBtn as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "AutoCheckUpdate" (iniAutoCheckUpdate as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC1" (iniToolC1 as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC2" (iniToolC2 as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC3" (iniToolC3 as string)
-	SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC4" (iniToolC4 as string)
-)
----------------配合BulletTools工具的ini文件保存位置信息-----------------
 
 -------------------右键面板空白处设置---------------------------------------------------------
 fn fnDelFileDir targetDel =  --删除文件
@@ -2249,8 +2176,8 @@ rollout rolBsKeyTools "" width:200 height:228
 		-- myTimer.Start()
 		-- timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
 		-- iniPos = (GetDialogPos rolBsKeyTools) 
-		fnLoadConfig ()  ---------------脚本位置赋值
-		fnSetConfig ()  ----------------保存位置信息到ini文件
+		stLoadConfig.fnLoadConfigBsKeyTools ()  ---------------脚本位置赋值
+		stSetConfig.fnSetConfigBsKeyTools ()  ----------------保存位置信息到ini文件
 		fnReloadToolsBtn()
 		if(switchMSPanel == 0) then (ckbSwitchMyScripts.checked = false)
 		else (ckbSwitchMyScripts.checked = true)
@@ -2272,7 +2199,7 @@ rollout rolBsKeyTools "" width:200 height:228
 	on rolBsKeyTools close do -- 关闭记忆浮动窗口位置
 	(
 		iniPos = (GetDialogPos rolBsKeyTools)
-		fnSetConfig ()
+		stSetConfig.fnSetConfigBsKeyTools ()
 	)
 	-----------------------------------------------------------------------------------------
 	on rolBsKeyTools rbuttondown pos do 

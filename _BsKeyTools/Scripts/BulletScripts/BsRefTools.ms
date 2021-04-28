@@ -3,12 +3,18 @@
  * @Author: Bullet.S
  * @Date: 2020-12-29 01:12:45
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-25 13:11:56
+ * @LastEditTime: 2021-04-28 13:40:25
  * @Email: animator.bullet@foxmail.com
  */
 
 try(destroydialog rolAddRefFolder)catch()
 try(destroydialog rolRefTools)catch()
+
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
+catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))
+catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
+stLoadConfig.fnLoadConfigBsRefTools ()
 
 global currentVersion = "0.1.2"
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
@@ -28,13 +34,6 @@ global tempSavePath  = (getdir #temp) + @"\\tempReferencePic"
 
 global dateTime = (dotNetClass "System.DateTime").Now
 global arrDayWeek = #("日", "一", "二", "三", "四", "五", "六")
-Global iniPosRefTools
-global iniLastRefFolder = (itemsFolder name:"" dir:"")
-global iniRefFolder1    = (itemsFolder name:"<＋＋＋>" dir:"")
-global iniRefFolder2    = (itemsFolder name:"<＋＋＋>" dir:"")
-global iniRefFolder3    = (itemsFolder name:"<＋＋＋>" dir:"")
-global iniRefFolder4    = (itemsFolder name:"<＋＋＋>" dir:"")
-global iniFilterRefName = #()
 Global posMouMove       = [0,0]
 global tempAddFolderID  = "0"
 Global arrRefType       = #("静帧","动图","视频","剪切板")
@@ -44,61 +43,6 @@ global typeVedio        = #(".avi",".mp4",".mkv")
 global arrAllRefFiles   = #()
 global arrAllRefFolders = #()
 
-global myfgColor
-global myClickColor
-
-fn fnGetColorTheme =
-(
-	local curColorThemeFile = colorMan.getFileName()
-	if (curColorThemeFile != undefined) then
-	(
-		if (matchpattern curColorThemeFile pattern:"*light*") then
-		(
-			myfgColor    = (color 65 105 225)
-			myClickColor = (color 0 139 139)
-		)
-		else
-		(
-			myfgColor    = (color 219 209 72)
-			myClickColor = (color 0 255 127)
-		)
-	)
-	else
-	(
-		myfgColor    = (color 219 209 72)
-		myClickColor = (color 0 255 127)
-	)
-)
-fnGetColorTheme() ----获取当前主题是深色还是浅色,来更改文字颜色
-
-fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
-(
-	attr = (GetINISetting BulletConfig nameAttrClass nameAttr) as string  --先提取文件中的记录
-	if ((matchpattern nameAttr  pattern:"RefFolder*") or (nameAttr == "LastRefFolder"))then (attr = substituteString attr "dir:" "dir:@")
-	if attr == "" then attr = (execute valueAttr) else (attr = execute attr)  --判断记录为空与否得到需要的记录参数
-)
-fn fnSaveConfig =  --引用上面方法提出需要的参数
-(----提出脚本位置
-    iniPosRefTools   = fnGetConfig iniPosRefTools "BsRefToolsSet" "PosRefTools" (mouse.screenpos as string)
-    iniRefFolder1    = fnGetConfig iniRefFolder1 "BsRefToolsSet"  "RefFolder1" (iniRefFolder1 as string)
-    iniRefFolder2    = fnGetConfig iniRefFolder2 "BsRefToolsSet"  "RefFolder2" (iniRefFolder2 as string)
-    iniRefFolder3    = fnGetConfig iniRefFolder3 "BsRefToolsSet"  "RefFolder3" (iniRefFolder3 as string)
-    iniRefFolder4    = fnGetConfig iniRefFolder4 "BsRefToolsSet"  "RefFolder4" (iniRefFolder4 as string)
-    iniFilterRefName = fnGetConfig iniFilterRefName "BsRefToolsSet"  "FilterRefName" (iniFilterRefName as string)
-    iniLastRefFolder = fnGetConfig iniLastRefFolder "BsRefToolsSet"  "LastRefFolder" (iniLastRefFolder as string)
-)
-fnSaveConfig () --初始执行一遍
-fn fnSetConfig =  --保存参数,脚本位置
-(
-	SetINISetting BulletConfig "BsRefToolsSet"  "PosRefTools" (iniPosRefTools as string)
-	SetINISetting BulletConfig "BsRefToolsSet"  "RefFolder1" (iniRefFolder1 as string)
-	SetINISetting BulletConfig "BsRefToolsSet"  "RefFolder2" (iniRefFolder2 as string)
-	SetINISetting BulletConfig "BsRefToolsSet"  "RefFolder3" (iniRefFolder3 as string)
-	SetINISetting BulletConfig "BsRefToolsSet"  "RefFolder4" (iniRefFolder4 as string)
-	SetINISetting BulletConfig "BsRefToolsSet"  "FilterRefName" (iniFilterRefName as string)
-	SetINISetting BulletConfig "BsRefToolsSet"  "LastRefFolder" (iniLastRefFolder as string)
-)
----------------配合BulletTools工具的ini文件保存位置信息--------------------
 fn fnDelFileDir targetDel =  --删除文件
 (
 	if (SIOFile.Exists targetDel == true) then ---判断是否存在文件
@@ -601,7 +545,7 @@ rollout rolAddRefFolder "添加参考文件夹" width:340 height:80
 			str += "\r\nrolRefTools.btnRefDir" + tempAddFolderID + ".text = \"<" + edtAddDirName.text + ">\""
 			execute str
 			try(destroydialog rolAddRefFolder)catch()
-			fnSetConfig ()
+			stSetConfig.fnSetConfigBsRefTools ()
 		)
 	)
 )
@@ -827,8 +771,8 @@ rollout rolRefTools ("[参考工具]-BsRefTools_v" + currentVersion)  width:340 
         btnRefreshFolder.images  = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,3,3,3,3,true,false)
         btnOpenCurrentDir.images = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,5,5,5,5,true,false)
 		btnLastFolder.images     = #("MergeAnim_24i.bmp","MergeAnim_24i.bmp",4,1,1,1,1,false,true)
-        fnSaveConfig ()  ---------------脚本位置等赋值
-		fnSetConfig ()  ----------------保存位置信息到ini文件
+        stLoadConfig.fnLoadConfigBsRefTools ()  ---------------脚本位置等赋值
+		stSetConfig.fnSetConfigBsRefTools ()  ----------------保存位置信息到ini文件
 		fnRefreshFilterItems ()
 		fnFreshRefDirText ()
 		fnRefreshList iniLastRefFolder.dir
@@ -841,7 +785,7 @@ rollout rolRefTools ("[参考工具]-BsRefTools_v" + currentVersion)  width:340 
 	(
 		iniPosRefTools   = (GetDialogPos rolRefTools)
 		iniLastRefFolder.dir = edtBrowseFolder.text
-		fnSetConfig ()
+		stSetConfig.fnSetConfigBsRefTools ()
 	)
 ------------------------------------------------------------------------
 	on btnRefDir1 pressed do 
