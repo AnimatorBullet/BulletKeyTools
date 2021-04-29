@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-28 19:39:39
+ * @LastEditTime: 2021-04-29 12:56:00
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -2238,11 +2238,28 @@ rollout rolBsKeyTools "" width:200 height:228
 	---------------------上面设置拖动脚本窗口,去掉标题栏后默认无法拖动---------------------
 	on btnSelBiped pressed do ----选择biped
 	(
-		clearselection ()
-		for o in objects where (o.ishidden == false) do 
+		-- for o in objects where (o.ishidden == false) do 
+		-- (
+		-- 	if classof o == Biped_Object then selectmore o
+		-- 	-- if (matchpattern o.name pattern:"*Bip*") then selectmore o
+		-- )
+		if selection.count != 0 then 
 		(
-			if classof o == Biped_Object then selectmore o
-			-- if (matchpattern o.name pattern:"*Bip*") then selectmore o
+			arrSelbipedRoot = #()   -------判断选择了几个biped骨架
+			for i in selection where ((classof i == Biped_Object) and (i.ishidden == false)) do  
+			(
+				appendIfUnique arrSelbipedRoot i.controller.rootNode  --添加到骨架数组
+			)
+			for i in arrSelbipedRoot do 
+			(
+				execute ("select $'" + i.name + "*'")
+				execute ("deselect $'" + i.name + "*Footsteps'")
+			)
+		)
+		else 
+		(
+			select $'Bip*'
+			deselect $'Bip*Footsteps'
 		)
 	)
 
