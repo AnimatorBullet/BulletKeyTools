@@ -104,7 +104,9 @@ rollout rolBsAnimButton  "BsAnimButton_v1.0"
 			SetDialogPos rolBsAnimButton (mouse.screenpos - posAnimButtonMouMove)			
 		)
 	)
+    ------------------------------------------------------------------------------------------------------
 
+    -- PolyToolsModeling.Quadrify true false
 )
 -- createDialog rolBsAnimButton 1000 100 fgcolor:myFgColor menu:RCmenuConfig
 if (iniPosAnimButtonTools != 0) then 

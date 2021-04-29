@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-29 12:56:00
+ * @LastEditTime: 2021-04-29 13:21:36
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1022,7 +1022,7 @@ rollout rolBsKeyTools "" width:200 height:228
 		tooltip:"欧拉和TCB互转" pos:btnPos
 		button btnEulerFilter "欧拉过滤" width:btnWidth height:btnHeight visible:false \
 		tooltip:"Bone骨骼过滤欧拉旋转" pos:btnPos
-		button btnHotAnimBtn "自带命令" width:btnWidth height:btnHeight visible:false \
+		button btnHotAnimBtn "简单命令" width:btnWidth height:btnHeight visible:false \
 		tooltip:"动画相关3dsMax自带功能整合" pos:btnPos
 		button btnDelOutKeys "清所有帧" width:btnWidth height:btnHeight visible:false \
 		toolTip:"清除所有帧\r\nLink帧请手动删" pos:btnPos
@@ -1070,7 +1070,7 @@ rollout rolBsKeyTools "" width:200 height:228
 		button btnDelDecimalKeys "删小数帧" width:btnWidth height:btnHeight visible:false \
 		toolTip:"删除所有小数帧" pos:btnPos
 		button btnRescaleWU "蒙皮缩放" width:btnWidth height:btnHeight visible:false \
-		toolTip:"删除所有小数帧" pos:btnPos
+		toolTip:"带有Skin的缩放" pos:btnPos
 
 		local btnMsWidth = 72.5
 		checkbutton ckbSwitchMyScripts "切换" pos:[5,230] width:35 height:20
