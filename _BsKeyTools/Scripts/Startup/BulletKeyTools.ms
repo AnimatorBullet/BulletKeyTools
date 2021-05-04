@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-29 13:21:36
+ * @LastEditTime: 2021-05-04 23:54:19
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -12,9 +12,9 @@ try(destroydialog rolFnKeys)catch()
 try(destroydialog rolAddMyScripts)catch()
 try(destroydialog rolCustomFps)catch()
 
-try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
-try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
-try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 stLoadConfig.fnLoadConfigBsKeyTools ()
 
 global curVerBsKeyTools = "0.9.6"
@@ -917,11 +917,11 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 -----------------------------------------------------------------
 
 -------------主UI-----------------------------------------------------------------
-rollout rolBsKeyTools "" width:200 height:228
+rollout rolBsKeyTools "" width:200 height:248
 (
 	local strMainRol = ("BsKeyTools_v" + curVerBsKeyTools + "（中键关闭）")
 	---------------------------------UI--------------------------------------
-	groupbox gbxMainUI strMainRol pos:[5,5] width:190 height:192
+	groupbox gbxMainUI strMainRol pos:[5,5] width:190 height:212
 	
 		-- label lblRangeStartText "起始帧" pos:[15,21] width:80 height:20
 		-- label lblRangeEndText "结束帧" pos:[65,21] width:80 height:20
@@ -933,75 +933,87 @@ rollout rolBsKeyTools "" width:200 height:228
 		tooltip:"预览选择帧\r\n再点回到上次帧范围"
 		button btnAllFrameDisplay "首尾帧" pos:[55,40] width:45 height:20 \
 		tooltip:"预览全部帧\r\n再点回到上次帧范围"
-		button btnZeroFrameDisplay "零" pos:[100,40] width:30 height:20 \
-		tooltip:"显示0帧"
-		button btnMagicBtn "" pos:[135,22] width:55 height:35   \
+		button btnZeroFrameDisplay "零帧" pos:[100,40] width:30 height:20 \
+		tooltip:"首帧回到0帧"
+		button btnCutSequence "动画分段" pos:[130,40] width:60 height:20 \
+		toolTip:"为长动画分段动作区间 (修改自San_oOo)"
+		button btnHotAnimBtn "命令集" pos:[10,60] width:45 height:20 \
+		tooltip:"动画相关3dsMax自带功能整合"
+		button btnLightTable "洋葱皮" pos:[55,60] width:45 height:20 \
+		toolTip:"显示运动重影 (修改自San_oOo)"
+		checkbutton ckbShadowCut "剪影" highlightcolor:myCheckedColor \
+		pos:[100,60] width:30 height:20 toolTip:"切换剪影显示"
+		button btnDemoTool "Demo工具" pos:[130,60] width:60 height:20 \
+		toolTip:"[已有想法待补充]\r\n方便渲染作品和练习的工具"
+		button btnMagicBtn "" pos:[130,21] width:60 height:18  \
 		tooltip:"点我点我点我~良心小工具" border:false
 		-- edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
 		-- pos:[10,70] labelOnTop:false text:"5f" bold:true readOnly:false 
 		-- button btnSet5 "5f" width:35 pos:[90,67]
 		-- button btnSetAdd "+5f" width:35 pos:[125,67]
 		-- button btnSetOpposite "负" width:30 pos:[160,67]
+		button btnHideUnSel "独显" pos:[10,80]width:40 height:30 \
+		toolTip:"隐藏当前显示的未选中物体，右键可重新显示"
 		checkbutton btnJudgeLinkKey "Link?" highlightcolor:myCheckedColor \
-		pos:[10,60] tooltip:"是否存在Link帧?" width:35 height:30 checked:false  
+		pos:[50,80] tooltip:"是否存在Link帧?" width:35 height:30 checked:false  
 		button btnSelBeforeKeys "" \
-		pos:[45,60] width:35 height:30 toolTip:"选择滑条前面关键帧"  
+		pos:[85,80] width:35 height:30 toolTip:"选择滑条前面关键帧"  
 		button btnSelAllKeys "" \
-		pos:[80,60] width:35 height:30 toolTip:"选择所有关键帧"  
+		pos:[120,80] width:35 height:30 toolTip:"选择所有关键帧"  
 		button btnSelAfterKeys "" \
-		pos:[115,60] width:35 height:30 toolTip:"选择滑条后面关键帧"
-		checkbutton ckbShadowCut "剪影" highlightcolor:myCheckedColor \
-		pos:[150,60] width:40 height:30 toolTip:"切换剪影显示"
+		pos:[155,80] width:35 height:30 toolTip:"选择滑条后面关键帧"
 		-- button btnMoveKeys " " width:30 height:30 \
 		-- pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~"  
 		checkbutton ckbFnBoxDisplay "BOX显"  highlightcolor:myCheckedColor \
-		width:45 height:25 toolTip:"骨骼切换Box显示" pos:[10,92]
+		width:45 height:25 toolTip:"骨骼切换Box显示" pos:[10,112]
 		checkbutton ckbFreezeMesh "冻模型" highlightcolor:myCheckedColor \
-		toolTip:"冻结解冻模型" width:45 height:25 pos:[55,92]
+		toolTip:"冻结解冻模型" width:45 height:25 pos:[55,112]
 		checkbutton ckbHideBones "隐Bone" highlightcolor:myCheckedColor \
-		width:45 height:25 toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[100,92]
+		width:45 height:25 toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[100,112]
 		checkbutton ckbHideBiped "隐Bip" width:45 height:25 highlightcolor:myCheckedColor \
-		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[145,92]
-		button btnImageComp "构图框" pos:[10,117] width:45 height:25 \
+		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[145,112]
+		button btnImageComp "构图框" pos:[10,137] width:45 height:25 \
 		tooltip:"各种经典分割视图以辅助构图"
-		button btnTrajedit "轨迹线" pos:[55,117] width:45 height:25 \
+		button btnTrajedit "轨迹线" pos:[55,137] width:45 height:25 \
 		tooltip:"动画轨迹工具个人优化版"
-		button btnHideUnSel "隐未选" pos:[100,117]width:45 height:25 \
-		toolTip:"隐藏当前显示的未选中物体，右键可重新显示"
-		button btnFileOpen "时光机" pos:[145,117] width:45 height:25 \
+		button btnFileOpen "时光机" pos:[100,137] width:45 height:25 \
 		tooltip:"快速打开max文件\r\n可收藏常用目录" 
-		checkButton ckbPlayBlocking "跳帧播" pos:[10,142] width:45 height:25 
+		button btnKeyStepMode "帧跳转" pos:[145,137] width:45 height:25 \
+		tooltip:"前后切关键帧设置，\r\n可配合删帧或单轴修帧" 
+		checkButton ckbPlayBlocking "跳帧播" pos:[10,162] width:45 height:25 
 		highlightcolor:myCheckedColor tooltip:"点击预览关键帧 Blocking 动画\r\n若有 Link 帧需要按下上面按钮" checked:false
 		timer clock "PlayClock" interval:1 active:false
-		button btnSpringMagic "飘带解" pos:[55,142] width:45 height:25 \
+		button btnSpringMagic "飘带解" pos:[55,162] width:45 height:25 \
 		tooltip:"左点新版,右点旧版" 
-		button btnCSTools "CS选择" pos:[100,142] width:45 height:25 \
+		button btnCSTools "CS选择" pos:[100,162] width:45 height:25 \
 		toolTip:"快速选择CS骨骼和调Biped等" 
-		button btnAnimCopyPaste "暴力贴"  pos:[145,142] width:45 height:25 \
+		button btnAnimCopyPaste "暴力贴"  pos:[145,162] width:45 height:25 \
 		toolTip:"动画暴力粘贴(待优化)" 
-		button btnLayerManager "层" pos:[10,167] width:22.5 height:25 \
+		button btnLayerManager "层" pos:[10,187] width:20 height:25 \
 		toolTip:"模拟旧版层管理器" 
-		button btnPoseTool "库" pos:[32.5,167] width:22.5 height:25 \
+		button btnSelectionsetTools "集" pos:[30,187] width:20 height:25 \
+		toolTip:"选择集工具增强版" 
+		button btnPoseTool "库" pos:[50,187] width:20 height:25 \
 		toolTip:"参考库工具,待完善"
-		button btnQuickSave "快备份" pos:[55,167] width:45 height:25 \
+		button btnQuickSave "备份" pos:[70,187] width:30 height:25 \
 		toolTip:"快速备份" 
-		button btnSetFps "" pos:[100,167] width:45 height:25 \
+		button btnSetFps "" pos:[100,187] width:45 height:25 \
 		toolTip:"设置帧率" 
-		button btnSetSpeed "" pos:[145,167] width:45 height:25 \
+		button btnSetSpeed "" pos:[145,187] width:45 height:25 \
 		toolTip:"设置播放速度" 
 	
-	groupbox gbxMinTools "" pos:[200,5] width:130 height:220
+	groupbox gbxMinTools "" pos:[200,5] width:130 height:240
 	
-		checkbutton ckbC1 "坚" width:30 height:25 highlightcolor:myCheckedColor \
+		checkbutton ckbC1 "天" width:30 height:29 highlightcolor:myCheckedColor \
 		pos:[205,15] toolTip:"" border:false
-		checkbutton ckbC2 "持" width:30 height:25 highlightcolor:myCheckedColor \
+		checkbutton ckbC2 "动" width:30 height:29 highlightcolor:myCheckedColor \
 		pos:[235,15] toolTip:"" border:false
-		checkbutton ckbC3 "热" width:30 height:25 highlightcolor:myCheckedColor \
+		checkbutton ckbC3 "万" width:30 height:29 highlightcolor:myCheckedColor \
 		pos:[265,15] toolTip:"" border:false
-		checkbutton ckbC4 "爱" width:30 height:25 highlightcolor:myCheckedColor \
+		checkbutton ckbC4 "象" width:30 height:29 highlightcolor:myCheckedColor \
 		pos:[295,15] toolTip:"" border:false
 
-		local btnHeight = 30
+		local btnHeight = 32
 		local btnWidth = 60
 		local btnPos = [999999,999999]
 		button btnTemp "待添加" width:btnWidth height:btnHeight visible:false \
@@ -1022,8 +1034,6 @@ rollout rolBsKeyTools "" width:200 height:228
 		tooltip:"欧拉和TCB互转" pos:btnPos
 		button btnEulerFilter "欧拉过滤" width:btnWidth height:btnHeight visible:false \
 		tooltip:"Bone骨骼过滤欧拉旋转" pos:btnPos
-		button btnHotAnimBtn "简单命令" width:btnWidth height:btnHeight visible:false \
-		tooltip:"动画相关3dsMax自带功能整合" pos:btnPos
 		button btnDelOutKeys "清所有帧" width:btnWidth height:btnHeight visible:false \
 		toolTip:"清除所有帧\r\nLink帧请手动删" pos:btnPos
 		button btnCleanOutKeys "清无限帧" width:btnWidth height:btnHeight visible:false \
@@ -1042,15 +1052,11 @@ rollout rolBsKeyTools "" width:200 height:228
 		toolTip:"批量转换滑动关键帧等,\r\n后续可能按需优化更多设置" pos:btnPos
 		button btnRenameTools "改名工具" width:btnWidth height:btnHeight visible:false \
 		toolTip:"超级重命名工具" pos:btnPos
-		button btnMeshTools "模型整理" width:btnWidth height:btnHeight visible:false \
-		toolTip:"功能待添加" pos:btnPos
 		button btnAnimMirror "动画镜像" width:btnWidth height:btnHeight visible:false \
 		toolTip:"目前引用4698to大佬的插件\r\n后面随缘新写或优化" pos:btnPos
 		checkbutton ckbFnMtlDisplay "素模切换" width:btnWidth height:btnHeight visible:false \
 		toolTip:"左:切换显示隐藏贴图,方便白模预览\r\n右:Clay显示开关(红色模型显示)\r\n暂不支持子材质和Vray材质..."
 		pos:btnPos highlightcolor:myCheckedColor 
-		button btnCutSequence "动画分段" width:btnWidth height:btnHeight visible:false \
-		toolTip:"为长动画分段动作区间" pos:btnPos
 		button btnMopherSlider "表情滑条" width:btnWidth height:btnHeight visible:false \
 		toolTip:"选择带morpher的mesh，\r\n打开快速调节滑条方便K表情~" pos:btnPos
 		button btnBipedScale "CS缩放" width:btnWidth height:btnHeight visible:false \
@@ -1061,8 +1067,6 @@ rollout rolBsKeyTools "" width:200 height:228
 		toolTip:"根据自由视角创建相机" pos:btnPos
 		button btnMeshToBone "碎块加骨" width:btnWidth height:btnHeight visible:false \
 		toolTip:"破碎碎块快速加骨骼" pos:btnPos
-		button btnLightTable "运动重影" width:btnWidth height:btnHeight visible:false \
-		toolTip:"显示运动重影" pos:btnPos
 		button btnWinbox "窗口找回" width:btnWidth height:btnHeight visible:false \
 		toolTip:"方便找回曲线编辑器等窗口(多屏导致窗口丢失)" pos:btnPos
 		button btnHideBipedTwists "隐 Twist" width:btnWidth height:btnHeight visible:false \
@@ -1071,31 +1075,33 @@ rollout rolBsKeyTools "" width:200 height:228
 		toolTip:"删除所有小数帧" pos:btnPos
 		button btnRescaleWU "蒙皮缩放" width:btnWidth height:btnHeight visible:false \
 		toolTip:"带有Skin的缩放" pos:btnPos
+		button btnSkinTools "Skin工具" width:btnWidth height:btnHeight visible:false \
+		toolTip:"Skin工具集成 (修改自San_oOo)" pos:btnPos
 
 		local btnMsWidth = 72.5
-		checkbutton ckbSwitchMyScripts "切换" pos:[5,230] width:35 height:20
+		checkbutton ckbSwitchMyScripts "切换" pos:[5,250] width:35 height:20
 		tooltip:"切换自定义脚本按钮" border:true highlightcolor:myCheckedColor 
-		button btnMyScripts1 "<＋＋>" pos:[40,230] width:btnMsWidth height:20
+		button btnMyScripts1 "<＋＋>" pos:[40.5,250] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[1].dir border:true visible:false
-		button btnMyScripts2 "<＋＋>" pos:[112.5,230] width:btnMsWidth height:20
+		button btnMyScripts2 "<＋＋>" pos:[113,250] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[2].dir border:true visible:false
-		button btnMyScripts3 "<＋＋>" pos:[185,230] width:btnMsWidth height:20
+		button btnMyScripts3 "<＋＋>" pos:[185,250] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[3].dir border:true visible:false
-		button btnMyScripts4 "<＋＋>" pos:[257.5,230] width:btnMsWidth height:20
+		button btnMyScripts4 "<＋＋>" pos:[258,250] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[4].dir border:true visible:false
-		button btnMyScripts5 "<＋＋>" pos:[40,230] width:btnMsWidth height:20
+		button btnMyScripts5 "<＋＋>" pos:[40.5,250] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[5].dir border:true visible:false
-		button btnMyScripts6 "<＋＋>" pos:[112.5,230] width:btnMsWidth height:20
+		button btnMyScripts6 "<＋＋>" pos:[113,250] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[6].dir border:true visible:false
-		button btnMyScripts7 "<＋＋>" pos:[185,230] width:btnMsWidth height:20
+		button btnMyScripts7 "<＋＋>" pos:[185,250] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[7].dir border:true visible:false
-		button btnMyScripts8 "<＋＋>" pos:[257.5,230] width:btnMsWidth height:20
+		button btnMyScripts8 "<＋＋>" pos:[258,250] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[8].dir border:true visible:false
 
-	groupbox gbxTips "" pos:[5,195] width:155 height:30
+	groupbox gbxTips "" pos:[5,215] width:155 height:30
 	
-		label lblLink "2019.9[miHoYo_Bullet.S]" pos:[15,206] width:140 height:15
-		button btnConfig "设置" pos:[165,202] width:30 height:22 border:true
+		label lblLink "2019.9[miHoYo_Bullet.S]" pos:[15,226] width:140 height:15
+		button btnConfig "设置" pos:[165,222] width:30 height:22 border:true
 
 	local m_PBKeyTimeArray
 	local m_PBKeyMiliSecArray
@@ -1133,7 +1139,7 @@ rollout rolBsKeyTools "" width:200 height:228
 		if switchToolPanel == 0 then
 		(
 			rolBsKeyTools.width               = 200
-			rolBsKeyTools.height              = 228
+			rolBsKeyTools.height              = 248
 			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
 			ckbSwitchMyScripts.visible                = false
 			btnMyScripts1.visible                     = false
@@ -1148,7 +1154,7 @@ rollout rolBsKeyTools "" width:200 height:228
 		else
 		(
 			rolBsKeyTools.width               = 335
-			rolBsKeyTools.height              = 253
+			rolBsKeyTools.height              = 273
 			btnMagicBtn.text                          = "( = `▽`)"
 			ckbSwitchMyScripts.visible                = true
 			fnRefreshMsPanel ()
@@ -1161,7 +1167,7 @@ rollout rolBsKeyTools "" width:200 height:228
 		if switchToolPanel == 1 then
 		(
 			rolBsKeyTools.width               = 200
-			rolBsKeyTools.height              = 228
+			rolBsKeyTools.height              = 248
 			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
 			switchToolPanel                           = 0
 			ckbSwitchMyScripts.visible                = false
@@ -1177,7 +1183,7 @@ rollout rolBsKeyTools "" width:200 height:228
 		else
 		(
 			rolBsKeyTools.width               = 335
-			rolBsKeyTools.height              = 253
+			rolBsKeyTools.height              = 273
 			btnMagicBtn.text                          = "( = `▽`)"
 			switchToolPanel                           = 1
 			ckbSwitchMyScripts.visible                = true
@@ -1197,21 +1203,21 @@ rollout rolBsKeyTools "" width:200 height:228
 	fn fnReloadToolsBtn =
 	(
 		arrSourToolC1 = #(rolBsKeyTools.btnColorTools,rolBsKeyTools.btnFastAlign,
-						rolBsKeyTools.btnHotAnimBtn,rolBsKeyTools.btnAnimMirror,
+						rolBsKeyTools.btnDelDecimalKeys,rolBsKeyTools.btnAnimMirror,
 						rolBsKeyTools.btnFnKeyType,rolBsKeyTools.btnBatchExport,
 						rolBsKeyTools.ckbIsoMesh,rolBsKeyTools.btnBipedTraj,
-						rolBsKeyTools.btnMeshTools,rolBsKeyTools.btnQuickPrev,
+						rolBsKeyTools.btnRescaleWU,rolBsKeyTools.btnSkinTools,
 						rolBsKeyTools.btnFnFrame,rolBsKeyTools.ckbFnMtlDisplay)
-		arrSourToolC2 = #(rolBsKeyTools.btnCutSequence,rolBsKeyTools.btnMopherSlider,
+		arrSourToolC2 = #(rolBsKeyTools.btnCameraFromView,rolBsKeyTools.btnMopherSlider,
 						rolBsKeyTools.btnSelBiped,rolBsKeyTools.btnSelBone,
 						rolBsKeyTools.btnFnTCB,rolBsKeyTools.btnEulerFilter,
 						rolBsKeyTools.btnDelOutKeys,rolBsKeyTools.btnCleanOutKeys,
 						rolBsKeyTools.btnEndBone,rolBsKeyTools.btnRenameTools,
 						rolBsKeyTools.btnBipedScale,rolBsKeyTools.btnSelByColor)
-		arrSourToolC3 = #(rolBsKeyTools.btnCameraFromView,rolBsKeyTools.btnMeshToBone,
-						rolBsKeyTools.btnLightTable,rolBsKeyTools.btnWinbox,
-						rolBsKeyTools.btnHideBipedTwists,rolBsKeyTools.btnDelDecimalKeys,
-						rolBsKeyTools.btnRescaleWU,rolBsKeyTools.btnTemp,
+		arrSourToolC3 = #(rolBsKeyTools.btnMeshToBone,rolBsKeyTools.btnWinbox,
+						rolBsKeyTools.btnHideBipedTwists,rolBsKeyTools.btnQuickPrev,
+						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
 						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp)
 		arrSourToolC4 = #(rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
@@ -1239,11 +1245,11 @@ rollout rolBsKeyTools "" width:200 height:228
 		str += "	arrToolC" + idBtn as string + "[b].visible = true" + "\r\n"
 		str += "	if (mod b 2 == 1) then \r\n"
 		str += "	("
-		str += "		arrToolC" + idBtn as string + "[b].pos = " + [205,40] as string + " + [0,(b - 1) * 15]" + "\r\n"
+		str += "		arrToolC" + idBtn as string + "[b].pos = " + [205,45] as string + " + [0,(b - 1) * 16.5]" + "\r\n"
 		str += "	)"
 		str += "	else if (mod b 2 == 0) then"
 		str += "	("
-		str += "		arrToolC" + idBtn as string + "[b].pos = " + [265,40] as string + " + [0,(b - 2) * 15]" + "\r\n"
+		str += "		arrToolC" + idBtn as string + "[b].pos = " + [265,45] as string + " + [0,(b - 2) * 16.5]" + "\r\n"
 		str += "	)"
 		str += ")"
 		
@@ -2243,18 +2249,10 @@ rollout rolBsKeyTools "" width:200 height:228
 		-- 	if classof o == Biped_Object then selectmore o
 		-- 	-- if (matchpattern o.name pattern:"*Bip*") then selectmore o
 		-- )
-		if selection.count != 0 then 
+		if ((selection.count == 1) and (classof $ == Biped_Object) and ($.ishidden == false)) then 
 		(
-			arrSelbipedRoot = #()   -------判断选择了几个biped骨架
-			for i in selection where ((classof i == Biped_Object) and (i.ishidden == false)) do  
-			(
-				appendIfUnique arrSelbipedRoot i.controller.rootNode  --添加到骨架数组
-			)
-			for i in arrSelbipedRoot do 
-			(
-				execute ("select $'" + i.name + "*'")
-				execute ("deselect $'" + i.name + "*Footsteps'")
-			)
+			execute ("select $'" + $.controller.rootNode.name + "*'")
+			execute ("deselect $'" + $.controller.rootNode.name + "*Footsteps'")
 		)
 		else 
 		(
@@ -2360,23 +2358,23 @@ rollout rolBsKeyTools "" width:200 height:228
 	on btnCSTools pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\cstools.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 	on btnSpringMagic pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_New.mse"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 	on btnSpringMagic rightclick do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_Old.mse"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnFileOpen pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts" + "\\BsOpenTools.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on ckbIsoMesh changed state do
@@ -2804,7 +2802,7 @@ rollout rolBsKeyTools "" width:200 height:228
 	on btnImageComp pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\ImageCompHelper.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 	
 	on btnFnKeyType pressed do 
@@ -2865,19 +2863,19 @@ rollout rolBsKeyTools "" width:200 height:228
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\MorphSliders_11.ms")
 		macros.run "Tools" "MorphSliders")
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnLayerManager pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\LayerManagerAlternative.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnAnimMirror pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\动画镜像工具.mse"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnMyScripts1 pressed do 
@@ -3056,49 +3054,49 @@ rollout rolBsKeyTools "" width:200 height:228
 	on btnColorTools pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\ProColor.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnAnimCopyPaste pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\CPTools.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnPoseTool pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsRefTools.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnTrajedit pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\DTrajEdit.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnHotAnimBtn pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimButton.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on ckbShadowCut changed state do
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\Silhouette.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnRenameTools pressed do
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\P_ObjectRenamer.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnWinbox pressed do
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\WinBox.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnCameraFromView pressed do
@@ -3114,19 +3112,19 @@ rollout rolBsKeyTools "" width:200 height:228
 	on btnMeshToBone pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\AnimMeshToBonesAnim.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnLightTable pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\LightTable.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnCutSequence pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\AnimaRange.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 	on btnEndBone pressed do 
@@ -3196,7 +3194,19 @@ rollout rolBsKeyTools "" width:200 height:228
 	on btnRescaleWU pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\RescaleWU.ms"))
-		catch(messagebox "工具安装可能不完全,建议重新安装...        " beep:false)
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+	)
+
+	on btnSkinTools pressed do 
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\SkinTools.ms"))
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+	)
+
+	on btnKeyStepMode pressed do 
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsKeyStepMode.ms"))
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
 )

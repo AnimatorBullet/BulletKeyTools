@@ -1,8 +1,8 @@
 global rolBsAnimButton 
 try(destroyDialog rolBsAnimButton)catch()
 
-try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
-try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 stLoadConfig.fnLoadConfigBsAnimButton ()
 
 Global switchAnimButtonMouState = false
@@ -23,7 +23,7 @@ rollout rolBsAnimButton  "BsAnimButton_v1.0"
     button btnExit "✖" width:20 height:20 pos:[980,0]  border:false
     button btnHelp "？" width:20 height:20 pos:[960,0]  border:false
 
-    button 
+
     
     local arrAnimBtn1 = #()
     local arrAnimBtn2 = #()
