@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-04 23:54:19
+ * @LastEditTime: 2021-05-07 12:34:43
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1079,23 +1079,23 @@ rollout rolBsKeyTools "" width:200 height:248
 		toolTip:"Skin工具集成 (修改自San_oOo)" pos:btnPos
 
 		local btnMsWidth = 72.5
-		checkbutton ckbSwitchMyScripts "切换" pos:[5,250] width:35 height:20
+		checkbutton ckbSwitchMyScripts "切换" pos:[5,249] width:35 height:20
 		tooltip:"切换自定义脚本按钮" border:true highlightcolor:myCheckedColor 
-		button btnMyScripts1 "<＋＋>" pos:[40.5,250] width:btnMsWidth height:20
+		button btnMyScripts1 "<＋＋>" pos:[40.5,249] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[1].dir border:true visible:false
-		button btnMyScripts2 "<＋＋>" pos:[113,250] width:btnMsWidth height:20
+		button btnMyScripts2 "<＋＋>" pos:[113,249] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[2].dir border:true visible:false
-		button btnMyScripts3 "<＋＋>" pos:[185,250] width:btnMsWidth height:20
+		button btnMyScripts3 "<＋＋>" pos:[185,249] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[3].dir border:true visible:false
-		button btnMyScripts4 "<＋＋>" pos:[258,250] width:btnMsWidth height:20
+		button btnMyScripts4 "<＋＋>" pos:[258,249] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[4].dir border:true visible:false
-		button btnMyScripts5 "<＋＋>" pos:[40.5,250] width:btnMsWidth height:20
+		button btnMyScripts5 "<＋＋>" pos:[40.5,249] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[5].dir border:true visible:false
-		button btnMyScripts6 "<＋＋>" pos:[113,250] width:btnMsWidth height:20
+		button btnMyScripts6 "<＋＋>" pos:[113,249] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[6].dir border:true visible:false
-		button btnMyScripts7 "<＋＋>" pos:[185,250] width:btnMsWidth height:20
+		button btnMyScripts7 "<＋＋>" pos:[185,249] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[7].dir border:true visible:false
-		button btnMyScripts8 "<＋＋>" pos:[258,250] width:btnMsWidth height:20
+		button btnMyScripts8 "<＋＋>" pos:[258,249] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[8].dir border:true visible:false
 
 	groupbox gbxTips "" pos:[5,215] width:155 height:30
@@ -3206,6 +3206,12 @@ rollout rolBsKeyTools "" width:200 height:248
 	on btnKeyStepMode pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsKeyStepMode.ms"))
+		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+	)
+
+	on btnSelectionsetTools pressed do 
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsSelSetTools.ms"))
 		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 	)
 
