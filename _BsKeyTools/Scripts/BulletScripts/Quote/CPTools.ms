@@ -3,7 +3,7 @@ struct myCoolDialogs
  (
  	labelStr,
  
- 	stringQuery = rollout stringQuery "è¾“å…¥å‘½å"
+ 	stringQuery = rollout stringQuery "ÊäÈëÃüÃû"
  	(
  		local returnStr
  	
@@ -38,13 +38,56 @@ struct myCoolDialogs
 		(
 			destroyDialog myCoolDialogs.stringQuery
  			
-			returnStr = "æœªå‘½å_pose"
+			returnStr = "Î´ÃüÃû_pose"
 -- 			cptools.rloading.pressed()
 		
  		)	
  	)
  )
+	
+	fn MakeThumbnail_copy =(
+	grab_bmp = gw.getViewportDib()
+	croppedScreenGrab = bitmap grab_bmp.height grab_bmp.height 
+	pasteBitmap grab_bmp croppedScreenGrab [((grab_bmp.width - grab_bmp.height)/2)+1,1] [0,0]  -- paste the orginal image to the tempImage, this results in a cropped image widh same height as width
+	outputMap  = bitmap 170 170
+	copy croppedScreenGrab outputMap 	
+	close grab_bmp
+	close croppedScreenGrab
+	
+	gc light:true
+	if cptools.testList.visible  then   ---poseÄ£Ê½
+	(	if cptools.testList.selected!=undefined then (outputMap.filename =((GetDir #export)+ "\\cptools_data\\")+cptools.testList.selected+".bmp"))
+	else 
+	(	if cptools.testListAni.selected!=undefined then (outputMap.filename =((GetDir #export)+ "\\cptools_data\\")+cptools.testListAni.selected+".bmp"))
+	save outputMap --Save it to file
+	outputMap
+)
 
+struct vpSave_copy (
+	tmMatrix,
+	screenGrab,
+	vpType,
+	
+	fn saveTM =(
+		try(
+			vpType = viewport.getType()
+			tmMatrix = getViewTM()
+		)catch()
+	),
+	fn getTM =(
+		try(
+			viewport.setType vpType
+			viewport.setTM tmMatrix
+		)catch()
+	),
+	fn setScreenGrab =(
+		screenGrab = (MakeThumbnail_copy())
+	)
+)
+cptools_P1
+
+
+(
 global stime           = animationrange.start
 global etime           = animationrange.end
 global start_frame     = animationrange.start
@@ -88,46 +131,46 @@ global wcb_lag
 global rfl_lag             
 global language_a_lag     
 global language_b_lag      
-
+)
 --global frame_options   = false
 fn china = (
- name_lag             = "æš´åŠ›å¸§æ‹·è´ç²˜è´´V1.19" 
- removeFromList_lag   = "åˆ é™¤å½“å‰é›†ï¼šç‚¹å‡»åˆ é™¤å½“å‰åˆ—è¡¨ä¸­çš„é€‰æ‹©é›†åˆ"
- rloading_lag         = "æ›´æ–°åˆ—è¡¨ï¼šå°†åˆ—è¡¨å†…å®¹æ›´æ–°è‡³æœ€æ–°"
- rb_sel_a_lag         ="å§¿æ€"
- rb_sel_b_lag         ="åŠ¨ä½œ"
- ac_lag               ="å¸§æ•°èŒƒå›´ï¼šå¼€å§‹åˆ°ç»“æŸ"
- addToList_lag        = "æ‹·è´å¸§"
- pastepose_lag        =  "ç²˜è´´å¸§" 
- ABbutton_lag         = "é€å¸§æ‹·è´ï¼šåœ¨æ­¤æ¨¡å¼ä¸‹æ‹·è´å¸§å°†ä»¥é€å¸§æ–¹å¼è¿›è¡Œæ‹·è´æ“ä½œ"
-  obj_r_lag           = "é‡ç½®å˜æ¢ï¼šæŠŠå˜æ¢é‡ç½®ä¸ºXYZå±æ€§ï¼Œé‡ç½®åå°†æ— æ³•ä¿ç•™åŸå§‹åŠ¨ç”»ä¿¡æ¯"
-  obj_xyz_lag         ="è½¬æ¢XYZï¼šæŠŠé€‰æ‹©å¯¹è±¡è½¬æ¢ä¸ºXYZå±æ€§"
-  obj_tcb_lag         ="è½¬æ¢TCBï¼šæŠŠé€‰æ‹©å¯¹è±¡è½¬æ¢ä¸ºTCBå±æ€§"
-  paste_offset_lag    =  "åç§» " 
- paste_offset_b_lag   ="åç§»ç²˜è´´ï¼šè¾“å…¥å¸§æ•°ï¼Œç²˜è´´å¸§å°†äºï¼ˆå¼€å§‹å¸§æ•°+åç§»å¸§æ•°ï¼‰å¾€ä¸‹ç²˜è´´åŠ¨ä½œ"
+ name_lag             = "±©Á¦Ö¡¿½±´Õ³ÌùV1.19" 
+ removeFromList_lag   = "É¾³ıµ±Ç°¼¯£ºµã»÷É¾³ıµ±Ç°ÁĞ±íÖĞµÄÑ¡Ôñ¼¯ºÏ"
+ rloading_lag         = "¸üĞÂÁĞ±í£º½«ÁĞ±íÄÚÈİ¸üĞÂÖÁ×îĞÂ"
+ rb_sel_a_lag         ="×ËÌ¬"
+ rb_sel_b_lag         ="¶¯×÷"
+ ac_lag               ="Ö¡Êı·¶Î§£º¿ªÊ¼µ½½áÊø"
+ addToList_lag        = "¿½±´Ö¡"
+ pastepose_lag        =  "Õ³ÌùÖ¡" 
+ ABbutton_lag         = "ÖğÖ¡¿½±´£ºÔÚ´ËÄ£Ê½ÏÂ¿½±´Ö¡½«ÒÔÖğÖ¡·½Ê½½øĞĞ¿½±´²Ù×÷"
+  obj_r_lag           = "ÖØÖÃ±ä»»£º°Ñ±ä»»ÖØÖÃÎªXYZÊôĞÔ£¬ÖØÖÃºó½«ÎŞ·¨±£ÁôÔ­Ê¼¶¯»­ĞÅÏ¢"
+  obj_xyz_lag         ="×ª»»XYZ£º°ÑÑ¡Ôñ¶ÔÏó×ª»»ÎªXYZÊôĞÔ"
+  obj_tcb_lag         ="×ª»»TCB£º°ÑÑ¡Ôñ¶ÔÏó×ª»»ÎªTCBÊôĞÔ"
+  paste_offset_lag    =  "Æ«ÒÆ " 
+ paste_offset_b_lag   ="Æ«ÒÆÕ³Ìù£ºÊäÈëÖ¡Êı£¬Õ³ÌùÖ¡½«ÓÚ£¨¿ªÊ¼Ö¡Êı+Æ«ÒÆÖ¡Êı£©ÍùÏÂÕ³Ìù¶¯×÷"
  lnk1_lag             = " " 
- wayneCheckBox_lag    = "ä¿ç•™æ‹·è´ï¼šå‹¾é€‰è¯¥é¡¹ï¼Œä¸‹æ¬¡å¼€å¯å°†ä¿ç•™æœ¬æ¬¡æ‹·è´çš„å§¿æ€å’ŒåŠ¨ä½œ"
- ac_tooltip_a_lag     = "å¸§æ•°èŒƒå›´ï¼šå¼€å§‹åˆ°ç»“æŸ"
- ac_tooltip_b_lag     = "å¸§æ•°èŒƒå›´ï¼šè‡ªå®šä¹‰å¼€å§‹ç»“æŸ"
- ABbutton_tooltip_a_lag ="å…³é”®å¸§æ‹·è´ï¼šåœ¨æ­¤æ¨¡å¼ä¸‹æ‹·è´å¸§å°†ä»¥é€‰ä¸­æ‰€æœ‰å¯¹è±¡åœ¨æ—¶é—´æ¡ä¸­æœ‰å¸§çš„ä½ç½®è¿›è¡Œæ‹·è´æ“ä½œ"
- ABbutton_tooltip_b_lag ="é€å¸§æ‹·è´ï¼šåœ¨æ­¤æ¨¡å¼ä¸‹æ‹·è´å¸§å°†ä»¥é€å¸§æ–¹å¼è¿›è¡Œæ‹·è´æ“ä½œ" 
- messagebox_a_lag     = "è¯·é€‰æ‹©è‡³å°‘ä¸€ä¸ªç‰©ä½“"
- messagebox_b_lag     = "æ—¶é—´èŒƒå›´é”™è¯¯"
- messagebox_c_lag     ="æœªæ‰¾åˆ°é€‰æ‹©Poseï¼Œè¯·æ›´æ–°åˆ—è¡¨"
- messagebox_d_lag     = "æœªæ‰¾åˆ°é€‰æ‹©Animationï¼Œè¯·æ›´æ–°åˆ—è¡¨"
- messagebox_e_lag     = "åœºæ™¯ä¸­æ— ç‰©ä½“åœ¨å§¿æ€é›†ä¸­"
- messagebox_f_lag     = "é€‰æ‹©ä¸­æœ‰éƒ¨åˆ†æœªè¢«è®°å½•å§¿æ€"
- messagebox_a_title_lag = "æç¤º"
- format_a_lag         = "å·²å–æ¶ˆ\n"
- format_b_lag         = "å®Œæˆ\n"
- format_c_lag         = "è¿›åº¦"
- Accuracy_offset_lag  = "ç²¾åº¦"
- Accuracy_offset_b_lag  = "ç²¾åº¦ï¼šé€šè¿‡ç²¾åº¦æ•°å€¼è¿›è¡Œé‡å¤ç²˜è´´ä»¥è¾¾åˆ°æœ€å‡†ç¡®çš„æ•ˆæœï¼ˆæ•°å€¼è¶Šå¤§ç”¨æ—¶è¶Šé•¿ï¼‰"
- obj_r_b_lag            = "ĞŸ"
- wcb_lag              = "Ã¼"
- rfl_lag              = "Ã—"
- language_a_lag       = "ä¸­"
- language_b_lag       = "è¯­è¨€:å½“å‰æ˜¯ä¸­æ–‡"
+ wayneCheckBox_lag    = "±£Áô¿½±´£º¹´Ñ¡¸ÃÏî£¬ÏÂ´Î¿ªÆô½«±£Áô±¾´Î¿½±´µÄ×ËÌ¬ºÍ¶¯×÷"
+ ac_tooltip_a_lag     = "Ö¡Êı·¶Î§£º¿ªÊ¼µ½½áÊø"
+ ac_tooltip_b_lag     = "Ö¡Êı·¶Î§£º×Ô¶¨Òå¿ªÊ¼½áÊø"
+ ABbutton_tooltip_a_lag ="¹Ø¼üÖ¡¿½±´£ºÔÚ´ËÄ£Ê½ÏÂ¿½±´Ö¡½«ÒÔÑ¡ÖĞËùÓĞ¶ÔÏóÔÚÊ±¼äÌõÖĞÓĞÖ¡µÄÎ»ÖÃ½øĞĞ¿½±´²Ù×÷"
+ ABbutton_tooltip_b_lag ="ÖğÖ¡¿½±´£ºÔÚ´ËÄ£Ê½ÏÂ¿½±´Ö¡½«ÒÔÖğÖ¡·½Ê½½øĞĞ¿½±´²Ù×÷" 
+ messagebox_a_lag     = "ÇëÑ¡ÔñÖÁÉÙÒ»¸öÎïÌå"
+ messagebox_b_lag     = "Ê±¼ä·¶Î§´íÎó"
+ messagebox_c_lag     ="Î´ÕÒµ½Ñ¡ÔñPose£¬Çë¸üĞÂÁĞ±í"
+ messagebox_d_lag     = "Î´ÕÒµ½Ñ¡ÔñAnimation£¬Çë¸üĞÂÁĞ±í"
+ messagebox_e_lag     = "³¡¾°ÖĞÎŞÎïÌåÔÚ×ËÌ¬¼¯ÖĞ"
+ messagebox_f_lag     = "Ñ¡ÔñÖĞÓĞ²¿·ÖÎ´±»¼ÇÂ¼×ËÌ¬"
+ messagebox_a_title_lag = "ÌáÊ¾"
+ format_a_lag         = "ÒÑÈ¡Ïû\n"
+ format_b_lag         = "Íê³É\n"
+ format_c_lag         = "½ø¶È"
+ Accuracy_offset_lag  = "¾«¶È"
+ Accuracy_offset_b_lag  = "¾«¶È£ºÍ¨¹ı¾«¶ÈÊıÖµ½øĞĞÖØ¸´Õ³ÌùÒÔ´ïµ½×î×¼È·µÄĞ§¹û£¨ÊıÖµÔ½´óÓÃÊ±Ô½³¤£©"
+ obj_r_b_lag            = "§±"
+ wcb_lag              = "¨¹"
+ rfl_lag              = "¡Á"
+ language_a_lag       = "ÖĞ"
+ language_b_lag       = "ÓïÑÔ:µ±Ç°ÊÇÖĞÎÄ"
 )
 
 
@@ -172,14 +215,13 @@ fn english = (
  language_b_lag       = "Language: the current is in English"
 )
 
-
+---------------------------------------------------------------------------------------------´ò¿ªÎÄ¼ş¼ÓÔØ
 (
----------------------------------------------------------------------------------------------æ‰“å¼€æ–‡ä»¶åŠ è½½
-makeDir  ((GetDir #export)+ "\\cptools_data\\")------åˆ›å»ºè·¯å¾„
-tempdata = ((GetDir #export)+"\\cptools_data\\"+"temp.ini")-----æŒ‡å®šæ–‡ä»¶
-testPath = doesFileExist tempdata------æ£€æµ‹æ–‡ä»¶æ˜¯å¦å­˜åœ¨
+makeDir  ((GetDir #export)+ "\\cptools_data\\")------´´½¨Â·¾¶
+tempdata = ((GetDir #export)+"\\cptools_data\\"+"temp.ini")-----Ö¸¶¨ÎÄ¼ş
+testPath = doesFileExist tempdata------¼ì²âÎÄ¼şÊÇ·ñ´æÔÚ
 if testPath == true then (
-open_tempdata   = openFile tempdata------æ‰“å¼€tempæ–‡ä»¶
+open_tempdata   = openFile tempdata------´ò¿ªtempÎÄ¼ş
 skip_tmepdata   = skiptostring open_tempdata "Language = "
 if skip_tmepdata ==ok then (
 	read_tempdata = readLine open_tempdata 
@@ -190,24 +232,48 @@ close open_tempdata
 )else (china())
 -----------------------------------------------------------------------------------------------------------------
 )
+rollout cpToolsPicWin "ËõÂÔÍ¼"
+(
+  
+
+	button yunCopyImgBtn "--------" width:180 height:170 offset:[0,0]
+	button yunCopyImgBtnGet "¸üĞÂ"  offset:[0,0]
+
+	on cpToolsPicWin open do(
+	cptools_P1 = vpSave_copy()
+	)	
+	on yunCopyImgBtnGet pressed do (cptools_P1.saveTM() ; cptools_P1.setScreenGrab() ; yunCopyImgBtn.images = #(cptools_P1.screengrab, undefined, 1,1,1,1,1) )
+)
+rollout cpToolsMaster "cpToolsMaster" height:220 width: 230
+(
+  subrollout cpToolsParent1 "cpToolsParent1"
+  subrollout cpToolsParent2 "cpToolsParent2"	
+	
+
+)
 
 rollout cptools name_lag 
 (
-Group "Main" 
+Group   "Main"  
 (
 dropdownlist testList items:#() tooltip:"select pose"  across: 3 width:135 enabled:true visible:true
 button removeFromList ""  height:20 width:20 offset:[59,0] toolTip:removeFromList_lag
 button rloading       " R" height:20 width:20 offset:[22,0] toolTip:rloading_lag
-radioButtons rb_sel "" width:88 height:15 labels:#(rb_sel_a_lag ,rb_sel_b_lag ) offset:[-45,0] 
+
+
+	
+	
+radioButtons rb_sel "" width:88 height:15 labels:#(rb_sel_a_lag ,rb_sel_b_lag ) offset:[-45,0]  
 button ac "A" width:18 height:16 offset:[18,-20] enabled:false toolTip:ac_lag
-spinner Accuracy_offset "         " range:[1,10, 1] type:#integer  width:40 offset:[40,-19]  toolTip: Accuracy_offset_b_lag enabled:true
+spinner Accuracy_offset "         " range:[1,10, 3] type:#integer  width:40 offset:[40,-19]  toolTip: Accuracy_offset_b_lag enabled:true
 spinner spn_start  "" range:[-99999,99999, stime]     fieldwidth:37 across: 2 offset:[-40,0] type:#integer  enabled:false
 spinner spn_end "To " range:[-99999,99999, etime]  fieldwidth:37	 offset:[-60,0] type:#integer  enabled:false
-button addToList "" width:92 offset:[-19,0]
+button addToList "" width:92 offset:[-19,0]  toolTip:"°´ÏÂctrlµ¥»÷¿ÉÒÔÃüÃû"
 button pastepose "" width:58 height:42 offset:[61,-47]
 button ABbutton   "S" width:20   offset:[-77,-26] toolTip:ABbutton_lag  enabled:false
 
 )
+
 Group "Setting" 
 (
 button obj_r   ""    width:32 height:18 offset:[-4,0] across:4  toolTip:obj_r_lag
@@ -221,7 +287,13 @@ HyperLink lnk1 "                        " align:#center color:(color 150 150 150
 dropdownlist testListAni items:#() tooltip:"select pose" width:135 enabled:true visible:false offset:[0,-171] 
 checkbox wayneCheckBox "" offset:[-5,120] toolTip:wayneCheckBox_lag
 button language_btn ""  offset:[85,-18]  width:20 height:15 toolTip:language_b_lag
-progressbar    doit_prog  offset:[-9,0]    width:190 height:8    color:red 	
+button picShow "Í¼"  offset:[60,-19]  width:20 height:15 toolTip:"´ò¿ª»ò¹Ø±ÕËõÂÔÍ¼"
+progressbar    doit_prog  offset:[-9,0]    width:190 height:8    color:red 
+
+
+
+
+
 
 on language_btn pressed  do 
 (
@@ -229,7 +301,7 @@ on language_btn pressed  do
 	(
 		china()
 		language_btn.text = language_a_lag
-		----------------------------------------------è®°å½•çŠ¶æ€
+		----------------------------------------------¼ÇÂ¼×´Ì¬
         hold_CB = wayneCheckBox.checked
 		hold_RB = rb_sel.state
 		hold_ST = spn_start.value
@@ -250,7 +322,7 @@ on language_btn pressed  do
 		postest = getDialogpos cptools
 	    destroyDialog cptools
         createDialog cptools  200 210 pos:postest
-		-----------------------------------------------æ¢å¤çŠ¶æ€		
+		-----------------------------------------------»Ö¸´×´Ì¬		
 		wayneCheckBox.checked  = hold_CB
 		rb_sel.state           = hold_RB
 		spn_start.value        = hold_ST
@@ -270,7 +342,7 @@ on language_btn pressed  do
 	)else(
 		english()
 		language_btn.text = language_a_lag
-		----------------------------------------------è®°å½•çŠ¶æ€
+		----------------------------------------------¼ÇÂ¼×´Ì¬
         hold_CB = wayneCheckBox.checked
 		hold_RB = rb_sel.state
 		hold_ST = spn_start.value
@@ -291,7 +363,7 @@ on language_btn pressed  do
 		postest = getDialogpos cptools
 	    destroyDialog cptools
         createDialog cptools  200 210 pos:postest
-        -----------------------------------------------æ¢å¤çŠ¶æ€		
+        -----------------------------------------------»Ö¸´×´Ì¬		
 		wayneCheckBox.checked  = hold_CB
 		rb_sel.state           = hold_RB
 		spn_start.value        = hold_ST
@@ -321,13 +393,13 @@ paste_offset.text    = paste_offset_lag
 wayneCheckBox.text   = wcb_lag
 language_btn.text    = language_a_lag
 lnk1.text            = lnk1_lag
----------------------------------------------------------------------------------------------æ‰“å¼€æ–‡ä»¶åŠ è½½
+---------------------------------------------------------------------------------------------´ò¿ªÎÄ¼ş¼ÓÔØ
 
-makeDir  ((GetDir #export)+ "\\cptools_data\\")------åˆ›å»ºè·¯å¾„
-tempdata = ((GetDir #export)+"\\cptools_data\\"+"temp.ini")-----æŒ‡å®šæ–‡ä»¶
-testPath = doesFileExist tempdata------æ£€æµ‹æ–‡ä»¶æ˜¯å¦å­˜åœ¨
+makeDir  ((GetDir #export)+ "\\cptools_data\\")------´´½¨Â·¾¶
+tempdata = ((GetDir #export)+"\\cptools_data\\"+"temp.ini")-----Ö¸¶¨ÎÄ¼ş
+testPath = doesFileExist tempdata------¼ì²âÎÄ¼şÊÇ·ñ´æÔÚ
 if testPath == true do (
-open_tempdata   = openFile tempdata------æ‰“å¼€tempæ–‡ä»¶
+open_tempdata   = openFile tempdata------´ò¿ªtempÎÄ¼ş
 skiptostring open_tempdata "wayneCheckBox.checked ="
 	readChar open_tempdata
 read_tmepdata   = readLine open_tempdata 
@@ -335,7 +407,7 @@ if read_tmepdata != undefined do wayneCheckBox.checked = read_tmepdata as boolea
 close open_tempdata
 )
 ----------------------------------------------------------------------------------------------------------
----------------------------------------è·å¾—æ–‡ä»¶åˆ—è¡¨
+---------------------------------------»ñµÃÎÄ¼şÁĞ±í
 file_name_array = getFiles ((GetDir #export)+"\\cptools_data\\"+"*pose*.bps")
 
 for Fe in file_name_array do
@@ -350,7 +422,9 @@ for Fe in file_name_array do
 (
 Bip_FilesName=getFilenameFile Fe
 testListAni.items = append testListAni.items (Bip_FilesName as string)
-)	
+)
+
+
 )	
 
 on rloading pressed do 
@@ -388,10 +462,10 @@ testListAni.selection = testListAni.items.count
 on cptools close do 
 (
 --if wayneCheckBox.checked == false then(for f in getFiles ((GetDir #export)+ "\\cptools_data\\"+"*.bps") do deleteFile f)
----------------------------------------------------------------------------------------------é€€å‡ºæ–‡ä»¶åŠ è½½
+---------------------------------------------------------------------------------------------ÍË³öÎÄ¼ş¼ÓÔØ
 	
-makeDir  ((GetDir #export)+ "\\cptools_data\\")------åˆ›å»ºè·¯å¾„
-tempdata = ((GetDir #export)+"\\cptools_data\\"+"temp.ini")-----æŒ‡å®šæ–‡ä»¶
+makeDir  ((GetDir #export)+ "\\cptools_data\\")------´´½¨Â·¾¶
+tempdata = ((GetDir #export)+"\\cptools_data\\"+"temp.ini")-----Ö¸¶¨ÎÄ¼ş
 create_tempdata = createfile tempdata
 if wayneCheckBox.checked == true then formatdata = "wayneCheckBox.checked = true" else formatdata = "wayneCheckBox.checked = false"
 if language_btn.text  == "En" then forlagdata = "Language = true" else  forlagdata = "Language = false" 
@@ -458,268 +532,280 @@ on ABbutton pressed do
 	
 on addToList pressed do
 (
-with undo "addList" on (
-if(rb_sel.state==1)then(
-	
-if(selection.count == 0 )then(messagebox messagebox_a_lag   title:messagebox_a_title_lag beep:false )else(	
------------------------------------------æ‰‹åŠ¨è¾“å…¥----------------------------------------------
-struct myCoolDialogs
- (
- 	labelStr,
- 
- 	stringQuery = rollout stringQuery "è¾“å…¥å‘½å"
- 	(
- 		local returnStr
- 	
- 		label lblHeader
- 		editText etInput text:"_pose"
- 
- 		fn launch label: =
- 		(
- 			destroyDialog myCoolDialogs.stringQuery
- 			if label != unsupplied then
- 				myCoolDialogs.labelStr = label
- 			else myCoolDialogs.labelStr = "Enter some text:"
- 			createDialog myCoolDialogs.stringQuery modal:true
- 			returnStr -- only put it here if the dialog is modal
- 		)
- 
- 		on stringQuery open do
- 		(
- 			lblHeader.text = myCoolDialogs.labelStr
- 			setFocus etInput
- 		)
- 
- 		on etInput entered str do
- 		(
- 			destroyDialog myCoolDialogs.stringQuery
- 			returnStr = str
--- 			cptools.rloading.pressed()
+	with undo "addList" on (
+	if(rb_sel.state==1)then(
+		
+	if(selection.count == 0 )then(messagebox messagebox_a_lag   title:messagebox_a_title_lag beep:false )else(	
+	-----------------------------------------ÊÖ¶¯ÊäÈë----------------------------------------------
+	struct myCoolDialogs
+	 (
+		labelStr,
+	 
+		stringQuery = rollout stringQuery "ÊäÈëÃüÃû"
+		(
+			local returnStr
+		
+			label lblHeader
+			editText etInput text:"_pose"
+	 
+			fn launch label: =
+			(
+				destroyDialog myCoolDialogs.stringQuery
+				if label != unsupplied then
+					myCoolDialogs.labelStr = label
+				else myCoolDialogs.labelStr = "Enter some text:"
+				createDialog myCoolDialogs.stringQuery modal:true
+				returnStr -- only put it here if the dialog is modal
+			)
+	 
+			on stringQuery open do
+			(
+				lblHeader.text = myCoolDialogs.labelStr
+				setFocus etInput
+			)
+	 
+			on etInput entered str do
+			(
+				destroyDialog myCoolDialogs.stringQuery
+				returnStr = str
+	-- 			cptools.rloading.pressed()
+				
+				)
+			 
+			on stringQuery close do 
+			(
+				destroyDialog myCoolDialogs.stringQuery
+				
+				returnStr = "Î´ÃüÃû_pose"
+	-- 			cptools.rloading.pressed()
 			
 			)
-		 
-		on stringQuery close do 
-		(
-			destroyDialog myCoolDialogs.stringQuery
- 			
-			returnStr = "æœªå‘½å_pose"
--- 			cptools.rloading.pressed()
+			
+		)
+	 )
+if keyboard.controlPressed then ( myCoolDialogs = myCoolDialogs() -- as there are variables, an instance is needed
+	 result = myCoolDialogs.stringQuery.launch label:"»Ø³µÈ·ÈÏÃüÃû"
+
+
+	-----------------------------------------ÊÖ¶¯ÊäÈë----------------------------------------------
 		
- 		)	
- 	)
- )
- myCoolDialogs = myCoolDialogs() -- as there are variables, an instance is needed
- result = myCoolDialogs.stringQuery.launch label:"å›è½¦ç¡®è®¤å‘½å"
+	testList.items = append testList.items (result+ (testList.items.count+1) as string +" ("+ ((currentTime as integer)/TicksPerFrame)  as string +")")
 
+	-- rloading.pressed()
+	-- cptools.rloading.pressed()
 
------------------------------------------æ‰‹åŠ¨è¾“å…¥----------------------------------------------
+	testList.selection = testList.items.count
+
+	---------------------------------------------------------------------------------------
+	tabtxt   = testList.selection		
+	out_name = ((GetDir #export)+"\\cptools_data\\"+ result +tabtxt as string +" ("+ ((currentTime as integer)/TicksPerFrame) as string +")"+".bps")
+	out_file = createfile out_name
+)
+else (
 	
-testList.items = append testList.items (result+ (testList.items.count+1) as string +" ("+ ((currentTime as integer)/TicksPerFrame)  as string +")")
-
--- rloading.pressed()
--- cptools.rloading.pressed()
-
-testList.selection = testList.items.count
-
----------------------------------------------------------------------------------------
-tabtxt   = testList.selection		
-out_name = ((GetDir #export)+"\\cptools_data\\"+ result +tabtxt as string +" ("+ ((currentTime as integer)/TicksPerFrame) as string +")"+".bps")
-out_file = createfile out_name
-
--------------------------------------å°†é€‰æ‹©é‡æ–°æ’åº
-sort_array =#()
-temp_sort_file = selection as array
-sort_file = sort(for i in temp_sort_file collect i.name)
-
-for i=1 to sort_file.count do 
-(
-format "%|" sort_file[i] to: out_file -- æ·»åŠ ä¸€ä¸ªé€‰æ‹©é›†
+	testList.items = append testList.items ("Pose "+ (testList.items.count+1) as string +" ("+ ((currentTime as integer)/TicksPerFrame)  as string +")")
+	testList.selection = testList.items.count
+	tabtxt   = testList.selection		
+	out_name = ((GetDir #export)+"\\cptools_data\\pose "+ tabtxt as string +" ("+ ((currentTime as integer)/TicksPerFrame) as string +")"+".bps")
+	out_file = createfile out_name
 )
-format "\n"  to:out_file
+	-------------------------------------½«Ñ¡ÔñÖØĞÂÅÅĞò
+	sort_array =#()
+	temp_sort_file = selection as array
+	sort_file = sort(for i in temp_sort_file collect i.name)
 
-for i =1 to sort_file.count do 
-(
-obj =getnodebyname sort_file[i] 
-append sort_array obj
-)
-select sort_array
------------------------------------------
-k=1
-for o in selection do
-(
-	if keyboard.escPressed do 
+	for i=1 to sort_file.count do 
 	(
-		format format_a_lag
-		exit
+	format "%|" sort_file[i] to: out_file -- Ìí¼ÓÒ»¸öÑ¡Ôñ¼¯
 	)
-doit_prog.value = 100.*k/selection.count
-if selection.count !=0 then 
-(
-	format "$'%'.transform = %\n" o.name o.transform to:out_file
-)
-k=k+1
-format (format_c_lag + ":(%/100)  \n")  doit_prog.value
-if doit_prog.value == 100 do (format format_b_lag )
-)
-doit_prog.value = 0
+	format "\n"  to:out_file
 
-close out_file
-
---format "You selected '%'!\n" testList.selection
-)	
-		
-)else(
-
-if(selection.count == 0 )then(messagebox messagebox_a_lag title:messagebox_a_title_lag beep:false )else(
-
-if (end_frame<=start_frame)then(messagebox messagebox_b_lag title:messagebox_a_title_lag beep:false )else(
-
-if ac.text =="C" then ( start_frame = spn_start.value;end_frame = spn_end.value)else (start_frame = animationrange.start;end_frame = animationrange.end)	
-	
-testListAni.items = append testListAni.items ("Animation "+ (testListAni.items.count+1) as string +"-"+(ABbutton.text) as string +" ("+ (start_frame) as string + "-" + (end_frame) as string+")" )
-testListAni.selection = testListAni.items.count
----------------------------------------------------------------------------------------
-tabtxt   = testListAni.selection		
-out_name = ((GetDir #export)+"\\cptools_data\\animation "+ tabtxt as string +"-"+(ABbutton.text) as string +" ("+ (start_frame) as string + "-" + (end_frame) as string+")"+".bps")
-out_file = createfile out_name
-
-tempstime = animationrange.start
-tempetime = animationrange.end
-
-animationRange = interval start_frame end_frame--time
-
-
--------------------------------------å°†é€‰æ‹©é‡æ–°æ’åº
-sort_array =#()
-temp_sort_file = selection as array
-sort_file = sort(for i in temp_sort_file collect i.name)
-
-for i=1 to sort_file.count do 
-(
-format "%|" sort_file[i] to: out_file -- æ·»åŠ ä¸€ä¸ªé€‰æ‹©é›†
-)
-format "\n"  to:out_file
-
-for i =1 to sort_file.count do 
-(
-obj =getnodebyname sort_file[i] 
-append sort_array obj
-)
-select sort_array
-
-----------------------------------------
-
-if ABbutton.text =="S" then (
-for i=animationrange.start to animationrange.end do
-(
-		if keyboard.escPressed do 
+	for i =1 to sort_file.count do 
 	(
-		format format_a_lag
-		exit
+	obj =getnodebyname sort_file[i] 
+	append sort_array obj
 	)
-	doit_prog.value = 100.*i/animationrange.end
-	slidertime = i
-
-for o in selection do
-(
-if selection.count !=0 then 
-(
-	format  "<%>|%| = %\n" i o.name o.transform to:out_file
-   )
-
-)
-format  (format_c_lag + ":(%/100)  \n")   doit_prog.value
-if doit_prog.value == 100 do (format format_b_lag)
-)
-doit_prog.value = 0
-
-)else(
-
-
-slidertime = animationrange.start
-
-a = slidertime
-
-frame_data = #()
-
-
-
-seek out_file #eof
-
-orgFilePos = filePos out_file
-
-format "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n"  to:out_file
-
----------------------------------------------------------------å…³é”®å¸§å¯¹è±¡ä½ç½®ä¿¡æ¯å†™å…¥
-do
-
-(
-	if keyboard.escPressed do 
-	(
-		format format_a_lag
-		exit
-	)
-	append frame_data a
-	
-    a_lost = a
-	
+	select sort_array
+	-----------------------------------------
+	k=1
 	for o in selection do
-(
+	(
+		if keyboard.escPressed do 
+		(
+			format format_a_lag
+			exit
+		)
+	doit_prog.value = 100.*k/selection.count
 	if selection.count !=0 then 
-   (
-	format  "<%>|%| = %\n" a o.name o.transform to:out_file
-   )
+	(
+		format "$'%'.transform = %\n" o.name o.transform to:out_file
+	)
+	k=k+1
+	format (format_c_lag + ":(%/100)  \n")  doit_prog.value
+	if doit_prog.value == 100 do (format format_b_lag )
+	)
+	doit_prog.value = 0
+
+	close out_file
+
+	--format "You selected '%'!\n" testList.selection
+	)	
+			
+	)else(
+
+	if(selection.count == 0 )then(messagebox messagebox_a_lag title:messagebox_a_title_lag beep:false )else(
+
+	if (end_frame<=start_frame)then(messagebox messagebox_b_lag title:messagebox_a_title_lag beep:false )else(
+
+	if ac.text =="C" then ( start_frame = spn_start.value;end_frame = spn_end.value)else (start_frame = animationrange.start;end_frame = animationrange.end)	
+		
+	testListAni.items = append testListAni.items ("Animation "+ (testListAni.items.count+1) as string +"-"+(ABbutton.text) as string +" ("+ (start_frame) as string + "-" + (end_frame) as string+")" )
+	testListAni.selection = testListAni.items.count
+	---------------------------------------------------------------------------------------
+	tabtxt   = testListAni.selection		
+	out_name = ((GetDir #export)+"\\cptools_data\\animation "+ tabtxt as string +"-"+(ABbutton.text) as string +" ("+ (start_frame) as string + "-" + (end_frame) as string+")"+".bps")
+	out_file = createfile out_name
+
+	tempstime = animationrange.start
+	tempetime = animationrange.end
+
+	animationRange = interval start_frame end_frame--time
+
+
+	-------------------------------------½«Ñ¡ÔñÖØĞÂÅÅĞò
+	sort_array =#()
+	temp_sort_file = selection as array
+	sort_file = sort(for i in temp_sort_file collect i.name)
+
+	for i=1 to sort_file.count do 
+	(
+	format "%|" sort_file[i] to: out_file -- Ìí¼ÓÒ»¸öÑ¡Ôñ¼¯
+	)
+	format "\n"  to:out_file
+
+	for i =1 to sort_file.count do 
+	(
+	obj =getnodebyname sort_file[i] 
+	append sort_array obj
+	)
+	select sort_array
+
+	----------------------------------------
+
+	if ABbutton.text =="S" then (
+	for i=animationrange.start to animationrange.end do
+	(
+			if keyboard.escPressed do 
+		(
+			format format_a_lag
+			exit
+		)
+		doit_prog.value = 100.*i/animationrange.end
+		slidertime = i
+
+	for o in selection do
+	(
+	if selection.count !=0 then 
+	(
+		format  "<%>|%| = %\n" i o.name o.transform to:out_file
+	   )
+
+	)
+	format  (format_c_lag + ":(%/100)  \n")   doit_prog.value
+	if doit_prog.value == 100 do (format format_b_lag)
+	)
+	doit_prog.value = 0
+
+	)else(
+
+
+	slidertime = animationrange.start
+
+	a = slidertime
+
+	frame_data = #()
+
+
+
+	seek out_file #eof
+
+	orgFilePos = filePos out_file
+
+	format "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n"  to:out_file
+
+	---------------------------------------------------------------¹Ø¼üÖ¡¶ÔÏóÎ»ÖÃĞÅÏ¢Ğ´Èë
+	do
+
+	(
+		if keyboard.escPressed do 
+		(
+			format format_a_lag
+			exit
+		)
+		append frame_data a
+		
+		a_lost = a
+		
+		for o in selection do
+	(
+		if selection.count !=0 then 
+	   (
+		format  "<%>|%| = %\n" a o.name o.transform to:out_file
+	   )
+	)
+		a = trackbar.getnextkeytime()
+
+		doit_prog.value = 100.*a_lost/(animationrange.end-animationrange.start)
+
+	if a!=undefined and a > animationrange.start and  a <= animationrange.end  then (
+		
+		slidertime = a
+		
+		)else (  Exit  )
+		
+	format  (format_c_lag + ":(%/100)  \n")   doit_prog.value
+		
+	if doit_prog.value == 100 do (format format_b_lag)	
+	)
+
+	while a > animationrange.start	and a > a_lost 
+	----------------------------------------------------------------¹Ø¼üÖ¡¶ÔÏóÎ»ÖÃĞÅÏ¢Ğ´Èë  End
+	doit_prog.value = 100
+
+	format format_b_lag
+
+	doit_prog.value = 0
+
+	seek out_file orgFilePos 
+
+	--------------------------------------------------------------¹Ø¼üÖ¡Ğ´ÈëÎÄ¼ş
+	format "frame:" to: out_file
+
+	for i=1 to frame_data .count do 
+	(
+	format "%|" frame_data [i] to: out_file -- Ìí¼ÓÒ»¸öÖ¡µÄÑ¡Ôñ¼¯
+
+	)
+	format "\n"  to:out_file
+
+	--------------------------------------------------------------¹Ø¼üÖ¡Ğ´ÈëÎÄ¼ş End
+
+	)
+
+	close out_file
+
+	animationRange = interval tempstime tempetime
+
+	)
+
+	)
+	)
+
+
+	cptools_P1.saveTM() ; cptools_P1.setScreenGrab() ;cpToolsPicWin.yunCopyImgBtn.images = #(cptools_P1.screengrab, undefined, 1,1,1,1,1) 
+	)
+
 )
-	a = trackbar.getnextkeytime()
-
-	doit_prog.value = 100.*a_lost/(animationrange.end-animationrange.start)
-
-if a!=undefined and a > animationrange.start and  a <= animationrange.end  then (
-	
-	slidertime = a
-	
-	)else (  Exit  )
-	
-format  (format_c_lag + ":(%/100)  \n")   doit_prog.value
-	
-if doit_prog.value == 100 do (format format_b_lag)	
-)
-
-while a > animationrange.start	and a > a_lost 
-----------------------------------------------------------------å…³é”®å¸§å¯¹è±¡ä½ç½®ä¿¡æ¯å†™å…¥  End
-doit_prog.value = 100
-
-format format_b_lag
-
-doit_prog.value = 0
-
-seek out_file orgFilePos 
-
---------------------------------------------------------------å…³é”®å¸§å†™å…¥æ–‡ä»¶
-format "frame:" to: out_file
-
-for i=1 to frame_data .count do 
-(
-format "%|" frame_data [i] to: out_file -- æ·»åŠ ä¸€ä¸ªå¸§çš„é€‰æ‹©é›†
-
-)
-format "\n"  to:out_file
-
---------------------------------------------------------------å…³é”®å¸§å†™å…¥æ–‡ä»¶ End
-
-)
-
-close out_file
-
-animationRange = interval tempstime tempetime
-
-)
-
-)
-)
-)
-)
-
 
 on removeFromList pressed do
 (
@@ -755,26 +841,51 @@ testListAni.selection = testListAni.items.count
 )
 
 )
-----------------------------------------------é€‰æ‹©poseä¸­æ·»åŠ ç‰©ä½“
+----------------------------------------------Ñ¡ÔñposeÖĞÌí¼ÓÎïÌå
 on testList selected i do
 (
-tabtxt = testList.items[i]
-in_sel = ((GetDir #export)+"\\cptools_data\\"+ tabtxt as string +".bps")
-in_file = openFile in_sel
-if in_file == undefined do  ( messagebox messagebox_c_lag beep:false Title:messagebox_a_title_lag Return 0 )
+	tabtxt = testList.items[i]
+	in_sel = ((GetDir #export)+"\\cptools_data\\"+ tabtxt as string +".bps")
+	in_file = openFile in_sel
+	if in_file == undefined do  ( messagebox messagebox_c_lag beep:false Title:messagebox_a_title_lag Return 0 )
 
-seek in_file 0
-ss = readLine in_file
-tokens = filterString ss "|"
-arrayl=#()
+	seek in_file 0
+	ss = readLine in_file
+	tokens = filterString ss "|"
+	arrayl=#()
 
-for i =1 to tokens.count do 
-(
-obj =getnodebyname tokens[i] 
-if obj != undefined do append arrayl obj
-)
-if arrayl.count !=0 then select arrayl else  ( messagebox messagebox_e_lag beep:false Title:messagebox_a_title_lag )
-close in_file
+	for i =1 to tokens.count do 
+	(
+	obj =getnodebyname tokens[i] 
+	if obj != undefined do append arrayl obj
+	)
+	if arrayl.count !=0 then select arrayl else  ( messagebox messagebox_e_lag beep:false Title:messagebox_a_title_lag )
+	close in_file
+	
+-- Ë¢Í¼
+	if cptools.testList.visible  then   ---poseÄ£Ê½
+	(
+		if cptools.testList.selected!=undefined then
+		(
+			picSelName =openBitmap  (((GetDir #export)+ "\\cptools_data\\")+cptools.testList.selected+".bmp")
+			if picSelName!=undefined then
+			(
+			forceReloadBitmapFile  picSelName;cpToolsPicWin.yunCopyImgBtn.images = #(picSelName, undefined, 1,1,1,1,1)
+			)
+			else (cpToolsPicWin.yunCopyImgBtn.images =#("enss_tools_16i.bmp", undefined,13, 3, 3,3,3, true))
+		)
+	)
+	else(         --¶¯»­Ä£Ê½
+		if cptools.testListAni.selected!=undefined then
+		(
+			picSelName =openBitmap  (((GetDir #export)+ "\\cptools_data\\")+cptools.testListAni.selected+".bmp")
+			if picSelName!=undefined then
+			(
+			forceReloadBitmapFile  picSelName;cpToolsPicWin.yunCopyImgBtn.images = #(picSelName, undefined, 1,1,1,1,1)
+			)
+			else (cpToolsPicWin.yunCopyImgBtn.images =#("enss_tools_16i.bmp", undefined,13, 3, 3,3,3, true))
+		)
+	)
 )
 
 ------------------
@@ -800,15 +911,39 @@ if obj != undefined do append arrayl obj
 )
 if arrayl.count !=0 then select arrayl else  ( messagebox messagebox_e_lag beep:false Title:messagebox_a_title_lag )
 close in_file
+
+---Ë¢Í¼
+if cptools.testList.visible  then   ---poseÄ£Ê½
+	(
+		if cptools.testList.selected!=undefined then
+		(
+			picSelName =openBitmap  (((GetDir #export)+ "\\cptools_data\\")+cptools.testList.selected+".bmp")
+			if picSelName!=undefined then
+			(
+			forceReloadBitmapFile  picSelName;cpToolsPicWin.yunCopyImgBtn.images = #(picSelName, undefined, 1,1,1,1,1)
+			)
+			else (cpToolsPicWin.yunCopyImgBtn.images =#("enss_tools_16i.bmp", undefined,13, 3, 3,3,3, true))
+		)
+	)
+	else(         --¶¯»­Ä£Ê½
+		if cptools.testListAni.selected!=undefined then
+		(
+			picSelName =openBitmap  (((GetDir #export)+ "\\cptools_data\\")+cptools.testListAni.selected+".bmp")
+			if picSelName!=undefined then
+			(
+			forceReloadBitmapFile  picSelName;cpToolsPicWin.yunCopyImgBtn.images = #(picSelName, undefined, 1,1,1,1,1)
+			)
+			else (cpToolsPicWin.yunCopyImgBtn.images =#("enss_tools_16i.bmp", undefined,13, 3, 3,3,3, true))
+		)
+	)
+
 )
-
-
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 on pastepose pressed do 
 (
 	
--------------------------------------å°†é€‰æ‹©é‡æ–°æ’åº
+-------------------------------------½«Ñ¡ÔñÖØĞÂÅÅĞò
 sort_array =#()
 temp_sort_file = selection as array
 sort_file = sort(for i in temp_sort_file collect i.name)
@@ -880,7 +1015,7 @@ doit_prog.value = 0
 close in_file
 
 )if selectundefined != 0 then(
---strmessage = "é€‰æ‹©ä¸­æœ‰"+ selectundefined as string +"ä¸ªå¯¹è±¡æœªè®°å½•Pose" 
+--strmessage = "Ñ¡ÔñÖĞÓĞ"+ selectundefined as string +"¸ö¶ÔÏóÎ´¼ÇÂ¼Pose" 
 strmessage = messagebox_f_lag
 messagebox strmessage   title:messagebox_a_title_lag beep:false
 )
@@ -903,7 +1038,7 @@ tempetime = animationrange.end
 
 animationRange = interval (start_frame) (end_frame)--time
 
-------------åˆ¤æ–­Sè¿˜æ˜¯K
+------------ÅĞ¶ÏS»¹ÊÇK
 
 s_or_k =  filterstring tabtxt "S"
 
@@ -962,7 +1097,7 @@ if doit_prog.value == 100 do (format format_b_lag )
 )
 doit_prog.value = 0
 )else(
-----------------------------------------------------------------------------------------------------------------------------ç²˜è´´å…³é”®å¸§ä»£ç 
+----------------------------------------------------------------------------------------------------------------------------Õ³Ìù¹Ø¼üÖ¡´úÂë
 seek in_file 0
 
 skipToNextLine in_file
@@ -974,7 +1109,7 @@ ss  = readLine in_file
 frame_array_filter = filterString ss "|"
 
 frame_arrayl =#()
------ç­›é€‰
+-----É¸Ñ¡
 
 for k =1 to frame_array_filter.count do 
 (
@@ -1047,7 +1182,7 @@ animationRange = interval tempstime tempetime
 
 if selectundefined != 0 then(
 selectundefined = selectundefined/(spn_end.value-spn_start.value)
---strmessage = "é€‰æ‹©ä¸­æœ‰"+ selectundefined as string +"ä¸ªå¯¹è±¡æœªè®°å½•Pose" 
+--strmessage = "Ñ¡ÔñÖĞÓĞ"+ selectundefined as string +"¸ö¶ÔÏóÎ´¼ÇÂ¼Pose" 
 strmessage = messagebox_f_lag
 messagebox strmessage   title:messagebox_a_title_lag beep:false
 selectundefined = 0
@@ -1089,6 +1224,79 @@ o.rotation.controller =TCB_Rotation()
 )
 
 
+on picShow pressed do 
+(
+if cpToolsMaster.width<300 then  ( cpToolsMaster.width =410	)
+else ( cpToolsMaster.width =200	)
+
 )
-createDialog cptools 200 210
---bgcolor:[0,0,0] 
+
+-- on picShow rightClick do 
+-- (
+-- 	
+-- cpToolsMaster.width =  200
+-- )
+
+
+) 
+
+
+
+-- createDialog cptools  200 330
+-- bgcolor:[0,0,0] 
+createdialog cpToolsMaster
+
+	
+	fn MakeThumbnail_copy =(
+	grab_bmp = gw.getViewportDib()
+	croppedScreenGrab = bitmap grab_bmp.height grab_bmp.height 
+	pasteBitmap grab_bmp croppedScreenGrab [((grab_bmp.width - grab_bmp.height)/2)+1,1] [0,0]  -- paste the orginal image to the tempImage, this results in a cropped image widh same height as width
+	outputMap  = bitmap 170 170
+	copy croppedScreenGrab outputMap 	
+	close grab_bmp
+	close croppedScreenGrab
+	
+	gc light:true
+	if cptools.testList.visible  then   ---poseÄ£Ê½
+	(	if cptools.testList.selected!=undefined then (outputMap.filename =((GetDir #export)+ "\\cptools_data\\")+cptools.testList.selected+".bmp"))
+	else 
+	(	if cptools.testListAni.selected!=undefined then (outputMap.filename =((GetDir #export)+ "\\cptools_data\\")+cptools.testListAni.selected+".bmp"))
+	save outputMap --Save it to file
+	outputMap
+)
+
+AddSubRollout cpToolsMaster.cpToolsParent1 cptools
+AddSubRollout cpToolsMaster.cpToolsParent2 cpToolsPicWin
+cpToolsMaster.cpToolsParent1.pos = [0,0]
+cpToolsMaster.cpToolsParent1.height = 240
+cpToolsMaster.cpToolsParent1.width = 200
+cpToolsMaster.cpToolsParent2.pos = [210,0]
+cpToolsMaster.cpToolsParent2.height = 240
+cpToolsMaster.width =  410
+cpToolsMaster.height = 240
+-- cpToolsMaster.width =  200
+
+-- Ë¢Í¼
+	if cptools.testList.visible  then   ---poseÄ£Ê½
+	(
+		if cptools.testList.selected!=undefined then
+		(
+			picSelName =openBitmap  (((GetDir #export)+ "\\cptools_data\\")+cptools.testList.selected+".bmp")
+			if picSelName!=undefined then
+			(
+			forceReloadBitmapFile  picSelName;cpToolsPicWin.yunCopyImgBtn.images = #(picSelName, undefined, 1,1,1,1,1)
+			)
+			else (cpToolsPicWin.yunCopyImgBtn.images =#("enss_tools_16i.bmp", undefined,13, 3, 3,3,3, true))
+		)
+	)
+	else(         --¶¯»­Ä£Ê½
+		if cptools.testListAni.selected!=undefined then
+		(
+			picSelName =openBitmap  (((GetDir #export)+ "\\cptools_data\\")+cptools.testListAni.selected+".bmp")
+			if picSelName!=undefined then
+			(
+			forceReloadBitmapFile  picSelName;cpToolsPicWin.yunCopyImgBtn.images = #(picSelName, undefined, 1,1,1,1,1)
+			)
+			else (cpToolsPicWin.yunCopyImgBtn.images =#("enss_tools_16i.bmp", undefined,13, 3, 3,3,3, true))
+		)
+	)
