@@ -3,20 +3,25 @@
  * @Author: Bullet.S
  * @Date: 2021-05-07 12:33:36
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-07 13:48:14
+ * @LastEditTime: 2021-05-08 14:07:57
  * @Email: animator.bullet@foxmail.com
  */
 
 try(destroydialog rolSelSetTools)catch()
 
+try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
+catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))
-catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
+catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+stLoadConfig.fnLoadConfigSelSetTools ()
 
 global rolSelSetTools
 global rolLoadSelSet
 global dotNetXmlDoc = dotNetObject "System.xml.xmlDocument"
 global strXmlRootName = "SelectionSet_Tools"
-	
+Global switchRolSelSetMouState = false
+Global posRolSelSetMouMove     = [0,0]
+
 global arrSelSetNameLoaded
 global arrSelSetObjLoaded
 
@@ -100,7 +105,7 @@ fn fnCreateSelSet arrSelSetName arrSelSetObj n =
 		execute txt
 	)else
 	(
-		messagebox( "Selection Set \"" + arrSelSetName[n] + "\" 是空的。\n选择集\"" + arrSelSetName[n] + "\"未被读取...                    \t")
+		messagebox( "Selection Set \"" + arrSelSetName[n] + "\" 是空的。\n选择集\"" + arrSelSetName[n] + "\"包含的对象不在场景中，所以未被读取...                    \t")
 	)
 )
 fn fnUpdateSelSetList = 
@@ -108,7 +113,9 @@ fn fnUpdateSelSetList =
 	local arrNodesList = #()
 	for s in selectionSets do append arrNodesList s.name
 	sort arrNodesList
-	rolSelSetTools.LB_selset.items = arrNodesList
+	rolSelSetTools.lbxSelSet.items = arrNodesList
+	rolSelSetTools.lbxSelSet.selection = 0
+	rolSelSetTools.lbxSelSetNode.items = #()
 )
 
 rollout rolLoadSelSet "Load_SelectionSet"
@@ -117,35 +124,93 @@ rollout rolLoadSelSet "Load_SelectionSet"
 	button btnLoadSel "Load selected" width:80 height: 25 across:2
 	button btnLoadAll "Load ALL" width:80 height:25
 		
-	on btnLoadSel pressed do(
-		for n in mlbLoadSelSet.selection do(
+	on btnLoadSel pressed do
+	(
+		for n in mlbLoadSelSet.selection do
+		(
 			fnCreateSelSet arrSelSetNameLoaded arrSelSetObjLoaded n
 		)
 		fnUpdateSelSetList()
 	)
 	
 	on btnLoadAll pressed do(
-		for n = 1 to mlbLoadSelSet.items.count do(
+		for n = 1 to mlbLoadSelSet.items.count do
+		(
 			fnCreateSelSet arrSelSetNameLoaded arrSelSetObjLoaded n
 		)
 		fnUpdateSelSetList()
 	)
 )
 
-rollout rolSelSetTools "[选择集工具]BsSelSetTools v1.0"
+rollout rolSelSetTools "BsSelSetTools_v1.0"
 (
-	button BTN_save_xml "Save SelSets" width:90 height:20 across:2
-	button BTN_load_xml "Load SelSets" width:90 height:20
-	
-	button BTN_update "update list" width:190 height:18 offset:[0,5]
-	listbox LB_selset "Selection Set" height:20
+	listbox lbxSelSet "[选择集] Selection Set" width:180 height:16 pos:[5,5]
+	checkbutton chkMoreTools "更多" width:50 height:20 pos:[135,1]
+	button btnUpdateList "更新列表" width:140 height:20 pos:[5,235]
+	button btnCloseRol "关闭" width:40 height:20 pos:[145,235]
+
+	button btnSaveXml "保存" width:60 height:20 pos:[190,0] enabled:false
+	button btnLoadXml "加载" width:60 height:20 pos:[250,0] enabled:false
+	listbox lbxSelSetNode "" width:120 height:16 pos:[190,20] enabled:false
+	button btnHelp "必看帮助" width:120 height:20 pos:[190,235] enabled:false
+
+	fn fnUpdateMoreToolsState =
+	(
+		btnSaveXml.enabled    = chkMoreTools.state
+		btnLoadXml.enabled    = chkMoreTools.state
+		lbxSelSetNode.enabled = chkMoreTools.state
+		btnHelp.enabled       = chkMoreTools.state
+		if chkMoreTools.state then rolSelSetTools.width = 315 else rolSelSetTools.width = 190
+	)
+
+	on btnHelp pressed do 
+	(shellLaunch "https://www.notion.so/bullet4869/5e0e30442ad348a09d7aa45ea6f8d53a" "")
+
+	on rolSelSetTools mbuttondown pos do 
+	(
+		try (destroydialog rolSelSetTools) catch ()
+	)
+
+	on rolSelSetTools lbuttondown posMou do
+	(
+		posRolSelSetMouMove = posMou
+		switchRolSelSetMouState = on
+	)
+
+	on rolSelSetTools lbuttonup posMou do
+	(
+		switchRolSelSetMouState = off
+	)
+
+	on rolSelSetTools rbuttondown pos do 
+	(
+		popupMenu RCmenuConfig pos:[mouse.screenpos.x + 20,mouse.screenpos.y]
+	)
+
+	on rolSelSetTools mouseMove pos do
+	(
+		if switchRolSelSetMouState == on then
+		(
+			SetDialogPos rolSelSetTools (mouse.screenpos - posRolSelSetMouMove)			
+		)
+	)
 
 	on rolSelSetTools open do
 	(
+		stLoadConfig.fnLoadConfigSelSetTools ()  ---------------脚本位置等赋值
+		stSetConfig.fnSetConfigSelSetTools ()  ----------------保存位置信息到ini文件
+		fnUpdateMoreToolsState ()
+		fnUpdateSelSetList()
 		fnUpdateSelSetList()
 	)
 
-	on BTN_save_xml pressed do
+	on rolSelSetTools close do -- 关闭记忆浮动窗口位置
+	(
+		iniPosSelSetTools   = (GetDialogPos rolSelSetTools)
+        stSetConfig.fnSetConfigSelSetTools ()
+	)
+
+	on btnSaveXml pressed do
 	(
 		local save_path = getSaveFileName caption:"Save XML File " filename:".xml" types:"XML(*.xml)|*.xml|"
 		if save_path != undefined then
@@ -154,38 +219,58 @@ rollout rolSelSetTools "[选择集工具]BsSelSetTools v1.0"
 		)
 	)	
 
-	on BTN_load_xml pressed do
+	on btnLoadXml pressed do
 	(
-		local load_path = getOpenFileName caption:"Load XML File" types:"XML(*.xml)|*.xml|"
-		if load_path != undefined then
+		local pathLoad = getOpenFileName caption:"Load XML File" types:"XML(*.xml)|*.xml|"
+		if pathLoad != undefined then
 		(
-			local load_data = fnLoadSelXml load_path
+			local dataLoad = fnLoadSelXml pathLoad
 			
-			if load_data != undefined then
+			if dataLoad != undefined then
 			(
-				print (load_data as string)
-				arrSelSetNameLoaded = load_data[1]
-				arrSelSetObjLoaded = load_data[2]
+				print (dataLoad as string)
+				arrSelSetNameLoaded = dataLoad[1]
+				arrSelSetObjLoaded = dataLoad[2]
 				
 				createdialog rolLoadSelSet pos:[SST_RF.pos.x+SST_RF.size.x, SST_RF.pos.y ] width:200 height:370 parent:rolSelSetTools.hwnd
-				rolLoadSelSet.mlbLoadSelSet.items = load_data[1]
-				
+				rolLoadSelSet.mlbLoadSelSet.items = dataLoad[1]
 			)
 		)
 	)
 
-	on BTN_update pressed do
+	on btnUpdateList pressed do
 	(
 		fnUpdateSelSetList()
 	)
 
-	on LB_selset selected sel do
+	on lbxSelSet selected sel do
 	(
-		if LB_selset.selected != undefined then
+		if lbxSelSet.selected != undefined then
 		(
-			local set_a = selectionSets[LB_selset.selected]
-			try(select set_a)catch()
+			local selSet = selectionSets[lbxSelSet.selected]
+			try(select selSet;lbxSelSetNode.items = for i in selSet collect i.name)catch()
+			lbxSelSetNode.selection = 0
 		)	
 	)
+
+	on lbxSelSetNode selected sel do 
+	(
+		if lbxSelSetNode.selected != undefined then
+		(
+			local strSelSetNode = lbxSelSetNode.selected
+			if getNodeByName strSelSetNode != undefined  then
+			(
+				select (getNodeByName strSelSetNode)
+			)
+		)
+	)
+
+	on chkMoreTools changed state do 
+	(
+		fnUpdateMoreToolsState ()
+	)
+
 )
-Createdialog rolSelSetTools 250 400 fgcolor:myFgColor
+if (iniPosSelSetTools != 0) then 
+(Createdialog rolSelSetTools 315 260 fgcolor:myFgColor pos:iniPosSelSetTools style:#())
+else (Createdialog rolSelSetTools 315 260 fgcolor:myFgColor style:#())

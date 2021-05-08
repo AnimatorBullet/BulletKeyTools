@@ -20,7 +20,6 @@ Global iniToolC3          = #(1,2,3,4,5,6,7,8,9,10,11,12)
 Global iniToolC4          = #(1,2,3,4,5,6,7,8,9,10,11,12)
 ---------------------------------------------------------------------BsKeyTools
 Global iniPosAnimButtonTools
-Global posAnimButtonMouMove  = [0,0]
 global iniAnimButtonSelected = 0
 ---------------------------------------------------------------------BsAnimButton
 struct itemsFolder (name,dir)
@@ -39,6 +38,7 @@ global iniRefFolder3    = (itemsFolder name:"<＋＋＋>" dir:"")
 global iniRefFolder4    = (itemsFolder name:"<＋＋＋>" dir:"")
 global iniFilterRefName = #()
 ----------------------------------------------------------------------------------
+global iniPosSelSetTools
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
 (
@@ -89,7 +89,7 @@ struct stLoadConfig
 	),
 	fn fnLoadConfigBsOpenTools =
 	(
-		iniPosOpenTools   = fnGetConfig iniPosOpenTools "BsOpenToolsSet" "PosOpenTools" (mouse.screenpos as string)
+		iniPosOpenTools   = fnGetConfig iniPosOpenTools "BsOpenToolsSet" "PosOpenTools" (0 as string)
 		iniSelectedID     = fnGetConfig iniSelectedID "BsOpenToolsSet" "SelectedID" (iniSelectedID as string)
 		iniLikedFolder    = fnGetConfig iniLikedFolder "BsOpenToolsSet"  "LikedFolder" (iniLikedFolder as string)
 		iniFilterPrefix   = fnGetConfig iniFilterPrefix "BsOpenToolsSet"  "FilterPrefix" (iniFilterPrefix as string)
@@ -98,13 +98,17 @@ struct stLoadConfig
 	),
 	fn fnLoadConfigBsRefTools =
 	(
-		iniPosRefTools   = fnGetConfig iniPosRefTools "BsRefToolsSet" "PosRefTools" (mouse.screenpos as string)
+		iniPosRefTools   = fnGetConfig iniPosRefTools "BsRefToolsSet" "PosRefTools" (0 as string)
 		iniRefFolder1    = fnGetConfig iniRefFolder1 "BsRefToolsSet"  "RefFolder1" (iniRefFolder1 as string)
 		iniRefFolder2    = fnGetConfig iniRefFolder2 "BsRefToolsSet"  "RefFolder2" (iniRefFolder2 as string)
 		iniRefFolder3    = fnGetConfig iniRefFolder3 "BsRefToolsSet"  "RefFolder3" (iniRefFolder3 as string)
 		iniRefFolder4    = fnGetConfig iniRefFolder4 "BsRefToolsSet"  "RefFolder4" (iniRefFolder4 as string)
 		iniFilterRefName = fnGetConfig iniFilterRefName "BsRefToolsSet"  "FilterRefName" (iniFilterRefName as string)
 		iniLastRefFolder = fnGetConfig iniLastRefFolder "BsRefToolsSet"  "LastRefFolder" (iniLastRefFolder as string)
+	),
+	fn fnLoadConfigSelSetTools =
+	(
+		iniPosSelSetTools = fnGetConfig iniPosSelSetTools "BsSelSetToolsSet" "PosSelSetTools" (0 as string)
 	)
 )
 struct stSetConfig
@@ -145,5 +149,9 @@ struct stSetConfig
 		SetINISetting BulletConfig "BsRefToolsSet"  "RefFolder4" (iniRefFolder4 as string)
 		SetINISetting BulletConfig "BsRefToolsSet"  "FilterRefName" (iniFilterRefName as string)
 		SetINISetting BulletConfig "BsRefToolsSet"  "LastRefFolder" (iniLastRefFolder as string)
+	),
+	fn fnSetConfigSelSetTools =
+	(
+		SetINISetting BulletConfig "BsSelSetToolsSet"  "PosSelSetTools" (iniPosSelSetTools as string)
 	)
 )
