@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2021-05-07 12:33:36
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-08 14:07:57
+ * @LastEditTime: 2021-05-08 14:11:37
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -248,7 +248,9 @@ rollout rolSelSetTools "BsSelSetTools_v1.0"
 		if lbxSelSet.selected != undefined then
 		(
 			local selSet = selectionSets[lbxSelSet.selected]
-			try(select selSet;lbxSelSetNode.items = for i in selSet collect i.name)catch()
+			local arrSelSetNodesName = (for i in selSet collect i.name)
+			sort arrSelSetNodesName
+			try(select selSet;lbxSelSetNode.items = arrSelSetNodesName)catch()
 			lbxSelSetNode.selection = 0
 		)	
 	)
