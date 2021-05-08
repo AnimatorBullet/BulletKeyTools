@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2021-05-07 12:33:36
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-09 04:32:01
+ * @LastEditTime: 2021-05-09 04:36:19
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -358,6 +358,11 @@ rollout rolSelSetTools "BsSelSetTools_v1.0"
 		)
 		mlbSelSetNode.selection = arrSelIndex
 		lblCount.text = "选中高亮 " + arrSelIndex.count as string + " 个物体"
+	)
+
+	on btnCreateSelSet pressed do 
+	(
+		
 	)
 
 	on mlbSelSetNode selectionEnd do 
