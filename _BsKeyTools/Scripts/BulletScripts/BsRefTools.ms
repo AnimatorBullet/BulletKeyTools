@@ -3,12 +3,20 @@
  * @Author: Bullet.S
  * @Date: 2020-12-29 01:12:45
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-08 13:19:57
+ * @LastEditTime: 2021-05-09 22:33:04
  * @Email: animator.bullet@foxmail.com
  */
 
 try(destroydialog rolAddRefFolder)catch()
 try(destroydialog rolRefTools)catch()
+
+Global iniPosRefTools
+global iniLastRefFolder = (itemsFolder name:"" dir:"")
+global iniRefFolder1    = (itemsFolder name:"<＋＋＋>" dir:"")
+global iniRefFolder2    = (itemsFolder name:"<＋＋＋>" dir:"")
+global iniRefFolder3    = (itemsFolder name:"<＋＋＋>" dir:"")
+global iniRefFolder4    = (itemsFolder name:"<＋＋＋>" dir:"")
+global iniFilterRefName = #()
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
 catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)

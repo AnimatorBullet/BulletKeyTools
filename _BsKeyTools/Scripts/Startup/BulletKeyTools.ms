@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-09 22:14:04
+ * @LastEditTime: 2021-05-09 22:31:57
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -13,6 +13,25 @@ try(destroydialog rolAddMyScripts)catch()
 try(destroydialog rolCustomFps)catch()
 try (callbacks.removeScripts #animationRangeChange id:#UpdateTimeRange) catch ()
 try (callbacks.removeScripts #filePostOpen id:#UpdateFps) catch ()
+
+Global iniPos  	--位置保存记录
+struct myScript (id,msName,dir)
+Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
+(myScript id:2 msName:"<＋＋>" dir:""), \
+(myScript id:3 msName:"<＋＋>" dir:""), \
+(myScript id:4 msName:"<＋＋>" dir:""), \
+(myScript id:5 msName:"<＋＋>" dir:""), \
+(myScript id:6 msName:"<＋＋>" dir:""), \
+(myScript id:7 msName:"<＋＋>" dir:""), \
+(myScript id:8 msName:"<＋＋>" dir:""))
+Global idBtn              = 1
+global iniAutoCheckUpdate = true
+Global switchToolPanel    = 0
+global switchMSPanel      = 0
+Global iniToolC1          = #(1,2,3,4,5,6,7,8,9,10,11,12)
+Global iniToolC2          = #(1,2,3,4,5,6,7,8,9,10,11,12)
+Global iniToolC3          = #(1,2,3,4,5,6,7,8,9,10,11,12)
+Global iniToolC4          = #(1,2,3,4,5,6,7,8,9,10,11,12)
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
 catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
@@ -1104,7 +1123,7 @@ rollout rolBsKeyTools "" width:200 height:248
 
 	groupbox gbxTips "" pos:[5,215] width:155 height:30
 	
-		label lblLink "2019.9[miHoYo_Bullet.S]" pos:[15,226] width:140 height:15
+		label lblLink "2019.9[miHoYo_Bullet.S]4869" pos:[10,226] width:140 height:15
 		button btnConfig "设置" pos:[165,222] width:30 height:22 border:true
 
 	local m_PBKeyTimeArray

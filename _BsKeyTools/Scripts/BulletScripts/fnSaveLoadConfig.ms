@@ -1,44 +1,4 @@
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
--------------------------------------------------------------------------------
-Global iniPos  	--位置保存记录
-struct myScript (id,msName,dir)
-Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
-(myScript id:2 msName:"<＋＋>" dir:""), \
-(myScript id:3 msName:"<＋＋>" dir:""), \
-(myScript id:4 msName:"<＋＋>" dir:""), \
-(myScript id:5 msName:"<＋＋>" dir:""), \
-(myScript id:6 msName:"<＋＋>" dir:""), \
-(myScript id:7 msName:"<＋＋>" dir:""), \
-(myScript id:8 msName:"<＋＋>" dir:""))
-Global idBtn              = 1
-global iniAutoCheckUpdate = true
-Global switchToolPanel    = 0
-global switchMSPanel      = 0
-Global iniToolC1          = #(1,2,3,4,5,6,7,8,9,10,11,12)
-Global iniToolC2          = #(1,2,3,4,5,6,7,8,9,10,11,12)
-Global iniToolC3          = #(1,2,3,4,5,6,7,8,9,10,11,12)
-Global iniToolC4          = #(1,2,3,4,5,6,7,8,9,10,11,12)
----------------------------------------------------------------------BsKeyTools
-Global iniPosAnimButtonTools
-global iniAnimButtonSelected = 0
----------------------------------------------------------------------BsAnimButton
-struct itemsFolder (name,dir)
-Global iniPosOpenTools
-Global iniWidthOpenTools = 340
-Global iniDesktop        = (itemsFolder name:"Desktop" dir:"")
-Global iniSelectedID     = 1
-Global iniLikedFolder    = #()
-Global iniFilterPrefix   = #()
---------------------------------------------------------------------------
-Global iniPosRefTools
-global iniLastRefFolder = (itemsFolder name:"" dir:"")
-global iniRefFolder1    = (itemsFolder name:"<＋＋＋>" dir:"")
-global iniRefFolder2    = (itemsFolder name:"<＋＋＋>" dir:"")
-global iniRefFolder3    = (itemsFolder name:"<＋＋＋>" dir:"")
-global iniRefFolder4    = (itemsFolder name:"<＋＋＋>" dir:"")
-global iniFilterRefName = #()
-----------------------------------------------------------------------------------
-global iniPosSelSetTools
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
 (

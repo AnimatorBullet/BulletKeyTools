@@ -3,13 +3,21 @@
 * @Author: Bullet.S
 * @Date: 2019-11-23 01:41:13
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-04-28 13:40:33
+ * @LastEditTime: 2021-05-09 22:32:29
 * @Email: animator.bullet@foxmail.com
 */
 
 
 try(destroydialog rolBsOpenTools)catch()
 try(destroydialog rolAddItem)catch()
+
+struct itemsFolder (name,dir)
+Global iniPosOpenTools
+Global iniWidthOpenTools = 340
+Global iniDesktop        = (itemsFolder name:"Desktop" dir:"")
+Global iniSelectedID     = 1
+Global iniLikedFolder    = #()
+Global iniFilterPrefix   = #()
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
 catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)

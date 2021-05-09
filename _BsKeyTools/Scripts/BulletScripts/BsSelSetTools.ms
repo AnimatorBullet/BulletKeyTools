@@ -3,12 +3,14 @@
  * @Author: Bullet.S
  * @Date: 2021-05-07 12:33:36
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-09 22:16:43
+ * @LastEditTime: 2021-05-09 22:59:16
  * @Email: animator.bullet@foxmail.com
  */
 
 try(destroydialog rolSelSetTools)catch()
 try (callbacks.removeScripts #filePostOpen id:#UpdateSelSetList) catch ()
+
+global iniPosSelSetTools
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
 catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
@@ -178,28 +180,33 @@ rollout rolLoadSelSet "加载选择集"
 	)
 )
 
-rollout rolSelSetTools "BsSelSetTools_v1.0"
+rollout rolSelSetTools ""
 (
-	listbox lbxSelSet " " width:180 height:16 pos:[5,5]
-	label lblCount "" width:180 height:16 pos:[5,5]
-	
-	button btnCloseRol "关闭" width:40 height:20 pos:[5,235]
-	button btnUpdateList "更新列表" width:90 height:20 pos:[45,235]
-	checkbutton chkMoreTools "更多" width:50 height:20 pos:[135,235]
+	groupbox grpMain "BsSelSetTools_v1.0--MoveMe" width:180 height:275 pos:[5,0]
 
-	button btnCreateSelSet "" width:30 height:20 pos:[195,0] enabled:false tooltip:"创建选择集"
-	button btnDeleteSelSet "" width:30 height:20 pos:[225,0] enabled:false tooltip:"删除选择集"
-	button btnAddToSelSet "" width:30 height:20 pos:[255,0] enabled:false tooltip:"添加所选物体到选中的选择集"
-	button btnRemoveFromSelSet "" width:30 height:20 pos:[285,0] enabled:false tooltip:"从选中的选择集中移除所选物体"
-	button btnHighlightSelObj "" width:30 height:20 pos:[315,0] enabled:false tooltip:"高亮选中物体及其所在选择集"
-	MultiListBox mlbSelSetNode "" width:165 height:16 pos:[190,20] enabled:false
-	button btnSaveXml "保存" width:60 height:20 pos:[190,235] enabled:false
-	button btnLoadXml "加载" width:60 height:20 pos:[250,235] enabled:false
-	button btnHelp "帮助" width:45 height:20 pos:[310,235] enabled:false
+	listbox lbxSelSet "" width:170 height:16 pos:[10,35]
+	label lblCount "" width:170 height:16 pos:[10,20]
+	
+	button btnCloseRol "关闭" width:35 height:20 pos:[10,250]
+	button btnUpdateList "更新列表" width:90 height:20 pos:[45,250]
+	checkbutton chkMoreTools "更多" width:45 height:20 pos:[135,250]
+
+	button btnCreateSelSet "" width:30 height:25 pos:[195,10] enabled:false tooltip:"创建选择集"
+	button btnDeleteSelSet "" width:30 height:25 pos:[225,10] enabled:false tooltip:"删除选择集"
+	button btnAddToSelSet "" width:30 height:25 pos:[255,10] enabled:false tooltip:"添加所选物体到选中的选择集"
+	button btnRemoveFromSelSet "" width:30 height:25 pos:[285,10] enabled:false tooltip:"从选中的选择集中移除所选物体"
+	button btnHighlightSelObj "" width:30 height:25 pos:[315,10] enabled:false tooltip:"高亮选中物体及其所在选择集"
+	MultiListBox mlbSelSetNode "" width:160 height:16 pos:[190,35] enabled:false
+	button btnSaveXml "保存" width:60 height:20 pos:[190,250] enabled:false
+	button btnLoadXml "加载" width:60 height:20 pos:[250,250] enabled:false
+	button btnHelp "帮助" width:40 height:20 pos:[310,250] enabled:false
 
 	fn fnUpdateMoreToolsState =
 	(
-		if chkMoreTools.state then rolSelSetTools.width = 360 else rolSelSetTools.width = 190
+		if chkMoreTools.state then 
+		(rolSelSetTools.width = 360;grpMain.width = 350)
+		else
+		(rolSelSetTools.width = 190;grpMain.width = 180)
 	)
 
 	fn fnUpdateSelSetNodeList arrTemp =
@@ -397,7 +404,7 @@ rollout rolSelSetTools "BsSelSetTools_v1.0"
 
 )
 if (iniPosSelSetTools != 0) then 
-(Createdialog rolSelSetTools 360 260 fgcolor:myFgColor pos:iniPosSelSetTools style:#())
-else (Createdialog rolSelSetTools 360 260 fgcolor:myFgColor style:#())
+(Createdialog rolSelSetTools 360 280 fgcolor:myFgColor pos:iniPosSelSetTools style:#())
+else (Createdialog rolSelSetTools 360 280 fgcolor:myFgColor style:#())
 
 callbacks.addScript #filePostOpen "fnUpdateSelSetList()" id:#UpdateSelSetList
