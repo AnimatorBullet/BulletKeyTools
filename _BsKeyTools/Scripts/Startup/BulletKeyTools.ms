@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-09 11:34:56
+ * @LastEditTime: 2021-05-09 22:14:04
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -11,6 +11,8 @@ try(destroydialog rolBsKeyTools)catch()
 try(destroydialog rolFnKeys)catch()
 try(destroydialog rolAddMyScripts)catch()
 try(destroydialog rolCustomFps)catch()
+try (callbacks.removeScripts #animationRangeChange id:#UpdateTimeRange) catch ()
+try (callbacks.removeScripts #filePostOpen id:#UpdateFps) catch ()
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
 catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
@@ -2210,6 +2212,8 @@ rollout rolBsKeyTools "" width:200 height:248
 	(
 		iniPos = (GetDialogPos rolBsKeyTools)
 		stSetConfig.fnSetConfigBsKeyTools ()
+		try (callbacks.removeScripts #animationRangeChange id:#UpdateTimeRange) catch ()
+		try (callbacks.removeScripts #filePostOpen id:#UpdateFps) catch ()
 	)
 	-----------------------------------------------------------------------------------------
 	on rolBsKeyTools rbuttondown pos do 

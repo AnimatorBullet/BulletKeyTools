@@ -3,11 +3,12 @@
  * @Author: Bullet.S
  * @Date: 2021-05-07 12:33:36
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-09 12:06:19
+ * @LastEditTime: 2021-05-09 22:16:43
  * @Email: animator.bullet@foxmail.com
  */
 
 try(destroydialog rolSelSetTools)catch()
+try (callbacks.removeScripts #filePostOpen id:#UpdateSelSetList) catch ()
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
 catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
@@ -398,3 +399,5 @@ rollout rolSelSetTools "BsSelSetTools_v1.0"
 if (iniPosSelSetTools != 0) then 
 (Createdialog rolSelSetTools 360 260 fgcolor:myFgColor pos:iniPosSelSetTools style:#())
 else (Createdialog rolSelSetTools 360 260 fgcolor:myFgColor style:#())
+
+callbacks.addScript #filePostOpen "fnUpdateSelSetList()" id:#UpdateSelSetList
