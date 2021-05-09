@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2021-05-07 12:33:36
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-09 04:36:19
+ * @LastEditTime: 2021-05-09 12:06:19
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -54,7 +54,7 @@ fn fnLoadSelXml pathXml =
 	if rootElement.name != strXmlRootName then
 	(
 		messagebox "这不是BsSelSetTools创建的XML文件。          \t"
-		return undefined
+		undefined
 	)
 	
 	local nodesSelSet = rootElement.ChildNodes
@@ -78,7 +78,7 @@ fn fnLoadSelXml pathXml =
 		)
 	)
 	local result = #(arrSelSetName, arrSelSetObj)
-	return result
+	result
 )
 
 fn fnCreateSelSet arrSelSetName arrSelSetObj n = 
@@ -109,30 +109,7 @@ fn fnCreateSelSet arrSelSetName arrSelSetObj n =
 	)
 )
 
-fn getFilesequenceFile f &base &digits = 
-(
-	f = getFilenameFile f
-	base = trimRight f "0123456789"
-	digits = subString f (base.count + 1) -1
-)
-
-fn fnPseudoNaturalSort a b =  --文件名排序新方法--https://forums.cgsociety.org/t/sorting-filenames/1219205/4
-	(
-		a = a as string
-		b = b as string
-		getFilesequenceFile a &aBase &aDigits
-		aDigits = subString ((1000000 + (aDigits as integer)) as string) 2 -1
-		getFilesequenceFile b &bBase &bDigits
-		bDigits = subString ((1000000 + (bDigits as integer)) as string) 2 -1
-		a = aBase + aDigits
-		b = bBase + bDigits
-	
-		case of (
-		(a == b): 0
-		(a < b): -1
-		(a > b): 1
-		)
-	)
+fn fnSortNames str1 str2 = stricmp str1 str2
 
 fn fnUpdateSelSetList = 
 (
@@ -141,11 +118,39 @@ fn fnUpdateSelSetList =
 	(
 		append arrNodesList s.name
 	)
-	qsort arrNodesList fnPseudoNaturalSort
+	qsort arrNodesList fnSortNames
 	rolSelSetTools.lbxSelSet.items = arrNodesList
 	rolSelSetTools.lbxSelSet.selection = 0
 	rolSelSetTools.mlbSelSetNode.items = #()
 	rolSelSetTools.lblCount.text = "共 " + selectionsets.count as string + " 个选择集"
+)
+
+rollout rolCreateSelSet "创建选择集"
+(
+	edittext edtCreateName "命名:" width:190 pos:[5,5]
+	button btnDoCreate "以选中物体创建选择集" width:190 pos:[5,30]
+
+	on btnDoCreate pressed do 
+	(
+		local strCreate = edtCreateName.text
+		local arrSelection = getcurrentselection()
+		local arrSelSetName = for i in selectionsets collect i.name
+		if ((strCreate != "") or (strCreate != undefined)) then 
+		(
+			if finditem arrSelSetName strCreate != 0 then
+			(
+				local duplicateSelSetName = arrSelSetName[finditem arrSelSetName strCreate]
+				if (queryBox ("当前已有重名选择集，\r\n\r\n重名选择集：\"" + duplicateSelSetName + "\"\r\n\r\n是否将选择物体添加进该选择集？                                  ") \
+				title:"选择集重名" beep:false) then
+				(
+					selectionsets[duplicateSelSetName] = join (join #() selectionsets[duplicateSelSetName]) arrSelection
+					fnUpdateSelSetList()
+				)
+			)
+			else (selectionsets[strCreate] = arrSelection;fnUpdateSelSetList())
+		)
+		try(destroydialog rolCreateSelSet)catch()
+	)
 )
 
 rollout rolLoadSelSet "加载选择集"
@@ -199,7 +204,7 @@ rollout rolSelSetTools "BsSelSetTools_v1.0"
 	fn fnUpdateSelSetNodeList arrTemp =
 	(
 		local arrSelSetNodesName = (for i in arrTemp collect i.name)
-		qsort arrSelSetNodesName fnPseudoNaturalSort
+		qsort arrSelSetNodesName fnSortNames
 		mlbSelSetNode.items = arrSelSetNodesName
 		mlbSelSetNode.selection = 0
 		lblCount.text = "当中共有 " + selectionsets[lbxSelSet.selected].count as string + " 个物体"
@@ -226,7 +231,7 @@ rollout rolSelSetTools "BsSelSetTools_v1.0"
 				fnUpdateSelSetNodeList selectionsets[lbxSelSet.selected]
 			)
 		)
-		return arrCurSelSet
+		arrCurSelSet
 	)
 
 	fn fnRefreshBtnEnabled =
@@ -329,8 +334,11 @@ rollout rolSelSetTools "BsSelSetTools_v1.0"
 	(
 		if lbxSelSet.selected != undefined then 
 		(
-			deleteItem selectionSets lbxSelSet.selected
-			fnUpdateSelSetList()
+			undo "DeleteSelSet" on
+			(
+				deleteItem selectionSets lbxSelSet.selected
+				fnUpdateSelSetList()
+			)
 		)
 	)
 
@@ -362,7 +370,12 @@ rollout rolSelSetTools "BsSelSetTools_v1.0"
 
 	on btnCreateSelSet pressed do 
 	(
-		
+		local arrSelection = getcurrentselection()
+		if arrSelection != undefined then 
+		(
+			iniPosSelSetTools   = (GetDialogPos rolSelSetTools)
+			createdialog rolCreateSelSet pos:[iniPosSelSetTools.x - 210,iniPosSelSetTools.y] width:200 height:55 parent:rolSelSetTools.hwnd
+		)
 	)
 
 	on mlbSelSetNode selectionEnd do 

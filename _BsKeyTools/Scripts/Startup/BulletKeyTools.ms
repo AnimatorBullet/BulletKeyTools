@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-08 13:25:44
+ * @LastEditTime: 2021-05-09 11:34:56
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -291,8 +291,7 @@ rcmenu menuConfig
 	(
 		if (queryBox "是否加入个人分享交流群？\r\n\r\n(游戏，动画爱好者休闲吹水正能量分享群)\r\n\r\n子弹工具人(993590655)，确认可直接跳转链接~          \r\n        " \
 		title:"加入交流群" beep:false) then
-		(
-		shellLaunch "https://jq.qq.com/?_wv=1027&k=hmeHhTwu" "")
+		(shellLaunch "https://jq.qq.com/?_wv=1027&k=hmeHhTwu" "")
 	)
 
 	on mItemCleanVirus picked do
