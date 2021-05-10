@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2020-12-29 01:12:45
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-09 22:33:04
+ * @LastEditTime: 2021-05-10 12:21:28
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -927,8 +927,8 @@ rollout rolRefTools ("[参考工具]-BsRefTools_v" + currentVersion)  width:340 
 	)
 )
 if (iniPosRefTools != 0) then 
-(Createdialog rolRefTools menu:RCmenuRefConfig fgcolor:myFgColor pos:iniPosRefTools style:#())
-else (Createdialog rolRefTools menu:RCmenuRefConfig fgcolor:myFgColor style:#())
+(Createdialog rolRefTools menu:RCmenuRefConfig fgcolor:myFgColor pos:iniPosRefTools)
+else (Createdialog rolRefTools menu:RCmenuRefConfig fgcolor:myFgColor)
 
 ------------------------toolbar----------------------------------------------------
 macroScript BsRefTools
