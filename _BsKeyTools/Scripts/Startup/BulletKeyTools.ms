@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-10 20:00:28
+ * @LastEditTime: 2021-05-10 20:10:18
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -944,7 +944,7 @@ rollout rolBsKeyTools "" width:200 height:248
 (
 	local strMainRol = ("BsKeyTools_v" + curVerBsKeyTools + "（中键关闭）")
 	---------------------------------UI--------------------------------------
-	groupbox gbxMainUI strMainRol pos:[5,5] width:190 height:147
+	groupbox gbxMainUI strMainRol pos:[5,5] width:190 height:212
 	
 		-- label lblRangeStartText "起始帧" pos:[15,21] width:80 height:20
 		-- label lblRangeEndText "结束帧" pos:[65,21] width:80 height:20
