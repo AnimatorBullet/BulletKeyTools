@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-09 22:31:57
+ * @LastEditTime: 2021-05-10 12:36:10
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -34,12 +34,12 @@ Global iniToolC3          = #(1,2,3,4,5,6,7,8,9,10,11,12)
 Global iniToolC4          = #(1,2,3,4,5,6,7,8,9,10,11,12)
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
-catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 stLoadConfig.fnLoadConfigBsKeyTools ()
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))
-catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))
-catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 
 global curVerBsKeyTools = "0.9.6"
 global verUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/version.dat"
@@ -2383,23 +2383,23 @@ rollout rolBsKeyTools "" width:200 height:248
 	on btnCSTools pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\cstools.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 	on btnSpringMagic pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_New.mse"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 	on btnSpringMagic rightclick do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\SpringMagic_Old.mse"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnFileOpen pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts" + "\\BsOpenTools.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on ckbIsoMesh changed state do
@@ -2827,7 +2827,7 @@ rollout rolBsKeyTools "" width:200 height:248
 	on btnImageComp pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\ImageCompHelper.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 	
 	on btnFnKeyType pressed do 
@@ -2888,19 +2888,19 @@ rollout rolBsKeyTools "" width:200 height:248
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\MorphSliders_11.ms")
 		macros.run "Tools" "MorphSliders")
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnLayerManager pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\LayerManagerAlternative.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnAnimMirror pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote" + "\\动画镜像工具.mse"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnMyScripts1 pressed do 
@@ -3079,49 +3079,49 @@ rollout rolBsKeyTools "" width:200 height:248
 	on btnColorTools pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\ProColor.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnAnimCopyPaste pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\CPTools.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnPoseTool pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsRefTools.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnTrajedit pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\DTrajEdit.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnHotAnimBtn pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimButton.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on ckbShadowCut changed state do
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\Silhouette.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnRenameTools pressed do
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\P_ObjectRenamer.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnWinbox pressed do
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\WinBox.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnCameraFromView pressed do
@@ -3137,19 +3137,19 @@ rollout rolBsKeyTools "" width:200 height:248
 	on btnMeshToBone pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\AnimMeshToBonesAnim.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnLightTable pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\LightTable.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnCutSequence pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\AnimaRange.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnEndBone pressed do 
@@ -3219,25 +3219,25 @@ rollout rolBsKeyTools "" width:200 height:248
 	on btnRescaleWU pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\RescaleWU.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnSkinTools pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\SkinTools.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnKeyStepMode pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsKeyStepMode.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 	on btnSelectionsetTools pressed do 
 	(
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsSelSetTools.ms"))
-		catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
 )

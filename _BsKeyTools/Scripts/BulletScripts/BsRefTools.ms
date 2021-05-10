@@ -3,13 +3,14 @@
  * @Author: Bullet.S
  * @Date: 2020-12-29 01:12:45
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-10 12:21:28
+ * @LastEditTime: 2021-05-10 12:32:51
  * @Email: animator.bullet@foxmail.com
  */
 
 try(destroydialog rolAddRefFolder)catch()
 try(destroydialog rolRefTools)catch()
 
+struct itemsFolder (name,dir)
 Global iniPosRefTools
 global iniLastRefFolder = (itemsFolder name:"" dir:"")
 global iniRefFolder1    = (itemsFolder name:"<＋＋＋>" dir:"")
