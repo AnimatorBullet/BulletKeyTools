@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-10 20:10:18
+ * @LastEditTime: 2021-05-10 20:12:24
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1020,12 +1020,12 @@ rollout rolBsKeyTools "" width:200 height:248
 		toolTip:"设置播放速度" 
 ----------------------------------------------------------------------------------------------------------
 	groupbox gbxCustomBtn "" pos:[5,148] width:190 height:70
-		button btnCustomBtn1 "[右击指定]" pos:[10,158] width:60 height:27.5
-		button btnCustomBtn2 "[右击指定]" pos:[70,158] width:60 height:27.5
-		button btnCustomBtn3 "[右击指定]" pos:[130,158] width:60 height:27.5
-		button btnCustomBtn4 "[右击指定]" pos:[10,186.5] width:60 height:27.5
-		button btnCustomBtn5 "[右击指定]" pos:[70,186.5] width:60 height:27.5
-		button btnCustomBtn6 "[右击指定]" pos:[130,186.5] width:60 height:27.5
+		button btnCustomBtn1 "" pos:[10,158] width:60 height:27.5 tooltip:"[右击指定]"
+		button btnCustomBtn2 "" pos:[70,158] width:60 height:27.5 tooltip:"[右击指定]"
+		button btnCustomBtn3 "" pos:[130,158] width:60 height:27.5 tooltip:"[右击指定]"
+		button btnCustomBtn4 "" pos:[10,186.5] width:60 height:27.5 tooltip:"[右击指定]"
+		button btnCustomBtn5 "" pos:[70,186.5] width:60 height:27.5 tooltip:"[右击指定]"
+		button btnCustomBtn6 "" pos:[130,186.5] width:60 height:27.5 tooltip:"[右击指定]"
 ----------------------------------------------------------------------------------------------------------
 	groupbox gbxMinTools "" pos:[200,5] width:130 height:240
 	
