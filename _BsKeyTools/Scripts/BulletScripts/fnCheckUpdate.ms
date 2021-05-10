@@ -28,7 +28,7 @@ fn fnCheckUpdate currentVer verURL dlURL dlFile isForceUpdate:false =
         (
             local Root = symbolicPaths.getPathValue "$Max"  --max根目录
 
-            if (doesFileExist dlFile) then (try(fnDelFileDir dlFile)catch(messageBox ("可能因为权限无法清除旧版本下载, 请手动删除:\r\n\r\n"+dlFile);ShellLaunch (getdir #temp) ""))
+            if (doesFileExist dlFile) then (try(fnDelFileDir dlFile)catch(messageBox ("可能因为权限无法清除旧版本下载, \r\n若安装失败请手动删除下面路径再更新，否则忽略:\t\t\t\t\t\t\t\t\t\r\n\r\n"+dlFile);ShellLaunch (getdir #temp) ""))
 
             try((dotNetObject "System.Net.WebClient").downloadFile dlURL dlFile)
             catch( print ( (getCurrentException()) + "  " + dlFile )  )

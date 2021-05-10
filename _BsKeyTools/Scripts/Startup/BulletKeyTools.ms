@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-10 20:12:24
+ * @LastEditTime: 2021-05-11 02:08:33
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -11,6 +11,7 @@ try(destroydialog rolBsKeyTools)catch()
 try(destroydialog rolFnKeys)catch()
 try(destroydialog rolAddMyScripts)catch()
 try(destroydialog rolCustomFps)catch()
+try(destroydialog rolCustomBtn)catch()
 try (callbacks.removeScripts #animationRangeChange id:#UpdateTimeRange) catch ()
 try (callbacks.removeScripts #filePostOpen id:#UpdateFps) catch ()
 
@@ -938,7 +939,50 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 	)
 )
 -----------------------------------------------------------------
+rollout rolCustomBtn "" width:120 height:200
+(
+	dotNetControl dotnetBtnTabCon "System.Windows.Forms.TabControl" height:170 width:35 align:#center pos:[1,2]
+	listbox lbxToolsAll "" width:80 height:12 pos:[35,5] selection:0
+	button btnSetBtn ">> 确认指定 <<" width:120 height:30 pos:[0,170]
+	local arrBtnTabCon = #(rolBsKeyTools.ckbC1.caption,rolBsKeyTools.ckbC2.caption,
+						rolBsKeyTools.ckbC3.caption,rolBsKeyTools.ckbC4.caption)
 
+	on rolCustomBtn open do 
+	(
+		lbxToolsAll.items        = for i in arrToolC1 collect i.caption
+		dotnetBtnTabCon.dock     = dotnetBtnTabCon.dock.Fill
+		dotnetBtnTabCon.Drawmode = dotnetBtnTabCon.Drawmode.OwnerDrawFixed
+		dotnetBtnTabCon.SizeMode = dotnetBtnTabCon.SizeMode.Fixed
+		dotnetBtnTabCon.ItemSize = dotNetobject "System.Drawing.Size" 40 30
+		dotnetBtnTabCon.alignment = (dotnetclass "system.Windows.Forms.Tabalignment").left
+        
+        for aTab in arrBtnTabCon do
+        (
+            dotnetBtnTabCon.TabPages.add aTab[1]
+        )
+        rolCustomBtn.dotnetBtnTabCon.SelectedIndex = 0
+	)
+	on ckbC1 pressed do (lbxToolsAll.items = for i in arrToolC1 collect i.caption)
+	on ckbC2 pressed do (lbxToolsAll.items = for i in arrToolC2 collect i.caption)
+	on ckbC3 pressed do (lbxToolsAll.items = for i in arrToolC3 collect i.caption)
+	on ckbC4 pressed do (lbxToolsAll.items = for i in arrToolC4 collect i.caption)
+	on dotnetBtnTabCon Selected itm do
+    (
+        execute ("rolCustomBtn.lbxToolsAll.items = for i in arrToolC" + (itm.TabPageIndex+1) as string + " collect i.caption")
+    )
+	on btnSetBtn pressed do 
+	(
+		if lbxToolsAll.selection != 0 then
+		(
+			local strAddBtnTemp = "tarBtn = arrToolC" + (dotnetBtnTabCon.selectedindex + 1) as string + "[" + lbxToolsAll.selection as string + "]"
+			strAddBtnTemp += "\r\nrolBsKeyTools.btnCustomBtn" + rolCustomBtn.title + ".visible = false"
+			strAddBtnTemp += "\r\ntarBtn.pos = rolBsKeyTools.btnCustomBtn" + rolCustomBtn.title + ".pos"
+			execute strAddBtnTemp
+		)
+		else (messagebox"请选中一个功能添加...          " beep:false)
+		try(destroydialog rolCustomBtn)catch()
+	)
+)
 -------------主UI-----------------------------------------------------------------
 rollout rolBsKeyTools "" width:200 height:248
 (
@@ -1027,18 +1071,18 @@ rollout rolBsKeyTools "" width:200 height:248
 		button btnCustomBtn5 "" pos:[70,186.5] width:60 height:27.5 tooltip:"[右击指定]"
 		button btnCustomBtn6 "" pos:[130,186.5] width:60 height:27.5 tooltip:"[右击指定]"
 ----------------------------------------------------------------------------------------------------------
-	groupbox gbxMinTools "" pos:[200,5] width:130 height:240
+	groupbox gbxMinTools "" pos:[200,5] width:130 height:212
 	
-		checkbutton ckbC1 "靖" width:30 height:29 highlightcolor:myCheckedColor \
+		checkbutton ckbC1 "靖" width:30 height:35 highlightcolor:myCheckedColor \
 		pos:[205,15] toolTip:"" border:false
-		checkbutton ckbC2 "妖" width:30 height:29 highlightcolor:myCheckedColor \
+		checkbutton ckbC2 "妖" width:30 height:35 highlightcolor:myCheckedColor \
 		pos:[235,15] toolTip:"" border:false
-		checkbutton ckbC3 "傩" width:30 height:29 highlightcolor:myCheckedColor \
+		checkbutton ckbC3 "傩" width:30 height:35 highlightcolor:myCheckedColor \
 		pos:[265,15] toolTip:"" border:false
-		checkbutton ckbC4 "舞" width:30 height:29 highlightcolor:myCheckedColor \
+		checkbutton ckbC4 "舞" width:30 height:35 highlightcolor:myCheckedColor \
 		pos:[295,15] toolTip:"" border:false
 
-		local btnHeight = 32
+		local btnHeight = 27.5
 		local btnWidth = 60
 		local btnPos = [999999,999999]
 		button btnTemp "待添加" width:btnWidth height:btnHeight visible:false \
@@ -1290,11 +1334,11 @@ rollout rolBsKeyTools "" width:200 height:248
 		str += "	arrToolC" + idBtn as string + "[b].visible = true" + "\r\n"
 		str += "	if (mod b 2 == 1) then \r\n"
 		str += "	("
-		str += "		arrToolC" + idBtn as string + "[b].pos = " + [205,45] as string + " + [0,(b - 1) * 16.5]" + "\r\n"
+		str += "		arrToolC" + idBtn as string + "[b].pos = " + [205,51] as string + " + [0,(b - 1) * 13.5]" + "\r\n"
 		str += "	)"
 		str += "	else if (mod b 2 == 0) then"
 		str += "	("
-		str += "		arrToolC" + idBtn as string + "[b].pos = " + [265,45] as string + " + [0,(b - 2) * 16.5]" + "\r\n"
+		str += "		arrToolC" + idBtn as string + "[b].pos = " + [265,51] as string + " + [0,(b - 2) * 13.5]" + "\r\n"
 		str += "	)"
 		str += ")"
 		
@@ -3261,6 +3305,19 @@ rollout rolBsKeyTools "" width:200 height:248
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsSelSetTools.ms"))
 		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
+
+	on btnCustomBtn1 rightclick do 
+	(try(destroydialog rolCustomBtn)catch();Createdialog rolCustomBtn fgcolor:myFgColor pos:(iniPos+[0,rolBsKeyTools.height]);rolCustomBtn.title = "1")
+	on btnCustomBtn2 rightclick do 
+	(try(destroydialog rolCustomBtn)catch();Createdialog rolCustomBtn fgcolor:myFgColor pos:(iniPos+[0,rolBsKeyTools.height]);rolCustomBtn.title = "2")
+	on btnCustomBtn3 rightclick do 
+	(try(destroydialog rolCustomBtn)catch();Createdialog rolCustomBtn fgcolor:myFgColor pos:(iniPos+[0,rolBsKeyTools.height]);rolCustomBtn.title = "3")
+	on btnCustomBtn4 rightclick do 
+	(try(destroydialog rolCustomBtn)catch();Createdialog rolCustomBtn fgcolor:myFgColor pos:(iniPos+[0,rolBsKeyTools.height]);rolCustomBtn.title = "4")
+	on btnCustomBtn5 rightclick do 
+	(try(destroydialog rolCustomBtn)catch();Createdialog rolCustomBtn fgcolor:myFgColor pos:(iniPos+[0,rolBsKeyTools.height]);rolCustomBtn.title = "5")
+	on btnCustomBtn6 rightclick do 
+	(try(destroydialog rolCustomBtn)catch();Createdialog rolCustomBtn fgcolor:myFgColor pos:(iniPos+[0,rolBsKeyTools.height]);rolCustomBtn.title = "6")
 
 )
 if (iniPos != 0) then (Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#())

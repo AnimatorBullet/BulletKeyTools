@@ -111,8 +111,6 @@ rollout rolBsAnimButton  "BsAnimButton_v1.0"
 		)
 	)
     ------------------------------------------------------------------------------------------------------
-
-    -- PolyToolsModeling.Quadrify true false
 )
 -- createDialog rolBsAnimButton 1000 100 fgcolor:myFgColor menu:RCmenuConfig
 if (iniPosAnimButtonTools != 0) then 
