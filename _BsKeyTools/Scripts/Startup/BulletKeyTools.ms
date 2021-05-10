@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-10 12:36:10
+ * @LastEditTime: 2021-05-10 20:00:28
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -41,7 +41,7 @@ catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))
 catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 
-global curVerBsKeyTools = "0.9.6"
+global curVerBsKeyTools = "0.9.7"
 global verUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/version.dat"
 global dlUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/_BsKeyTools%EF%BC%88%E8%A3%85%E5%AE%8C%E9%87%8D%E5%90%AFMAX,%E8%AF%AF%E6%9D%80%E8%AF%B7%E4%BF%A1%E4%BB%BB%EF%BC%89.exe"
 global dlFileBsKeyTools = (getdir #temp) + "\\_BsKeyTools（装完重启MAX,误杀请信任）.exe"
@@ -944,7 +944,7 @@ rollout rolBsKeyTools "" width:200 height:248
 (
 	local strMainRol = ("BsKeyTools_v" + curVerBsKeyTools + "（中键关闭）")
 	---------------------------------UI--------------------------------------
-	groupbox gbxMainUI strMainRol pos:[5,5] width:190 height:212
+	groupbox gbxMainUI strMainRol pos:[5,5] width:190 height:147
 	
 		-- label lblRangeStartText "起始帧" pos:[15,21] width:80 height:20
 		-- label lblRangeEndText "结束帧" pos:[65,21] width:80 height:20
@@ -956,18 +956,14 @@ rollout rolBsKeyTools "" width:200 height:248
 		tooltip:"预览选择帧\r\n再点回到上次帧范围"
 		button btnAllFrameDisplay "首尾帧" pos:[55,40] width:45 height:20 \
 		tooltip:"预览全部帧\r\n再点回到上次帧范围"
-		button btnZeroFrameDisplay "零帧" pos:[100,40] width:30 height:20 \
-		tooltip:"首帧回到0帧"
-		button btnCutSequence "动画分段" pos:[130,40] width:60 height:20 \
-		toolTip:"为长动画分段动作区间 (修改自San_oOo)"
-		button btnHotAnimBtn "命令集" pos:[10,60] width:45 height:20 \
-		tooltip:"动画相关3dsMax自带功能整合"
-		button btnLightTable "洋葱皮" pos:[55,60] width:45 height:20 \
-		toolTip:"显示运动重影 (修改自San_oOo)"
+		-- button btnZeroFrameDisplay "零帧" pos:[100,40] width:30 height:20 \
+		-- tooltip:"首帧回到0帧"
+		-- button btnHotAnimBtn "命令集" pos:[130,40] width:60 height:20 \
+		-- tooltip:"动画相关3dsMax自带功能整合"
+		button btnSpringMagic "飘带解算" pos:[130,40] width:60 height:20 \
+		tooltip:"左点新版,右点旧版" 
 		checkbutton ckbShadowCut "剪影" highlightcolor:myCheckedColor \
-		pos:[100,60] width:30 height:20 toolTip:"切换剪影显示"
-		button btnDemoTool "Demo工具" pos:[130,60] width:60 height:20 \
-		toolTip:"[已有想法待补充]\r\n方便渲染作品和练习的工具"
+		pos:[100,40] width:30 height:20 toolTip:"切换剪影显示"
 		button btnMagicBtn "" pos:[130,21] width:60 height:18  \
 		tooltip:"点我点我点我~良心小工具" border:false
 		-- edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
@@ -975,65 +971,71 @@ rollout rolBsKeyTools "" width:200 height:248
 		-- button btnSet5 "5f" width:35 pos:[90,67]
 		-- button btnSetAdd "+5f" width:35 pos:[125,67]
 		-- button btnSetOpposite "负" width:30 pos:[160,67]
-		button btnHideUnSel "独显" pos:[10,80]width:40 height:30 \
+		button btnHideUnSel "独显" pos:[10,60]width:40 height:30 \
 		toolTip:"隐藏当前显示的未选中物体，右键可重新显示"
 		checkbutton btnJudgeLinkKey "Link?" highlightcolor:myCheckedColor \
-		pos:[50,80] tooltip:"是否存在Link帧?" width:35 height:30 checked:false  
+		pos:[50,60] tooltip:"是否存在Link帧?" width:35 height:30 checked:false  
 		button btnSelBeforeKeys "" \
-		pos:[85,80] width:35 height:30 toolTip:"选择滑条前面关键帧"  
+		pos:[85,60] width:35 height:30 toolTip:"选择滑条前面关键帧"  
 		button btnSelAllKeys "" \
-		pos:[120,80] width:35 height:30 toolTip:"选择所有关键帧"  
+		pos:[120,60] width:35 height:30 toolTip:"选择所有关键帧"  
 		button btnSelAfterKeys "" \
-		pos:[155,80] width:35 height:30 toolTip:"选择滑条后面关键帧"
+		pos:[155,60] width:35 height:30 toolTip:"选择滑条后面关键帧"
 		-- button btnMoveKeys " " width:30 height:30 \
 		-- pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~"  
 		checkbutton ckbFnBoxDisplay "BOX显"  highlightcolor:myCheckedColor \
-		width:45 height:25 toolTip:"骨骼切换Box显示" pos:[10,112]
+		width:45 height:30 toolTip:"骨骼切换Box显示" pos:[10,92]
 		checkbutton ckbFreezeMesh "冻模型" highlightcolor:myCheckedColor \
-		toolTip:"冻结解冻模型" width:45 height:25 pos:[55,112]
+		toolTip:"冻结解冻模型" width:45 height:30 pos:[55,92]
 		checkbutton ckbHideBones "隐Bone" highlightcolor:myCheckedColor \
-		width:45 height:25 toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[100,112]
-		checkbutton ckbHideBiped "隐Bip" width:45 height:25 highlightcolor:myCheckedColor \
-		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[145,112]
-		button btnImageComp "构图框" pos:[10,137] width:45 height:25 \
-		tooltip:"各种经典分割视图以辅助构图"
-		button btnTrajedit "轨迹线" pos:[55,137] width:45 height:25 \
-		tooltip:"动画轨迹工具个人优化版"
-		button btnFileOpen "时光机" pos:[100,137] width:45 height:25 \
-		tooltip:"快速打开max文件\r\n可收藏常用目录" 
-		button btnKeyStepMode "帧跳转" pos:[145,137] width:45 height:25 \
-		tooltip:"前后切关键帧设置，\r\n可配合删帧或单轴修帧" 
-		checkButton ckbPlayBlocking "跳帧播" pos:[10,162] width:45 height:25 
-		highlightcolor:myCheckedColor tooltip:"点击预览关键帧 Blocking 动画\r\n若有 Link 帧需要按下上面按钮" checked:false
+		width:45 height:30 toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[100,92]
+		checkbutton ckbHideBiped "隐Bip" width:45 height:30 highlightcolor:myCheckedColor \
+		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[145,92]
+		-- button btnImageComp "构图框" pos:[10,122] width:45 height:30 \
+		-- tooltip:"各种经典分割视图以辅助构图"
+		-- button btnTrajedit "轨迹线" pos:[55,122] width:45 height:30 \
+		-- tooltip:"动画轨迹工具个人优化版"
+		-- button btnFileOpen "时光机" pos:[100,122] width:45 height:30 \
+		-- tooltip:"快速打开max文件\r\n可收藏常用目录"
+		-- button btnLightTable "洋葱皮" pos:[145,122] width:45 height:30 \
+		-- toolTip:"显示运动重影 (修改自San_oOo)"
+		-- checkButton ckbPlayBlocking "跳帧播" pos:[10,152] width:45 height:30 
+		-- highlightcolor:myCheckedColor tooltip:"点击预览关键帧Blocking动画\r\n若有Link帧需按下Link?按钮" checked:false
 		timer clock "PlayClock" interval:1 active:false
-		button btnSpringMagic "飘带解" pos:[55,162] width:45 height:25 \
-		tooltip:"左点新版,右点旧版" 
-		button btnCSTools "CS选择" pos:[100,162] width:45 height:25 \
-		toolTip:"快速选择CS骨骼和调Biped等" 
-		button btnAnimCopyPaste "暴力贴"  pos:[145,162] width:45 height:25 \
-		toolTip:"动画暴力粘贴(待优化)" 
-		button btnLayerManager "层" pos:[10,187] width:20 height:25 \
+		-- button btnCSTools "CS选择" pos:[100,152] width:45 height:30 \
+		-- toolTip:"快速选择CS骨骼和调Biped等" 
+		-- button btnAnimCopyPaste "暴力贴"  pos:[145,152] width:45 height:30 \
+		-- toolTip:"动画暴力粘贴东见云优化版\r\n(有时间我也会优化或新写)" 
+		button btnLayerManager "层" pos:[10,123] width:20 height:25 \
 		toolTip:"模拟旧版层管理器" 
-		button btnSelectionsetTools "集" pos:[30,187] width:20 height:25 \
+		button btnSelectionsetTools "集" pos:[30,123] width:20 height:25 \
 		toolTip:"选择集工具增强版" 
-		button btnPoseTool "库" pos:[50,187] width:20 height:25 \
+		button btnPoseTool "库" pos:[50,123] width:20 height:25 \
 		toolTip:"参考库工具,待完善"
-		button btnQuickSave "备份" pos:[70,187] width:30 height:25 \
+		button btnQuickSave "备份" pos:[70,123] width:30 height:25 \
 		toolTip:"快速备份" 
-		button btnSetFps "" pos:[100,187] width:45 height:25 \
+		button btnSetFps "" pos:[100,123] width:45 height:25 \
 		toolTip:"设置帧率" 
-		button btnSetSpeed "" pos:[145,187] width:45 height:25 \
+		button btnSetSpeed "" pos:[145,123] width:45 height:25 \
 		toolTip:"设置播放速度" 
-	
+----------------------------------------------------------------------------------------------------------
+	groupbox gbxCustomBtn "" pos:[5,148] width:190 height:70
+		button btnCustomBtn1 "[右击指定]" pos:[10,158] width:60 height:27.5
+		button btnCustomBtn2 "[右击指定]" pos:[70,158] width:60 height:27.5
+		button btnCustomBtn3 "[右击指定]" pos:[130,158] width:60 height:27.5
+		button btnCustomBtn4 "[右击指定]" pos:[10,186.5] width:60 height:27.5
+		button btnCustomBtn5 "[右击指定]" pos:[70,186.5] width:60 height:27.5
+		button btnCustomBtn6 "[右击指定]" pos:[130,186.5] width:60 height:27.5
+----------------------------------------------------------------------------------------------------------
 	groupbox gbxMinTools "" pos:[200,5] width:130 height:240
 	
-		checkbutton ckbC1 "天" width:30 height:29 highlightcolor:myCheckedColor \
+		checkbutton ckbC1 "靖" width:30 height:29 highlightcolor:myCheckedColor \
 		pos:[205,15] toolTip:"" border:false
-		checkbutton ckbC2 "动" width:30 height:29 highlightcolor:myCheckedColor \
+		checkbutton ckbC2 "妖" width:30 height:29 highlightcolor:myCheckedColor \
 		pos:[235,15] toolTip:"" border:false
-		checkbutton ckbC3 "万" width:30 height:29 highlightcolor:myCheckedColor \
+		checkbutton ckbC3 "傩" width:30 height:29 highlightcolor:myCheckedColor \
 		pos:[265,15] toolTip:"" border:false
-		checkbutton ckbC4 "象" width:30 height:29 highlightcolor:myCheckedColor \
+		checkbutton ckbC4 "舞" width:30 height:29 highlightcolor:myCheckedColor \
 		pos:[295,15] toolTip:"" border:false
 
 		local btnHeight = 32
@@ -1100,6 +1102,26 @@ rollout rolBsKeyTools "" width:200 height:248
 		toolTip:"带有Skin的缩放" pos:btnPos
 		button btnSkinTools "Skin工具" width:btnWidth height:btnHeight visible:false \
 		toolTip:"Skin工具集成 (修改自San_oOo)" pos:btnPos
+		button btnKeyStepMode "切帧设置" width:btnWidth height:btnHeight visible:false pos:btnPos \
+		tooltip:"前后切关键帧设置，\r\n可配合删帧或单轴修帧"
+		button btnDemoTool "Demo工具" width:btnWidth height:btnHeight visible:false pos:btnPos \
+		toolTip:"[已有想法待补充]\r\n方便渲染作品和练习的工具"
+		button btnCutSequence "动画分段" width:btnWidth height:btnHeight visible:false pos:btnPos \
+		toolTip:"为长动画分段动作区间 (修改自San_oOo)"
+		button btnImageComp "构图辅助" width:btnWidth height:btnHeight visible:false pos:btnPos \
+		tooltip:"各种经典分割视图以辅助构图"
+		checkButton ckbPlayBlocking "跳帧播放" width:btnWidth height:btnHeight visible:false pos:btnPos \
+		highlightcolor:myCheckedColor tooltip:"点击预览关键帧Blocking动画\r\n若有Link帧需按下Link?按钮" checked:false
+		button btnLightTable "洋葱皮影" width:btnWidth height:btnHeight visible:false pos:btnPos \
+		toolTip:"显示运动重影 (修改自San_oOo)"
+		button btnFileOpen "时光机器" width:btnWidth height:btnHeight visible:false pos:btnPos \
+		tooltip:"快速打开max文件\r\n可收藏常用目录"
+		button btnTrajedit "轨迹工具" width:btnWidth height:btnHeight visible:false pos:btnPos \
+		tooltip:"动画轨迹工具个人优化版"
+		button btnCSTools "CS选择" width:btnWidth height:btnHeight visible:false pos:btnPos \
+		toolTip:"快速选择CS骨骼和调Biped等" 
+		button btnAnimCopyPaste "暴力粘贴" width:btnWidth height:btnHeight visible:false pos:btnPos \
+		toolTip:"动画暴力粘贴东见云优化版\r\n(有时间我也会优化或新写)" 
 
 		local btnMsWidth = 72.5
 		checkbutton ckbSwitchMyScripts "切换" pos:[5,249] width:35 height:20
@@ -1123,7 +1145,7 @@ rollout rolBsKeyTools "" width:200 height:248
 
 	groupbox gbxTips "" pos:[5,215] width:155 height:30
 	
-		label lblLink "2019.9[miHoYo_Bullet.S]4869" pos:[10,226] width:140 height:15
+		label lblLink "2019.9[miHoYo_Bullet.S]4869" pos:[10,226] width:145 height:15
 		button btnConfig "设置" pos:[165,222] width:30 height:22 border:true
 
 	local m_PBKeyTimeArray
@@ -1220,16 +1242,16 @@ rollout rolBsKeyTools "" width:200 height:248
 		(
 			append arrTarget arrSource[i]
 		)
-		return arrTarget
+		arrTarget
 	)
 
 	fn fnReloadToolsBtn =
 	(
-		arrSourToolC1 = #(rolBsKeyTools.btnColorTools,rolBsKeyTools.btnFastAlign,
-						rolBsKeyTools.btnDelDecimalKeys,rolBsKeyTools.btnAnimMirror,
-						rolBsKeyTools.btnFnKeyType,rolBsKeyTools.btnBatchExport,
+		arrSourToolC1 = #(rolBsKeyTools.btnFileOpen,rolBsKeyTools.btnFastAlign,
+						rolBsKeyTools.btnAnimCopyPaste,rolBsKeyTools.btnAnimMirror,
+						rolBsKeyTools.btnDemoTool,rolBsKeyTools.btnBatchExport,
 						rolBsKeyTools.ckbIsoMesh,rolBsKeyTools.btnBipedTraj,
-						rolBsKeyTools.btnRescaleWU,rolBsKeyTools.btnSkinTools,
+						rolBsKeyTools.btnCSTools,rolBsKeyTools.btnSkinTools,
 						rolBsKeyTools.btnFnFrame,rolBsKeyTools.ckbFnMtlDisplay)
 		arrSourToolC2 = #(rolBsKeyTools.btnCameraFromView,rolBsKeyTools.btnMopherSlider,
 						rolBsKeyTools.btnSelBiped,rolBsKeyTools.btnSelBone,
@@ -1239,11 +1261,11 @@ rollout rolBsKeyTools "" width:200 height:248
 						rolBsKeyTools.btnBipedScale,rolBsKeyTools.btnSelByColor)
 		arrSourToolC3 = #(rolBsKeyTools.btnMeshToBone,rolBsKeyTools.btnWinbox,
 						rolBsKeyTools.btnHideBipedTwists,rolBsKeyTools.btnQuickPrev,
-						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
-						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
-						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
-						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp)
-		arrSourToolC4 = #(rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
+						rolBsKeyTools.btnKeyStepMode,rolBsKeyTools.btnFnKeyType,
+						rolBsKeyTools.btnCutSequence,rolBsKeyTools.btnImageComp,
+						rolBsKeyTools.ckbPlayBlocking,rolBsKeyTools.btnLightTable,
+						rolBsKeyTools.btnColorTools,rolBsKeyTools.btnTrajedit)
+		arrSourToolC4 = #(rolBsKeyTools.btnDelDecimalKeys,rolBsKeyTools.btnRescaleWU,
 						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
 						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
 						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
@@ -1980,7 +2002,7 @@ rollout rolBsKeyTools "" width:200 height:248
 		(
 			numTempName = findstring nameCurrentFile "_Backup"
 			numTempVer = substring nameCurrentFile (numTempName + 7) nameCurrentFile.count
-			return numTempVer
+			numTempVer
 		)
 
 		if (matchPattern nameCurrentFile pattern:"*_Backup*" ignorCase:false) then
@@ -2054,11 +2076,11 @@ rollout rolBsKeyTools "" width:200 height:248
 	(
 		case of
 		(
-			(timeConfiguration.playbackSpeed == 1):(return 0.25)
-			(timeConfiguration.playbackSpeed == 2):(return 0.5)
-			(timeConfiguration.playbackSpeed == 3):(return 1)
-			(timeConfiguration.playbackSpeed == 4):(return 2)
-			(timeConfiguration.playbackSpeed == 5):(return 4)
+			(timeConfiguration.playbackSpeed == 1):(0.25)
+			(timeConfiguration.playbackSpeed == 2):(0.5)
+			(timeConfiguration.playbackSpeed == 3):(1)
+			(timeConfiguration.playbackSpeed == 4):(2)
+			(timeConfiguration.playbackSpeed == 5):(4)
 		)
 	)
 
@@ -2067,7 +2089,7 @@ rollout rolBsKeyTools "" width:200 height:248
 
 	fn FramToMilisecond frame = 
 	(
-		return ((((frame - animationRange.start) as integer) * (10.0 / 48.0) * fnGetPlaySpeedValue()) as integer)
+		((((frame - animationRange.start) as integer) * (10.0 / 48.0) * fnGetPlaySpeedValue()) as integer)
     )
 
 	fn AppendKeyTimeArray m_PBKeyMiliSecArray keys = 
@@ -2089,7 +2111,7 @@ rollout rolBsKeyTools "" width:200 height:248
 	(
         clock.active = false
         ckbPlayBlocking.state = false
-        ckbPlayBlocking.text = "跳帧播"
+        ckbPlayBlocking.text = "跳帧播放"
 	)
 
 	fn PlayBlocking = 
@@ -2765,10 +2787,10 @@ rollout rolBsKeyTools "" width:200 height:248
 		)
 	)
 
-	on btnZeroFrameDisplay pressed do with undo on  ---------------帧栏显示0帧
-	(
-		animationrange = interval 0f animationrange.end
-	)
+	-- on btnZeroFrameDisplay pressed do with undo on  ---------------帧栏显示0帧
+	-- (
+	-- 	animationrange = interval 0f animationrange.end
+	-- )
 
 	------------切换工具栏分类--------------------------------------------
 	on ckbC1 changed state do 
@@ -3100,11 +3122,11 @@ rollout rolBsKeyTools "" width:200 height:248
 		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
-	on btnHotAnimBtn pressed do 
-	(
-		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimButton.ms"))
-		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
-	)
+	-- on btnHotAnimBtn pressed do 
+	-- (
+	-- 	try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimButton.ms"))
+	-- 	catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
+	-- )
 
 	on ckbShadowCut changed state do
 	(
