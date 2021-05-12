@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-12 17:29:30
+ * @LastEditTime: 2021-05-13 03:40:42
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -11,6 +11,7 @@ try(destroydialog rolBsKeyTools)catch()
 try(destroydialog rolFnKeys)catch()
 try(destroydialog rolAddMyScripts)catch()
 try(destroydialog rolCustomFps)catch()
+try(destroydialog rolCustomBtn)catch()
 try (callbacks.removeScripts #animationRangeChange id:#UpdateTimeRange) catch ()
 try (callbacks.removeScripts #filePostOpen id:#UpdateFps) catch ()
 
@@ -25,21 +26,29 @@ Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
 (myScript id:7 msName:"<＋＋>" dir:""), \
 (myScript id:8 msName:"<＋＋>" dir:""))
 Global idBtn              = 1
-global iniAutoCheckUpdate = true
+global iniBsAutoCheckUpdate
 Global switchToolPanel    = 0
 global switchMSPanel      = 0
 Global iniToolBtnAll      = #(101,102,103,104,105,106,107,108,109,110,111,112,
 							201,202,203,204,205,206,207,208,209,210,211,212,
 							301,302,303,304,305,306,307,308,309,310,311,312,
 							401,402,403,404,405,406,407,408,409,410,411,412)
+Global arrToolC1         = #()
+Global arrToolC2         = #()
+Global arrToolC3         = #()
+Global arrToolC4         = #()
+Global arrSourToolC1
+Global arrSourToolC2
+Global arrSourToolC3
+Global arrSourToolC4
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
-catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
-stLoadConfig.fnLoadConfigBsKeyTools ()
+catch(messagebox "加载配置失败，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))
 catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))
 catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
+stLoadConfig.fnLoadConfigBsKeyToolsAll()
 
 global curVerBsKeyTools = "0.9.7"
 global verUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/version.dat"
@@ -61,10 +70,6 @@ Global arrLinkKeys       = #()  -----------存link帧
 Global arrKeysSelected   = #()  -----------存选中的帧
 global arrBlockingKeys   = #()  -----------选中或者所有物体的所有关键帧
 global arrBoneEndAll     = #()  -----------末端骨骼临时层
-Global arrToolC1         = #()
-Global arrToolC2         = #()
-Global arrToolC3         = #()
-Global arrToolC4         = #()
 Global keyFirst
 Global keyEnd
 Global keySelFirst
@@ -74,8 +79,6 @@ Global fnSelectKeys
 Global fnSelLinkKeys
 Global fnAddLinkTimesKeys
 Global fnAddLinkParamsKeys
-global fnLoadToolConfig
-global fnSetToolConfig
 Global keyMovedOffset = 5
 Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
@@ -86,72 +89,6 @@ Global menuSetSpeed
 Global SIOFile = dotNetClass "System.IO.File"
 Global SIODir = dotNetClass "System.IO.Directory"
 -- Global myTimer = dotnetobject "System.Timers.Timer" 500 autoreset:true
------------分屏判断--------------------------------------------------------------------------
--- Struct MonitorInfoStruct 
--- (
---     MonitorOps,
---     Primary,
---     Secondary,
---     Count,
---     SecondMonitorPresent,
---     PrimaryBounds,
---     SecondaryBounds,
---     PrimaryWorkingArea,
---     SecondaryWorkingArea,
-    
---     on create do 
---     (
--- 		MonitorOps = (dotnetclass "System.Windows.Forms.Screen")		
--- 		Count = MonitorOps.AllScreens.count
--- 		SecondMonitorPresent = if Count > 1 then true else false
--- 		Primary = MonitorOps.primaryscreen
-		
--- 		if Primary != undefined then 
--- 		(
--- 			PrimaryWorkingArea= [MonitorOps.primaryscreen.WorkingArea.Width,MonitorOps.primaryscreen.WorkingArea.Height]
--- 			PrimaryBounds= [MonitorOps.primaryscreen.bounds.Width, MonitorOps.primaryscreen.bounds.Height]
--- 		)
-		
--- 		If SecondMonitorPresent then 
--- 		(
--- 			Secondary = MonitorOps.AllScreens[1]
--- 			SecondaryWorkingArea= [MonitorOps.AllScreens[1].WorkingArea.Width,MonitorOps.AllScreens[1].WorkingArea.Height]	
--- 			SecondaryBounds= [MonitorOps.AllScreens[1].bounds.Width,MonitorOps.AllScreens[1].bounds.Height]			
--- 		)
---     )		
--- )
--- fn GetMaxScreen =
--- (
---         winS = getMAXWindowPos()
---         winE = winS + getMAXWindowSize()
---         screens = (DotNetClass "System.Windows.Forms.Screen").AllScreens
---         maxScreen = undefined
---         maxScreenIntArea = 0
---         for s in screens do
---         (
---                 scrS = [s.bounds.left, s.bounds.top]
---                 scrE = [s.bounds.right, s.bounds.bottom]
---                 resS = [(amax winS[1] scrS[1]), (amax winS[2] scrS[2])]
---                 resE = [(amin winE[1] scrE[1]), (amin winE[2] scrE[2])]
---                 if resE[1] <= resS[1] then continue
---                 if resE[2] <= resS[2] then continue
---                 local a = (resE[1] - resS[1]) * (resE[2] - resS[2])
---                 if a > maxScreenIntArea then
---                 (
---                         maxScreenIntArea = a
---                         maxScreen = s
---                 )
---         )
---         return maxScreen
--- )
--- fn fnGetOpenPos = 
--- (
--- 	Monitor = GetMaxScreen()
-			
--- 	posw = Monitor.WorkingArea.Width
--- 	posh = Monitor.WorkingArea.Height
--- 	[posw/2,posh/2]
--- )
 ------------------全局变量-------------------------------------------------------------------
 
 -------------------右键面板空白处设置---------------------------------------------------------
@@ -260,7 +197,63 @@ fn addToolBarButton macro cat txt remove: false =
 			
 	) catch(messageBox "请手动处理Toolbar!             \r\n" title: "错误!")
 )
+-----------------------------------------------------------------------------------------------------
+global arrToolNewC1 = #();global arrToolNewC2 = #();global arrToolNewC3 = #();global arrToolNewC4 = #();
+global arrToolsAll
 
+rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
+(
+	dotNetControl dotnetBtnTabCon "System.Windows.Forms.TabControl" height:20 width:330 align:#center pos:[165,0]
+
+	multilistbox mlbToolsBtnAll "功能列表" width:100 height:12 pos:[5,4] selection:0
+	button btnAddToSort ">>>" width:30 height:81 pos:[106,20]
+	button btnRemoveFromSort "<<<" width:30 height:81 pos:[106,101]
+	listbox lbxToolBtn1 "" width:80 height:12 pos:[167,20] selection:0
+	listbox lbxToolBtn2 "" width:80 height:12 pos:[247,20] selection:0
+	listbox lbxToolBtn3 "" width:80 height:12 pos:[327,20] selection:0
+	listbox lbxToolBtn4 "" width:80 height:12 pos:[407,20] selection:0
+	button btnMoveUp "↑" width:30 height:81 pos:[137,20]
+	button btnMoveDown "↓" width:30 height:81 pos:[137,101]
+	button btnSetBtn ">> 确认设置排序 <<" width:350 height:25 pos:[140,185]
+	button btnResetBtn "恢复默认排序" width:140 height:25 pos:[0,185]
+	
+	on rolCustomBtn open do 
+	(
+		local arrBtnTabCon = #(rolBsKeyTools.ckbC1.caption,rolBsKeyTools.ckbC2.caption,
+						rolBsKeyTools.ckbC3.caption,rolBsKeyTools.ckbC4.caption)
+		arrToolsAll = (arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4)
+		mlbToolsBtnAll.items     = for i in arrToolsAll collect i.caption
+		dotnetBtnTabCon.dock     = dotnetBtnTabCon.dock.Fill
+		dotnetBtnTabCon.Drawmode = dotnetBtnTabCon.Drawmode.OwnerDrawFixed
+		dotnetBtnTabCon.SizeMode = dotnetBtnTabCon.SizeMode.Fixed
+		dotnetBtnTabCon.ItemSize = dotNetobject "System.Drawing.Size" 80 20
+-- 		dotnetBtnTabCon.alignment = (dotnetclass "system.Windows.Forms.Tabalignment").left
+        
+        for aTab in arrBtnTabCon do
+        (
+            dotnetBtnTabCon.TabPages.add aTab
+        )
+        rolCustomBtn.dotnetBtnTabCon.SelectedIndex = 0
+	)
+
+	on btnAddToSort pressed do
+	(
+		numSelBtn = (rolCustomBtn.mlbToolsBtnAll.selection as array).count
+		if numSelBtn > 0 and (arrToolNewC1.count + numSelBtn) <= 12 then
+		(
+			for i in mlbToolsBtnAll.selection as array do
+			(
+				append arrToolNewC1 arrToolsAll[i]
+				deleteitem arrToolsAll (finditem arrToolsAll arrToolsAll[i])
+			)
+			lbxToolBtn1.items = for i in arrToolNewC1 collect i.caption
+			mlbToolsBtnAll.items = for i in arrToolsAll collect i.caption
+			mlbToolsBtnAll.selection = 0
+		)
+		else if (arrToolNewC1.count + numSelBtn) > 12 then (messagebox"每栏最多12个按钮...          "beep:false)
+	)
+)
+--------------------------------------------------------------------------------------------------------
 rcmenu menuConfig
 (
 	local myMs = (getDir #Scripts)+ "\\BulletScripts\\BulletKeyTools.ms"
@@ -268,6 +261,7 @@ rcmenu menuConfig
 	menuItem mItemHelpDoc "【必看帮助文档】"
 	menuItem mItemIsStartup "是否随Max自启"
 	menuItem mItemAddToolBarBtn "添加工具栏按钮"
+	menuItem mItemCustomSortBtn "自定义功能位置"
 	subMenu "更新设置"
 	(
 		menuItem mItemCheckUpdate "检查更新"
@@ -295,7 +289,8 @@ rcmenu menuConfig
 		else (mItemIsStartup.checked = false)
 		if (iniAddToolbars == 1) then (mItemAddToolBarBtn.checked = true)
 		else (mItemAddToolBarBtn.checked = false)
-		mItemAutoCheckUpdate.checked = iniAutoCheckUpdate
+		if (iniBsAutoCheckUpdate == true) then (mItemAutoCheckUpdate.checked = true) 
+		else (mItemAutoCheckUpdate.checked = false)
 	)
 
 	on mItemHelpDoc picked do 
@@ -384,7 +379,7 @@ rcmenu menuConfig
 	(
 		if (mItemAutoCheckUpdate.checked == true) then (mItemAutoCheckUpdate.checked = false)
 		else (mItemAutoCheckUpdate.checked = true)
-		iniAutoCheckUpdate = mItemAutoCheckUpdate.checked
+		iniBsAutoCheckUpdate = mItemAutoCheckUpdate.checked
 	)
 
 	on mItemClose picked do 
@@ -416,6 +411,9 @@ rcmenu menuConfig
 	)
 
 	on mItemUpdateLog picked do (shellLaunch "https://www.notion.so/bullet4869/4e28c488d5474a9082e164b7c5b6926c" "")
+
+	on mItemCustomSortBtn picked do 
+	(Createdialog rolCustomBtn fgcolor:myFgColor pos:((getdialogpos rolBsKeyTools)+[rolBsKeyTools.width,0]) parent:rolBsKeyTools.hwnd)
 )
 
 -------------------帧率,播放速度--------------------------------------------------------------
@@ -940,10 +938,6 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 	)
 )
 -----------------------------------------------------------------
-rollout rolSortTools "自定义工具位置" width: 600 height:800
-(
-
-)
 -------------主UI-----------------------------------------------------------------
 rollout rolBsKeyTools "" width:200 height:248
 (
@@ -1166,25 +1160,25 @@ rollout rolBsKeyTools "" width:200 height:248
 	(
 		if switchToolPanel == 0 then
 		(
-			rolBsKeyTools.width               = 200
-			rolBsKeyTools.height              = 248
-			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
-			ckbSwitchMyScripts.visible                = false
-			btnMyScripts1.visible                     = false
-			btnMyScripts2.visible                     = false
-			btnMyScripts3.visible                     = false
-			btnMyScripts4.visible                     = false
-			btnMyScripts5.visible                     = false
-			btnMyScripts6.visible                     = false
-			btnMyScripts7.visible                     = false
-			btnMyScripts8.visible                     = false
+			rolBsKeyTools.width        = 200
+			rolBsKeyTools.height       = 248
+			btnMagicBtn.text           = "✧(≖ ◡ ≖)"
+			ckbSwitchMyScripts.visible = false
+			btnMyScripts1.visible      = false
+			btnMyScripts2.visible      = false
+			btnMyScripts3.visible      = false
+			btnMyScripts4.visible      = false
+			btnMyScripts5.visible      = false
+			btnMyScripts6.visible      = false
+			btnMyScripts7.visible      = false
+			btnMyScripts8.visible      = false
 		)
 		else
 		(
-			rolBsKeyTools.width               = 335
-			rolBsKeyTools.height              = 273
-			btnMagicBtn.text                          = "( = `▽`)"
-			ckbSwitchMyScripts.visible                = true
+			rolBsKeyTools.width        = 335
+			rolBsKeyTools.height       = 273
+			btnMagicBtn.text           = "( = `▽`)"
+			ckbSwitchMyScripts.visible = true
 			fnRefreshMsPanel ()
 		)
 	)
@@ -1194,38 +1188,39 @@ rollout rolBsKeyTools "" width:200 height:248
 		fnRefreshMsPanel()
 		if switchToolPanel == 1 then
 		(
-			rolBsKeyTools.width               = 200
-			rolBsKeyTools.height              = 248
-			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
-			switchToolPanel                           = 0
-			ckbSwitchMyScripts.visible                = false
-			btnMyScripts1.visible                     = false
-			btnMyScripts2.visible                     = false
-			btnMyScripts3.visible                     = false
-			btnMyScripts4.visible                     = false
-			btnMyScripts5.visible                     = false
-			btnMyScripts6.visible                     = false
-			btnMyScripts7.visible                     = false
-			btnMyScripts8.visible                     = false
+			rolBsKeyTools.width        = 200
+			rolBsKeyTools.height       = 248
+			btnMagicBtn.text           = "✧(≖ ◡ ≖)"
+			switchToolPanel            = 0
+			ckbSwitchMyScripts.visible = false
+			btnMyScripts1.visible      = false
+			btnMyScripts2.visible      = false
+			btnMyScripts3.visible      = false
+			btnMyScripts4.visible      = false
+			btnMyScripts5.visible      = false
+			btnMyScripts6.visible      = false
+			btnMyScripts7.visible      = false
+			btnMyScripts8.visible      = false
 		)
 		else
 		(
-			rolBsKeyTools.width               = 335
-			rolBsKeyTools.height              = 273
-			btnMagicBtn.text                          = "( = `▽`)"
-			switchToolPanel                           = 1
-			ckbSwitchMyScripts.visible                = true
+			rolBsKeyTools.width        = 335
+			rolBsKeyTools.height       = 273
+			btnMagicBtn.text           = "( = `▽`)"
+			switchToolPanel            = 1
+			ckbSwitchMyScripts.visible = true
 		)
 	)
 
-	fn fnSortById idBtnArr arrSortID =
+	fn fnSortById arrDefaultBtn idBtnArr arrSortID =
 	(
 		arrTargetTemp = #()
 		for i in arrSortID where i != undefined do 
 		(
 			local strSortID = i as string
+			local indexToolID = (strSortID[2] + strSortID[3]) as Number
 			if strSortID[1] == idBtnArr as string then
-			(execute ("append arrTargetTemp arrSourToolC" + strSortID[1] + "[" + strSortID[2] + strSortID[3] + "]"))
+			append arrTargetTemp arrDefaultBtn[indexToolID]
 		)
 		arrTargetTemp
 	)
@@ -1257,11 +1252,11 @@ rollout rolBsKeyTools "" width:200 height:248
 						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
 						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2)
 		
-		fnLoadToolConfig()
-		arrToolC1 = fnSortById 1 iniToolBtnAll
-		arrToolC2 = fnSortById 2 iniToolBtnAll
-		arrToolC3 = fnSortById 3 iniToolBtnAll
-		arrToolC4 = fnSortById 4 iniToolBtnAll
+		fnLoadToolBtnConfig()
+		arrToolC1 = fnSortById arrSourToolC1 1 iniToolBtnAll
+		arrToolC2 = fnSortById arrSourToolC2 2 iniToolBtnAll
+		arrToolC3 = fnSortById arrSourToolC3 3 iniToolBtnAll
+		arrToolC4 = fnSortById arrSourToolC4 4 iniToolBtnAll
 	)
 
 	fn fnSwitchToolsBtn idBtn =
@@ -1779,161 +1774,6 @@ rollout rolBsKeyTools "" width:200 height:248
 			)
 		)
 	)
-	
-	-- mapped fn fnMoveKeysAndLinkKeys obj offset =  ----https://forums.cgsociety.org/t/moving-keys-from-link-constraint-keys-access/1575053
-	-- (
-	-- 	local arrTargetID  = #()
-	-- 	moveKeys obj offset #selection  ---先移动非link帧
-	-- 	if rolBsKeyTools.btnJudgeLinkKey.checked == true then 
-	-- 	(
-	-- 		if classof obj.controller == Link_Constraint do
-	-- 		(
-	-- 			nTargets = obj.controller.getNumTargets()  ---得到link的帧数量
-	
-	-- 			if nTargets > 0 do
-	-- 			(
-	-- 				for i = nTargets to 1 by -1 do  ------如果大于0则从最后link帧开始移
-	-- 				(
-	-- 					fNumber = obj.controller.getFrameNo i
-	-- 					if ((fNumber >= keySelFirst) and (fNumber <= keySelEnd)) then
-	-- 					(
-	-- 						appendIfUnique arrTargetID i
-	-- 					)
-	-- 				)
-	-- 				if offset > 0 then  --------判断向前还是向后移动帧
-	-- 				(
-	-- 					for i = arrTargetID.count to 1 by -1 do  ------如果大于0则从最后link帧开始移
-	-- 					(
-	-- 						fNumber = obj.controller.getFrameNo arrTargetID[i]
-	-- 						obj.controller.setFrameNo i (fNumber + offset)
-	-- 					)
-	-- 				)
-	-- 				else
-	-- 				(
-	-- 					for i = 1 to arrTargetID.count do  ---如果移动帧小于0,从第一个link帧开始移
-	-- 					(
-	-- 						fNumber = obj.controller.getFrameNo arrTargetID[i]
-	-- 						obj.controller.setFrameNo i (fNumber + offset)
-	-- 					)
-	-- 				)
-	-- 			)
-	-- 		)
-	-- 	)
-	-- )
-
-	-- -- fn fnSplitSelBiped = --分开选择四肢和身体,例如同一条手臂只选择最父级的(方便移动帧)
-	-- -- (
-	-- -- 	arrSelBiped = for i in selection where classof i.controller == BipSlave_Control collect i 
-
-	-- -- )
-
-	-- fn fnMoveBipedKeys offsetFrame =  -------移动Biped帧
-	-- (
-	-- 	bipedRoot = #()   -------判断选择了几个biped骨架
-	-- 	for i in selection where ((classof i == Biped_Object) and (i.ishidden == false)) do  
-	-- 	(
-	-- 		appendIfUnique bipedRoot i.controller.rootNode  --添加到骨架数组
-	-- 	)
-	-- 	for c in bipedRoot do  ---按每个骨架处理
-	-- 	(
-	-- 		ctrlBiped = c.controller
-	-- 		bipedAll = #(biped.getNode ctrlBiped #pelvis, -----四肢同帧处理,只处理他首节biped
-	-- 					biped.getNode ctrlBiped #spine,
-	-- 					biped.getNode ctrlBiped #neck,
-	-- 					biped.getNode ctrlBiped #larm,
-	-- 					biped.getNode ctrlBiped #rarm,
-	-- 					biped.getNode ctrlBiped #lleg,
-	-- 					biped.getNode ctrlBiped #rleg,
-	-- 					biped.getNode ctrlBiped #prop1,
-	-- 					biped.getNode ctrlBiped #prop2,
-	-- 					biped.getNode ctrlBiped #prop3,
-	-- 					biped.getNode ctrlBiped #tail)
-
-	-- 		vertCtrl = ctrlBiped.vertical.controller  -----质心ctrl关键帧
-	-- 		horzCtrl = ctrlBiped.horizontal.controller
-	-- 		if (((sysinfo.GetMaxLanguage())[3]=="CHS") and ((maxVersion())[1] < 20000)) then 
-	-- 		(turnCtrl = ctrlBiped.flip.controller)
-	-- 		else(turnCtrl = ctrlBiped.turning.controller)
-	-- 		bipCtrlTemp = #(vertCtrl,horzCtrl,turnCtrl)
-	-- 		for c in bipCtrlTemp do
-	-- 		(
-	-- 			biped.moveKeys c offsetFrame #selection  -----移动选定的质心帧
-	-- 		)
-	-- 		for nodeBiped in bipedAll where nodeBiped != undefined do  -----移动其他biped的选定帧
-	-- 		(
-	-- 			biped.moveKeys nodeBiped.controller offsetFrame #selection
-	-- 		)
-	-- 	)
-	-- )		
-
-	-- mapped fn fnMoveBipedScaleKeys tempObj offsetFrame =  -------移动biped的缩放帧
-	-- (
-	-- 	ctrlBiped = tempObj.controller
-	-- 	if classof ctrlBiped == BipSlave_Control then  --------下面判定子动画是否为scaleXYZ
-	-- 	(
-	-- 		if ((ctrlBiped[1][1] != undefined) and ((getSubAnimName ctrlBiped[1][1] 1) == #ScaleXYZ)) then
-	-- 		(
-	-- 			movekeys ctrlBiped[1][1][1] offsetFrame #selection
-	-- 		)
-	-- 	)
-	-- )
-
-	-- fn fnMoveAllKeys keyMovedOffset fnRange:off =
-	-- (
-	-- 	local rangEnd = animationrange.end
-	-- 	local rangeStart = animationrange.start
-	-- 	local n = 0  --n来判定是否有选中biped
-
-	-- 	if keyMovedOffset != undefined then
-	-- 	(
-	-- 		if selection.count != 0 then
-	-- 		(
-	-- 			for i in selection where (i.ishidden == false) do
-	-- 			(
-	-- 				if classof i != Biped_Object then
-	-- 				(
-	-- 					fnMoveKeysAndLinkKeys i keyMovedOffset
-	-- 				)
-	-- 				else 
-	-- 				(
-	-- 					fnMoveBipedScaleKeys i keyMovedOffset
-	-- 					n += 1
-	-- 				)
-	-- 			)
-	-- 			if n != 0 then  ----------分开解决biped多移动的问题,傻瓜式方法
-	-- 			(
-	-- 				fnMoveBipedKeys keyMovedOffset
-	-- 			)
-	-- 		)
-	-- 		else  ---跟上面一样,只是对所有物体
-	-- 		(
-	-- 			for i in objects where (i.ishidden == false) do
-	-- 			(
-	-- 				if classof i != Biped_Object then
-	-- 				(
-	-- 					fnMoveKeysAndLinkKeys i keyMovedOffset
-	-- 				)
-	-- 				else fnMoveBipedScaleKeys i keyMovedOffset
-	-- 			)
-	-- 			fnMoveBipedKeys keyMovedOffset
-	-- 		)
-	-- 		if fnRange == on then
-	-- 		(
-	-- 			if keyMovedOffset > 0 then 
-	-- 			(
-	-- 				rangEnd = animationrange.end + keyMovedOffset
-	-- 				animationrange = interval animationrange.start rangEnd
-	-- 			)
-	-- 			else if keyMovedOffset < 0 then 
-	-- 			(
-	-- 				rangeStart = animationrange.start + keyMovedOffset
-	-- 				animationrange = interval rangeStart animationrange.end
-	-- 			)
-	-- 		)
-	-- 		keySelFirst += keyMovedOffset
-	-- 		keySelEnd  += keyMovedOffset
-	-- 	)
-	-- )
 
 	fn fnAddTrajLayer strlayerName templayerTarget =
 	(
@@ -2214,8 +2054,9 @@ rollout rolBsKeyTools "" width:200 height:248
 		-- myTimer.Start()
 		-- timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
 		-- iniPos = (GetDialogPos rolBsKeyTools) 
-		stLoadConfig.fnLoadConfigBsKeyTools ()  ---------------脚本位置赋值
+		stLoadConfig.fnLoadConfigBsKeyToolsAll ()  ---------------脚本位置赋值
 		stSetConfig.fnSetConfigBsKeyTools ()  ----------------保存位置信息到ini文件
+		print ("iniBsAutoCheckUpdate2: " + iniBsAutoCheckUpdate as string)
 		fnReloadToolsBtn()
 		if(switchMSPanel == 0) then (ckbSwitchMyScripts.checked = false)
 		else (ckbSwitchMyScripts.checked = true)
@@ -2230,8 +2071,9 @@ rollout rolBsKeyTools "" width:200 height:248
 		-- )
 		ckbPlayBlocking.state = false
 		clock.active = false
-		if (iniAutoCheckUpdate == true) then 
+		if (iniBsAutoCheckUpdate == true) then 
 		(fnAutoCheckVersion curVerBsKeyTools verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools)
+		print ("iniBsAutoCheckUpdate1: " + iniBsAutoCheckUpdate as string)
 	)
 	
 	on rolBsKeyTools close do -- 关闭记忆浮动窗口位置
@@ -3259,7 +3101,7 @@ fn fnUpdateTimeRange =
 callbacks.addScript #animationRangeChange "fnUpdateTimeRange()" id:#UpdateTimeRange
 callbacks.addScript #filePostOpen "fnRefFps()" id:#UpdateFps
 
-clearListener()  ---------清除侦听器
+-- clearListener()  ---------清除侦听器
 
 (
 	macroScript BulletKeyTools

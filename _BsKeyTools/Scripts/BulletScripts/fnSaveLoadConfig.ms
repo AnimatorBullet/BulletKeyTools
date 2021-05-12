@@ -1,50 +1,42 @@
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
-global fnLoadToolConfig
-global fnSetToolConfig
 global stSetConfig
+global stLoadConfig
+global fnLoadToolBtnConfig
+global fnSetToolBtnConfig
+global fnLoadConfigBsKeyToolsAll
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
 (
-	local printallelements = options.printallelements
-	attr = (with printAllElements on ((GetINISetting BulletConfig nameAttrClass nameAttr) as string))  --先提取文件中的记录
-	case of 
-	(
-		((nameAttr == "ArrMyScripts") or (nameAttr == "LikedFolder") \
-		or (nameAttr == "Desktop") or (matchpattern nameAttr  pattern:"RefFolder*") \
-		or (nameAttr == "LastRefFolder")):
-		(
-			attr = substituteString attr "dir:" "dir:@"
-		)
-		(nameAttr == "ToolBtnAll"):(options.printallelements = true)
-	)
-	if attr == "" then attr = (execute valueAttr)
-	else
-	(
-		attr = (execute attr) --判断记录为空与否得到需要的记录参数
-		options.printallelements = printallelements
-	)
+	local oldPrintAllElements  = options.printAllelements
+	options.printAllelements = true
+	attr = (GetINISetting BulletConfig nameAttrClass nameAttr) as string  --先提取文件中的记录
+	if ((nameAttr == "ArrMyScripts") or (nameAttr == "LikedFolder") \
+	or (nameAttr == "Desktop") or (matchpattern nameAttr  pattern:"RefFolder*") \
+	or (nameAttr == "LastRefFolder")) then(attr = substituteString attr "dir:" "dir:@")
+	if attr == "" then (attr = execute (with printAllelements on valueAttr)) else (attr = execute (with printAllelements on attr)) --判断记录为空与否得到需要的记录参数
+	options.printAllelements = oldPrintAllElements
 	attr
 )
-fn fnLoadToolConfig =
+fn fnLoadToolBtnConfig =
 (
-	iniToolBtnAll = fnGetConfig iniToolBtnAll "BulletKeyToolsSet" "ToolBtnAll" (with printAllElements on (iniToolBtnAll as string))
+	iniToolBtnAll = fnGetConfig iniToolBtnAll "BulletKeyToolsSet" "ToolBtnAll" (with printAllelements on (iniToolBtnAll as string))
 )
-fn fnSetToolConfig =
+fn fnSetToolBtnConfig =
 (
-	SetINISetting BulletConfig "BulletKeyToolsSet" "ToolBtnAll" (with printAllElements on (iniToolBtnAll as string))
+	SetINISetting BulletConfig "BulletKeyToolsSet" "ToolBtnAll" (with printAllelements on (iniToolBtnAll as string))
 )
 
 struct stLoadConfig
 (
-	fn fnLoadConfigBsKeyTools =
+	fn fnLoadConfigBsKeyToolsAll =
 	(
-		iniPos             = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" (0 as string)
-		switchToolPanel    = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
-		switchMSPanel      = fnGetConfig switchMSPanel "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
-		idBtn              = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
-		iniArrMyScripts    = fnGetConfig iniArrMyScripts "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
-		iniAutoCheckUpdate = fnGetConfig iniAutoCheckUpdate "BulletKeyToolsSet"  "AutoCheckUpdate" (iniAutoCheckUpdate as string)
-		fnLoadToolConfig()
+		iniPos               = fnGetConfig iniPos "BulletKeyToolsSet" "Pos" (0 as string)
+		switchToolPanel      = fnGetConfig switchToolPanel "BulletKeyToolsSet"  "ToolPanel" (switchToolPanel as string)
+		switchMSPanel        = fnGetConfig switchMSPanel "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
+		idBtn                = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
+		iniArrMyScripts      = fnGetConfig iniArrMyScripts "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
+		iniBsAutoCheckUpdate = fnGetConfig iniBsAutoCheckUpdate "BulletKeyToolsSet"  "AutoCheckUpdate" (true as string)
+		fnLoadToolBtnConfig()
 		if (iniArrMyScripts.count != 8) then
 		(
 			iniArrMyScripts = #((myScript id:1 msName:"<＋＋>" dir:""), \
@@ -95,8 +87,8 @@ struct stSetConfig
 		SetINISetting BulletConfig "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
 		SetINISetting BulletConfig "BulletKeyToolsSet"  "idBtn" (idBtn as string)
 		SetINISetting BulletConfig "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
-		SetINISetting BulletConfig "BulletKeyToolsSet"  "AutoCheckUpdate" (iniAutoCheckUpdate as string)
-		fnSetToolConfig()
+		SetINISetting BulletConfig "BulletKeyToolsSet"  "AutoCheckUpdate" (iniBsAutoCheckUpdate as string)
+		fnSetToolBtnConfig()
 	),
 	fn fnSetConfigBsAnimButton =
 	(

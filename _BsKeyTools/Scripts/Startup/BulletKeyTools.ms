@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-12 19:35:05
+ * @LastEditTime: 2021-05-13 03:40:42
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -26,21 +26,29 @@ Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
 (myScript id:7 msName:"<＋＋>" dir:""), \
 (myScript id:8 msName:"<＋＋>" dir:""))
 Global idBtn              = 1
-global iniAutoCheckUpdate = true
+global iniBsAutoCheckUpdate
 Global switchToolPanel    = 0
 global switchMSPanel      = 0
 Global iniToolBtnAll      = #(101,102,103,104,105,106,107,108,109,110,111,112,
 							201,202,203,204,205,206,207,208,209,210,211,212,
 							301,302,303,304,305,306,307,308,309,310,311,312,
 							401,402,403,404,405,406,407,408,409,410,411,412)
+Global arrToolC1         = #()
+Global arrToolC2         = #()
+Global arrToolC3         = #()
+Global arrToolC4         = #()
+Global arrSourToolC1
+Global arrSourToolC2
+Global arrSourToolC3
+Global arrSourToolC4
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
-catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
-stLoadConfig.fnLoadConfigBsKeyTools ()
+catch(messagebox "加载配置失败，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))
 catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))
 catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
+stLoadConfig.fnLoadConfigBsKeyToolsAll()
 
 global curVerBsKeyTools = "0.9.7"
 global verUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/version.dat"
@@ -62,10 +70,6 @@ Global arrLinkKeys       = #()  -----------存link帧
 Global arrKeysSelected   = #()  -----------存选中的帧
 global arrBlockingKeys   = #()  -----------选中或者所有物体的所有关键帧
 global arrBoneEndAll     = #()  -----------末端骨骼临时层
-Global arrToolC1         = #()
-Global arrToolC2         = #()
-Global arrToolC3         = #()
-Global arrToolC4         = #()
 Global keyFirst
 Global keyEnd
 Global keySelFirst
@@ -75,8 +79,6 @@ Global fnSelectKeys
 Global fnSelLinkKeys
 Global fnAddLinkTimesKeys
 Global fnAddLinkParamsKeys
-global fnLoadToolConfig
-global fnSetToolConfig
 Global keyMovedOffset = 5
 Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
@@ -197,7 +199,7 @@ fn addToolBarButton macro cat txt remove: false =
 )
 -----------------------------------------------------------------------------------------------------
 global arrToolNewC1 = #();global arrToolNewC2 = #();global arrToolNewC3 = #();global arrToolNewC4 = #();
-global arrToolsAll = (arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4)
+global arrToolsAll
 
 rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 (
@@ -219,6 +221,7 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 	(
 		local arrBtnTabCon = #(rolBsKeyTools.ckbC1.caption,rolBsKeyTools.ckbC2.caption,
 						rolBsKeyTools.ckbC3.caption,rolBsKeyTools.ckbC4.caption)
+		arrToolsAll = (arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4)
 		mlbToolsBtnAll.items     = for i in arrToolsAll collect i.caption
 		dotnetBtnTabCon.dock     = dotnetBtnTabCon.dock.Fill
 		dotnetBtnTabCon.Drawmode = dotnetBtnTabCon.Drawmode.OwnerDrawFixed
@@ -286,7 +289,8 @@ rcmenu menuConfig
 		else (mItemIsStartup.checked = false)
 		if (iniAddToolbars == 1) then (mItemAddToolBarBtn.checked = true)
 		else (mItemAddToolBarBtn.checked = false)
-		mItemAutoCheckUpdate.checked = iniAutoCheckUpdate
+		if (iniBsAutoCheckUpdate == true) then (mItemAutoCheckUpdate.checked = true) 
+		else (mItemAutoCheckUpdate.checked = false)
 	)
 
 	on mItemHelpDoc picked do 
@@ -375,7 +379,7 @@ rcmenu menuConfig
 	(
 		if (mItemAutoCheckUpdate.checked == true) then (mItemAutoCheckUpdate.checked = false)
 		else (mItemAutoCheckUpdate.checked = true)
-		iniAutoCheckUpdate = mItemAutoCheckUpdate.checked
+		iniBsAutoCheckUpdate = mItemAutoCheckUpdate.checked
 	)
 
 	on mItemClose picked do 
@@ -1156,25 +1160,25 @@ rollout rolBsKeyTools "" width:200 height:248
 	(
 		if switchToolPanel == 0 then
 		(
-			rolBsKeyTools.width               = 200
-			rolBsKeyTools.height              = 248
-			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
-			ckbSwitchMyScripts.visible                = false
-			btnMyScripts1.visible                     = false
-			btnMyScripts2.visible                     = false
-			btnMyScripts3.visible                     = false
-			btnMyScripts4.visible                     = false
-			btnMyScripts5.visible                     = false
-			btnMyScripts6.visible                     = false
-			btnMyScripts7.visible                     = false
-			btnMyScripts8.visible                     = false
+			rolBsKeyTools.width        = 200
+			rolBsKeyTools.height       = 248
+			btnMagicBtn.text           = "✧(≖ ◡ ≖)"
+			ckbSwitchMyScripts.visible = false
+			btnMyScripts1.visible      = false
+			btnMyScripts2.visible      = false
+			btnMyScripts3.visible      = false
+			btnMyScripts4.visible      = false
+			btnMyScripts5.visible      = false
+			btnMyScripts6.visible      = false
+			btnMyScripts7.visible      = false
+			btnMyScripts8.visible      = false
 		)
 		else
 		(
-			rolBsKeyTools.width               = 335
-			rolBsKeyTools.height              = 273
-			btnMagicBtn.text                          = "( = `▽`)"
-			ckbSwitchMyScripts.visible                = true
+			rolBsKeyTools.width        = 335
+			rolBsKeyTools.height       = 273
+			btnMagicBtn.text           = "( = `▽`)"
+			ckbSwitchMyScripts.visible = true
 			fnRefreshMsPanel ()
 		)
 	)
@@ -1184,38 +1188,39 @@ rollout rolBsKeyTools "" width:200 height:248
 		fnRefreshMsPanel()
 		if switchToolPanel == 1 then
 		(
-			rolBsKeyTools.width               = 200
-			rolBsKeyTools.height              = 248
-			btnMagicBtn.text                          = "✧(≖ ◡ ≖)"
-			switchToolPanel                           = 0
-			ckbSwitchMyScripts.visible                = false
-			btnMyScripts1.visible                     = false
-			btnMyScripts2.visible                     = false
-			btnMyScripts3.visible                     = false
-			btnMyScripts4.visible                     = false
-			btnMyScripts5.visible                     = false
-			btnMyScripts6.visible                     = false
-			btnMyScripts7.visible                     = false
-			btnMyScripts8.visible                     = false
+			rolBsKeyTools.width        = 200
+			rolBsKeyTools.height       = 248
+			btnMagicBtn.text           = "✧(≖ ◡ ≖)"
+			switchToolPanel            = 0
+			ckbSwitchMyScripts.visible = false
+			btnMyScripts1.visible      = false
+			btnMyScripts2.visible      = false
+			btnMyScripts3.visible      = false
+			btnMyScripts4.visible      = false
+			btnMyScripts5.visible      = false
+			btnMyScripts6.visible      = false
+			btnMyScripts7.visible      = false
+			btnMyScripts8.visible      = false
 		)
 		else
 		(
-			rolBsKeyTools.width               = 335
-			rolBsKeyTools.height              = 273
-			btnMagicBtn.text                          = "( = `▽`)"
-			switchToolPanel                           = 1
-			ckbSwitchMyScripts.visible                = true
+			rolBsKeyTools.width        = 335
+			rolBsKeyTools.height       = 273
+			btnMagicBtn.text           = "( = `▽`)"
+			switchToolPanel            = 1
+			ckbSwitchMyScripts.visible = true
 		)
 	)
 
-	fn fnSortById idBtnArr arrSortID =
+	fn fnSortById arrDefaultBtn idBtnArr arrSortID =
 	(
 		arrTargetTemp = #()
 		for i in arrSortID where i != undefined do 
 		(
 			local strSortID = i as string
+			local indexToolID = (strSortID[2] + strSortID[3]) as Number
 			if strSortID[1] == idBtnArr as string then
-			(execute ("append arrTargetTemp arrSourToolC" + strSortID[1] + "[" + strSortID[2] + strSortID[3] + "]"))
+			append arrTargetTemp arrDefaultBtn[indexToolID]
 		)
 		arrTargetTemp
 	)
@@ -1247,11 +1252,11 @@ rollout rolBsKeyTools "" width:200 height:248
 						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
 						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2)
 		
-		fnLoadToolConfig()
-		arrToolC1 = fnSortById 1 iniToolBtnAll
-		arrToolC2 = fnSortById 2 iniToolBtnAll
-		arrToolC3 = fnSortById 3 iniToolBtnAll
-		arrToolC4 = fnSortById 4 iniToolBtnAll
+		fnLoadToolBtnConfig()
+		arrToolC1 = fnSortById arrSourToolC1 1 iniToolBtnAll
+		arrToolC2 = fnSortById arrSourToolC2 2 iniToolBtnAll
+		arrToolC3 = fnSortById arrSourToolC3 3 iniToolBtnAll
+		arrToolC4 = fnSortById arrSourToolC4 4 iniToolBtnAll
 	)
 
 	fn fnSwitchToolsBtn idBtn =
@@ -2049,8 +2054,9 @@ rollout rolBsKeyTools "" width:200 height:248
 		-- myTimer.Start()
 		-- timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
 		-- iniPos = (GetDialogPos rolBsKeyTools) 
-		stLoadConfig.fnLoadConfigBsKeyTools ()  ---------------脚本位置赋值
+		stLoadConfig.fnLoadConfigBsKeyToolsAll ()  ---------------脚本位置赋值
 		stSetConfig.fnSetConfigBsKeyTools ()  ----------------保存位置信息到ini文件
+		print ("iniBsAutoCheckUpdate2: " + iniBsAutoCheckUpdate as string)
 		fnReloadToolsBtn()
 		if(switchMSPanel == 0) then (ckbSwitchMyScripts.checked = false)
 		else (ckbSwitchMyScripts.checked = true)
@@ -2065,8 +2071,9 @@ rollout rolBsKeyTools "" width:200 height:248
 		-- )
 		ckbPlayBlocking.state = false
 		clock.active = false
-		if (iniAutoCheckUpdate == true) then 
+		if (iniBsAutoCheckUpdate == true) then 
 		(fnAutoCheckVersion curVerBsKeyTools verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools)
+		print ("iniBsAutoCheckUpdate1: " + iniBsAutoCheckUpdate as string)
 	)
 	
 	on rolBsKeyTools close do -- 关闭记忆浮动窗口位置
@@ -3094,7 +3101,7 @@ fn fnUpdateTimeRange =
 callbacks.addScript #animationRangeChange "fnUpdateTimeRange()" id:#UpdateTimeRange
 callbacks.addScript #filePostOpen "fnRefFps()" id:#UpdateFps
 
-clearListener()  ---------清除侦听器
+-- clearListener()  ---------清除侦听器
 
 (
 	macroScript BulletKeyTools
