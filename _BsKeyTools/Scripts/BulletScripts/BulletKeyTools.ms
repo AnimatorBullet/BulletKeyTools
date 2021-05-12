@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-13 03:40:42
+ * @LastEditTime: 2021-05-13 03:59:47
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -25,18 +25,18 @@ Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
 (myScript id:6 msName:"<＋＋>" dir:""), \
 (myScript id:7 msName:"<＋＋>" dir:""), \
 (myScript id:8 msName:"<＋＋>" dir:""))
-Global idBtn              = 1
-global iniBsAutoCheckUpdate
-Global switchToolPanel    = 0
-global switchMSPanel      = 0
-Global iniToolBtnAll      = #(101,102,103,104,105,106,107,108,109,110,111,112,
+Global idBtn                = 1
+global iniBsAutoCheckUpdate = true
+Global switchToolPanel      = 0
+global switchMSPanel        = 0
+Global iniToolBtnAll        = #(101,102,103,104,105,106,107,108,109,110,111,112,
 							201,202,203,204,205,206,207,208,209,210,211,212,
 							301,302,303,304,305,306,307,308,309,310,311,312,
 							401,402,403,404,405,406,407,408,409,410,411,412)
-Global arrToolC1         = #()
-Global arrToolC2         = #()
-Global arrToolC3         = #()
-Global arrToolC4         = #()
+Global arrToolC1 = #()
+Global arrToolC2 = #()
+Global arrToolC3 = #()
+Global arrToolC4 = #()
 Global arrSourToolC1
 Global arrSourToolC2
 Global arrSourToolC3
@@ -208,10 +208,10 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 	multilistbox mlbToolsBtnAll "功能列表" width:100 height:12 pos:[5,4] selection:0
 	button btnAddToSort ">>>" width:30 height:81 pos:[106,20]
 	button btnRemoveFromSort "<<<" width:30 height:81 pos:[106,101]
-	listbox lbxToolBtn1 "" width:80 height:12 pos:[167,20] selection:0
-	listbox lbxToolBtn2 "" width:80 height:12 pos:[247,20] selection:0
-	listbox lbxToolBtn3 "" width:80 height:12 pos:[327,20] selection:0
-	listbox lbxToolBtn4 "" width:80 height:12 pos:[407,20] selection:0
+	multilistbox mlbToolBtn1 "" width:80 height:12 pos:[167,20] selection:0
+	multilistbox mlbToolBtn2 "" width:80 height:12 pos:[247,20] selection:0
+	multilistbox mlbToolBtn3 "" width:80 height:12 pos:[327,20] selection:0
+	multilistbox mlbToolBtn4 "" width:80 height:12 pos:[407,20] selection:0
 	button btnMoveUp "↑" width:30 height:81 pos:[137,20]
 	button btnMoveDown "↓" width:30 height:81 pos:[137,101]
 	button btnSetBtn ">> 确认设置排序 <<" width:350 height:25 pos:[140,185]
@@ -246,7 +246,7 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 				append arrToolNewC1 arrToolsAll[i]
 				deleteitem arrToolsAll (finditem arrToolsAll arrToolsAll[i])
 			)
-			lbxToolBtn1.items = for i in arrToolNewC1 collect i.caption
+			mlbToolBtn1.items = for i in arrToolNewC1 collect i.caption
 			mlbToolsBtnAll.items = for i in arrToolsAll collect i.caption
 			mlbToolsBtnAll.selection = 0
 		)
@@ -2056,7 +2056,6 @@ rollout rolBsKeyTools "" width:200 height:248
 		-- iniPos = (GetDialogPos rolBsKeyTools) 
 		stLoadConfig.fnLoadConfigBsKeyToolsAll ()  ---------------脚本位置赋值
 		stSetConfig.fnSetConfigBsKeyTools ()  ----------------保存位置信息到ini文件
-		print ("iniBsAutoCheckUpdate2: " + iniBsAutoCheckUpdate as string)
 		fnReloadToolsBtn()
 		if(switchMSPanel == 0) then (ckbSwitchMyScripts.checked = false)
 		else (ckbSwitchMyScripts.checked = true)
@@ -2073,7 +2072,7 @@ rollout rolBsKeyTools "" width:200 height:248
 		clock.active = false
 		if (iniBsAutoCheckUpdate == true) then 
 		(fnAutoCheckVersion curVerBsKeyTools verUrlBsKeyTools dlUrlBsKeyTools dlFileBsKeyTools)
-		print ("iniBsAutoCheckUpdate1: " + iniBsAutoCheckUpdate as string)
+		-- print ("iniBsAutoCheckUpdate: " + iniBsAutoCheckUpdate as string)
 	)
 	
 	on rolBsKeyTools close do -- 关闭记忆浮动窗口位置

@@ -13,7 +13,7 @@ fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方�
 	if ((nameAttr == "ArrMyScripts") or (nameAttr == "LikedFolder") \
 	or (nameAttr == "Desktop") or (matchpattern nameAttr  pattern:"RefFolder*") \
 	or (nameAttr == "LastRefFolder")) then(attr = substituteString attr "dir:" "dir:@")
-	if attr == "" then (attr = execute (with printAllelements on valueAttr)) else (attr = execute (with printAllelements on attr)) --判断记录为空与否得到需要的记录参数
+	if attr == "" then (attr = execute valueAttr) else (attr = execute attr) --判断记录为空与否得到需要的记录参数
 	options.printAllelements = oldPrintAllElements
 	attr
 )
@@ -35,7 +35,7 @@ struct stLoadConfig
 		switchMSPanel        = fnGetConfig switchMSPanel "BulletKeyToolsSet"  "MSPanel" (switchMSPanel as string)
 		idBtn                = fnGetConfig idBtn "BulletKeyToolsSet"  "idBtn" (idBtn as string)
 		iniArrMyScripts      = fnGetConfig iniArrMyScripts "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
-		iniBsAutoCheckUpdate = fnGetConfig iniBsAutoCheckUpdate "BulletKeyToolsSet"  "AutoCheckUpdate" (true as string)
+		iniBsAutoCheckUpdate = fnGetConfig iniBsAutoCheckUpdate "BulletKeyToolsSet"  "AutoCheckUpdate" (iniBsAutoCheckUpdate as string)
 		fnLoadToolBtnConfig()
 		if (iniArrMyScripts.count != 8) then
 		(
