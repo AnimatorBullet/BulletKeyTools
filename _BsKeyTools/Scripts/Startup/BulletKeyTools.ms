@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-12 18:52:17
+ * @LastEditTime: 2021-05-12 19:35:05
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -196,10 +196,13 @@ fn addToolBarButton macro cat txt remove: false =
 	) catch(messageBox "请手动处理Toolbar!             \r\n" title: "错误!")
 )
 -----------------------------------------------------------------------------------------------------
+global arrToolNewC1 = #();global arrToolNewC2 = #();global arrToolNewC3 = #();global arrToolNewC4 = #();
+global arrToolsAll = (arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4)
+
 rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 (
 	dotNetControl dotnetBtnTabCon "System.Windows.Forms.TabControl" height:20 width:330 align:#center pos:[165,0]
--- 	listbox 
+
 	multilistbox mlbToolsBtnAll "功能列表" width:100 height:12 pos:[5,4] selection:0
 	button btnAddToSort ">>>" width:30 height:81 pos:[106,20]
 	button btnRemoveFromSort "<<<" width:30 height:81 pos:[106,101]
@@ -211,14 +214,11 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 	button btnMoveDown "↓" width:30 height:81 pos:[137,101]
 	button btnSetBtn ">> 确认设置排序 <<" width:350 height:25 pos:[140,185]
 	button btnResetBtn "恢复默认排序" width:140 height:25 pos:[0,185]
-	local arrBtnTabCon = #(rolBsKeyTools.ckbC1.caption,rolBsKeyTools.ckbC2.caption,
-						rolBsKeyTools.ckbC3.caption,rolBsKeyTools.ckbC4.caption)
-	local arrToolsAll = (arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4)
-						
-	local arrToolNewC1 = #();local arrToolNewC2 = #();local arrToolNewC3 = #();local arrToolNewC4 = #();
 	
 	on rolCustomBtn open do 
 	(
+		local arrBtnTabCon = #(rolBsKeyTools.ckbC1.caption,rolBsKeyTools.ckbC2.caption,
+						rolBsKeyTools.ckbC3.caption,rolBsKeyTools.ckbC4.caption)
 		mlbToolsBtnAll.items     = for i in arrToolsAll collect i.caption
 		dotnetBtnTabCon.dock     = dotnetBtnTabCon.dock.Fill
 		dotnetBtnTabCon.Drawmode = dotnetBtnTabCon.Drawmode.OwnerDrawFixed
@@ -235,15 +235,19 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 
 	on btnAddToSort pressed do
 	(
-		numSelBtn = rolCustomBtn.mlbToolsBtnAll.selection.count
-		if numSelBtn > 0 and numSelBtn <= 12 then
+		numSelBtn = (rolCustomBtn.mlbToolsBtnAll.selection as array).count
+		if numSelBtn > 0 and (arrToolNewC1.count + numSelBtn) <= 12 then
 		(
-			for i in mlbToolsBtnAll.selection do
+			for i in mlbToolsBtnAll.selection as array do
 			(
-				
+				append arrToolNewC1 arrToolsAll[i]
+				deleteitem arrToolsAll (finditem arrToolsAll arrToolsAll[i])
 			)
+			lbxToolBtn1.items = for i in arrToolNewC1 collect i.caption
+			mlbToolsBtnAll.items = for i in arrToolsAll collect i.caption
+			mlbToolsBtnAll.selection = 0
 		)
-		if numSelBtn > 12 then (messagebox"一次最多选择12个按钮...          "beep:false)
+		else if (arrToolNewC1.count + numSelBtn) > 12 then (messagebox"每栏最多12个按钮...          "beep:false)
 	)
 )
 --------------------------------------------------------------------------------------------------------
