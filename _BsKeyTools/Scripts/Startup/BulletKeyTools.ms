@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-11 02:08:33
+ * @LastEditTime: 2021-05-12 18:52:17
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -29,10 +29,10 @@ Global idBtn              = 1
 global iniAutoCheckUpdate = true
 Global switchToolPanel    = 0
 global switchMSPanel      = 0
-Global iniToolC1          = #(1,2,3,4,5,6,7,8,9,10,11,12)
-Global iniToolC2          = #(1,2,3,4,5,6,7,8,9,10,11,12)
-Global iniToolC3          = #(1,2,3,4,5,6,7,8,9,10,11,12)
-Global iniToolC4          = #(1,2,3,4,5,6,7,8,9,10,11,12)
+Global iniToolBtnAll      = #(101,102,103,104,105,106,107,108,109,110,111,112,
+							201,202,203,204,205,206,207,208,209,210,211,212,
+							301,302,303,304,305,306,307,308,309,310,311,312,
+							401,402,403,404,405,406,407,408,409,410,411,412)
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
 catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
@@ -75,6 +75,8 @@ Global fnSelectKeys
 Global fnSelLinkKeys
 Global fnAddLinkTimesKeys
 Global fnAddLinkParamsKeys
+global fnLoadToolConfig
+global fnSetToolConfig
 Global keyMovedOffset = 5
 Global symbol ----选择的范围判断, 0左边,1右边,2全部
 Global layerTraj --轨迹辅助层
@@ -85,72 +87,6 @@ Global menuSetSpeed
 Global SIOFile = dotNetClass "System.IO.File"
 Global SIODir = dotNetClass "System.IO.Directory"
 -- Global myTimer = dotnetobject "System.Timers.Timer" 500 autoreset:true
------------分屏判断--------------------------------------------------------------------------
--- Struct MonitorInfoStruct 
--- (
---     MonitorOps,
---     Primary,
---     Secondary,
---     Count,
---     SecondMonitorPresent,
---     PrimaryBounds,
---     SecondaryBounds,
---     PrimaryWorkingArea,
---     SecondaryWorkingArea,
-    
---     on create do 
---     (
--- 		MonitorOps = (dotnetclass "System.Windows.Forms.Screen")		
--- 		Count = MonitorOps.AllScreens.count
--- 		SecondMonitorPresent = if Count > 1 then true else false
--- 		Primary = MonitorOps.primaryscreen
-		
--- 		if Primary != undefined then 
--- 		(
--- 			PrimaryWorkingArea= [MonitorOps.primaryscreen.WorkingArea.Width,MonitorOps.primaryscreen.WorkingArea.Height]
--- 			PrimaryBounds= [MonitorOps.primaryscreen.bounds.Width, MonitorOps.primaryscreen.bounds.Height]
--- 		)
-		
--- 		If SecondMonitorPresent then 
--- 		(
--- 			Secondary = MonitorOps.AllScreens[1]
--- 			SecondaryWorkingArea= [MonitorOps.AllScreens[1].WorkingArea.Width,MonitorOps.AllScreens[1].WorkingArea.Height]	
--- 			SecondaryBounds= [MonitorOps.AllScreens[1].bounds.Width,MonitorOps.AllScreens[1].bounds.Height]			
--- 		)
---     )		
--- )
--- fn GetMaxScreen =
--- (
---         winS = getMAXWindowPos()
---         winE = winS + getMAXWindowSize()
---         screens = (DotNetClass "System.Windows.Forms.Screen").AllScreens
---         maxScreen = undefined
---         maxScreenIntArea = 0
---         for s in screens do
---         (
---                 scrS = [s.bounds.left, s.bounds.top]
---                 scrE = [s.bounds.right, s.bounds.bottom]
---                 resS = [(amax winS[1] scrS[1]), (amax winS[2] scrS[2])]
---                 resE = [(amin winE[1] scrE[1]), (amin winE[2] scrE[2])]
---                 if resE[1] <= resS[1] then continue
---                 if resE[2] <= resS[2] then continue
---                 local a = (resE[1] - resS[1]) * (resE[2] - resS[2])
---                 if a > maxScreenIntArea then
---                 (
---                         maxScreenIntArea = a
---                         maxScreen = s
---                 )
---         )
---         return maxScreen
--- )
--- fn fnGetOpenPos = 
--- (
--- 	Monitor = GetMaxScreen()
-			
--- 	posw = Monitor.WorkingArea.Width
--- 	posh = Monitor.WorkingArea.Height
--- 	[posw/2,posh/2]
--- )
 ------------------全局变量-------------------------------------------------------------------
 
 -------------------右键面板空白处设置---------------------------------------------------------
@@ -259,7 +195,58 @@ fn addToolBarButton macro cat txt remove: false =
 			
 	) catch(messageBox "请手动处理Toolbar!             \r\n" title: "错误!")
 )
+-----------------------------------------------------------------------------------------------------
+rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
+(
+	dotNetControl dotnetBtnTabCon "System.Windows.Forms.TabControl" height:20 width:330 align:#center pos:[165,0]
+-- 	listbox 
+	multilistbox mlbToolsBtnAll "功能列表" width:100 height:12 pos:[5,4] selection:0
+	button btnAddToSort ">>>" width:30 height:81 pos:[106,20]
+	button btnRemoveFromSort "<<<" width:30 height:81 pos:[106,101]
+	listbox lbxToolBtn1 "" width:80 height:12 pos:[167,20] selection:0
+	listbox lbxToolBtn2 "" width:80 height:12 pos:[247,20] selection:0
+	listbox lbxToolBtn3 "" width:80 height:12 pos:[327,20] selection:0
+	listbox lbxToolBtn4 "" width:80 height:12 pos:[407,20] selection:0
+	button btnMoveUp "↑" width:30 height:81 pos:[137,20]
+	button btnMoveDown "↓" width:30 height:81 pos:[137,101]
+	button btnSetBtn ">> 确认设置排序 <<" width:350 height:25 pos:[140,185]
+	button btnResetBtn "恢复默认排序" width:140 height:25 pos:[0,185]
+	local arrBtnTabCon = #(rolBsKeyTools.ckbC1.caption,rolBsKeyTools.ckbC2.caption,
+						rolBsKeyTools.ckbC3.caption,rolBsKeyTools.ckbC4.caption)
+	local arrToolsAll = (arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4)
+						
+	local arrToolNewC1 = #();local arrToolNewC2 = #();local arrToolNewC3 = #();local arrToolNewC4 = #();
+	
+	on rolCustomBtn open do 
+	(
+		mlbToolsBtnAll.items     = for i in arrToolsAll collect i.caption
+		dotnetBtnTabCon.dock     = dotnetBtnTabCon.dock.Fill
+		dotnetBtnTabCon.Drawmode = dotnetBtnTabCon.Drawmode.OwnerDrawFixed
+		dotnetBtnTabCon.SizeMode = dotnetBtnTabCon.SizeMode.Fixed
+		dotnetBtnTabCon.ItemSize = dotNetobject "System.Drawing.Size" 80 20
+-- 		dotnetBtnTabCon.alignment = (dotnetclass "system.Windows.Forms.Tabalignment").left
+        
+        for aTab in arrBtnTabCon do
+        (
+            dotnetBtnTabCon.TabPages.add aTab
+        )
+        rolCustomBtn.dotnetBtnTabCon.SelectedIndex = 0
+	)
 
+	on btnAddToSort pressed do
+	(
+		numSelBtn = rolCustomBtn.mlbToolsBtnAll.selection.count
+		if numSelBtn > 0 and numSelBtn <= 12 then
+		(
+			for i in mlbToolsBtnAll.selection do
+			(
+				
+			)
+		)
+		if numSelBtn > 12 then (messagebox"一次最多选择12个按钮...          "beep:false)
+	)
+)
+--------------------------------------------------------------------------------------------------------
 rcmenu menuConfig
 (
 	local myMs = (getDir #Scripts)+ "\\BulletScripts\\BulletKeyTools.ms"
@@ -267,6 +254,7 @@ rcmenu menuConfig
 	menuItem mItemHelpDoc "【必看帮助文档】"
 	menuItem mItemIsStartup "是否随Max自启"
 	menuItem mItemAddToolBarBtn "添加工具栏按钮"
+	menuItem mItemCustomSortBtn "自定义功能位置"
 	subMenu "更新设置"
 	(
 		menuItem mItemCheckUpdate "检查更新"
@@ -415,6 +403,9 @@ rcmenu menuConfig
 	)
 
 	on mItemUpdateLog picked do (shellLaunch "https://www.notion.so/bullet4869/4e28c488d5474a9082e164b7c5b6926c" "")
+
+	on mItemCustomSortBtn picked do 
+	(Createdialog rolCustomBtn fgcolor:myFgColor pos:((getdialogpos rolBsKeyTools)+[rolBsKeyTools.width,0]) parent:rolBsKeyTools.hwnd)
 )
 
 -------------------帧率,播放速度--------------------------------------------------------------
@@ -939,56 +930,12 @@ rollout rolFnKeys "滑动帧切换 v1.1" width:280 height:120
 	)
 )
 -----------------------------------------------------------------
-rollout rolCustomBtn "" width:120 height:200
-(
-	dotNetControl dotnetBtnTabCon "System.Windows.Forms.TabControl" height:170 width:35 align:#center pos:[1,2]
-	listbox lbxToolsAll "" width:80 height:12 pos:[35,5] selection:0
-	button btnSetBtn ">> 确认指定 <<" width:120 height:30 pos:[0,170]
-	local arrBtnTabCon = #(rolBsKeyTools.ckbC1.caption,rolBsKeyTools.ckbC2.caption,
-						rolBsKeyTools.ckbC3.caption,rolBsKeyTools.ckbC4.caption)
-
-	on rolCustomBtn open do 
-	(
-		lbxToolsAll.items        = for i in arrToolC1 collect i.caption
-		dotnetBtnTabCon.dock     = dotnetBtnTabCon.dock.Fill
-		dotnetBtnTabCon.Drawmode = dotnetBtnTabCon.Drawmode.OwnerDrawFixed
-		dotnetBtnTabCon.SizeMode = dotnetBtnTabCon.SizeMode.Fixed
-		dotnetBtnTabCon.ItemSize = dotNetobject "System.Drawing.Size" 40 30
-		dotnetBtnTabCon.alignment = (dotnetclass "system.Windows.Forms.Tabalignment").left
-        
-        for aTab in arrBtnTabCon do
-        (
-            dotnetBtnTabCon.TabPages.add aTab[1]
-        )
-        rolCustomBtn.dotnetBtnTabCon.SelectedIndex = 0
-	)
-	on ckbC1 pressed do (lbxToolsAll.items = for i in arrToolC1 collect i.caption)
-	on ckbC2 pressed do (lbxToolsAll.items = for i in arrToolC2 collect i.caption)
-	on ckbC3 pressed do (lbxToolsAll.items = for i in arrToolC3 collect i.caption)
-	on ckbC4 pressed do (lbxToolsAll.items = for i in arrToolC4 collect i.caption)
-	on dotnetBtnTabCon Selected itm do
-    (
-        execute ("rolCustomBtn.lbxToolsAll.items = for i in arrToolC" + (itm.TabPageIndex+1) as string + " collect i.caption")
-    )
-	on btnSetBtn pressed do 
-	(
-		if lbxToolsAll.selection != 0 then
-		(
-			local strAddBtnTemp = "tarBtn = arrToolC" + (dotnetBtnTabCon.selectedindex + 1) as string + "[" + lbxToolsAll.selection as string + "]"
-			strAddBtnTemp += "\r\nrolBsKeyTools.btnCustomBtn" + rolCustomBtn.title + ".visible = false"
-			strAddBtnTemp += "\r\ntarBtn.pos = rolBsKeyTools.btnCustomBtn" + rolCustomBtn.title + ".pos"
-			execute strAddBtnTemp
-		)
-		else (messagebox"请选中一个功能添加...          " beep:false)
-		try(destroydialog rolCustomBtn)catch()
-	)
-)
 -------------主UI-----------------------------------------------------------------
 rollout rolBsKeyTools "" width:200 height:248
 (
-	local strMainRol = ("BsKeyTools_v" + curVerBsKeyTools + "（中键关闭）")
+	local strMainRol = ("BsKeyTools_v" + curVerBsKeyTools)
 	---------------------------------UI--------------------------------------
-	groupbox gbxMainUI strMainRol pos:[5,5] width:190 height:212
+	groupbox gbxMainUI strMainRol pos:[5,5] width:190 height:217
 	
 		-- label lblRangeStartText "起始帧" pos:[15,21] width:80 height:20
 		-- label lblRangeEndText "结束帧" pos:[65,21] width:80 height:20
@@ -996,18 +943,16 @@ rollout rolBsKeyTools "" width:200 height:248
 		range:[-999999999,999999999,animationrange.start] scale:1
 		spinner spiEndTime "" pos:[70,21] width:60 height:20 type:#integer \
 		range:[-999999999,999999999,animationrange.end] scale:1
-		button btnCutFrameDisplay "选定帧" pos:[10,40] width:45 height:20 \
+		button btnCutFrameDisplay "选定帧" pos:[10,40] width:45 height:25 \
 		tooltip:"预览选择帧\r\n再点回到上次帧范围"
-		button btnAllFrameDisplay "首尾帧" pos:[55,40] width:45 height:20 \
+		button btnAllFrameDisplay "首尾帧" pos:[55,40] width:45 height:25 \
 		tooltip:"预览全部帧\r\n再点回到上次帧范围"
 		-- button btnZeroFrameDisplay "零帧" pos:[100,40] width:30 height:20 \
 		-- tooltip:"首帧回到0帧"
-		-- button btnHotAnimBtn "命令集" pos:[130,40] width:60 height:20 \
-		-- tooltip:"动画相关3dsMax自带功能整合"
-		button btnSpringMagic "飘带解算" pos:[130,40] width:60 height:20 \
-		tooltip:"左点新版,右点旧版" 
+		button btnHotAnimBtn "简单命令" pos:[130,40] width:60 height:25 \
+		tooltip:"动画相关3dsMax自带功能整合"
 		checkbutton ckbShadowCut "剪影" highlightcolor:myCheckedColor \
-		pos:[100,40] width:30 height:20 toolTip:"切换剪影显示"
+		pos:[100,40] width:30 height:25 toolTip:"切换剪影显示"
 		button btnMagicBtn "" pos:[130,21] width:60 height:18  \
 		tooltip:"点我点我点我~良心小工具" border:false
 		-- edittext edtMoveKey "移动" width:70 usePercentageWidth:true percentageWidth:44.0 \ 
@@ -1015,74 +960,68 @@ rollout rolBsKeyTools "" width:200 height:248
 		-- button btnSet5 "5f" width:35 pos:[90,67]
 		-- button btnSetAdd "+5f" width:35 pos:[125,67]
 		-- button btnSetOpposite "负" width:30 pos:[160,67]
-		button btnHideUnSel "独显" pos:[10,60]width:40 height:30 \
+		button btnHideUnSel "独显" pos:[10,65]width:40 height:30 \
 		toolTip:"隐藏当前显示的未选中物体，右键可重新显示"
 		checkbutton btnJudgeLinkKey "Link?" highlightcolor:myCheckedColor \
-		pos:[50,60] tooltip:"是否存在Link帧?" width:35 height:30 checked:false  
+		pos:[50,65] tooltip:"是否存在Link帧?" width:35 height:30 checked:false  
 		button btnSelBeforeKeys "" \
-		pos:[85,60] width:35 height:30 toolTip:"选择滑条前面关键帧"  
+		pos:[85,65] width:35 height:30 toolTip:"选择滑条前面关键帧"  
 		button btnSelAllKeys "" \
-		pos:[120,60] width:35 height:30 toolTip:"选择所有关键帧"  
+		pos:[120,65] width:35 height:30 toolTip:"选择所有关键帧"  
 		button btnSelAfterKeys "" \
-		pos:[155,60] width:35 height:30 toolTip:"选择滑条后面关键帧"
+		pos:[155,65] width:35 height:30 toolTip:"选择滑条后面关键帧"
 		-- button btnMoveKeys " " width:30 height:30 \
 		-- pos:[160,93] toolTip:"移动关键帧,先左边选帧\r\n左：帧栏范围保持不变~\r\n右：帧栏范围同步增减~"  
 		checkbutton ckbFnBoxDisplay "BOX显"  highlightcolor:myCheckedColor \
-		width:45 height:30 toolTip:"骨骼切换Box显示" pos:[10,92]
+		width:45 height:30 toolTip:"骨骼切换Box显示" pos:[10,97]
 		checkbutton ckbFreezeMesh "冻模型" highlightcolor:myCheckedColor \
-		toolTip:"冻结解冻模型" width:45 height:30 pos:[55,92]
+		toolTip:"冻结解冻模型" width:45 height:30 pos:[55,97]
 		checkbutton ckbHideBones "隐Bone" highlightcolor:myCheckedColor \
-		width:45 height:30 toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[100,92]
+		width:45 height:30 toolTip:"显示隐藏 bone\r\n所在层若隐藏则不会显示" pos:[100,97]
 		checkbutton ckbHideBiped "隐Bip" width:45 height:30 highlightcolor:myCheckedColor \
-		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[145,92]
-		-- button btnImageComp "构图框" pos:[10,122] width:45 height:30 \
-		-- tooltip:"各种经典分割视图以辅助构图"
-		-- button btnTrajedit "轨迹线" pos:[55,122] width:45 height:30 \
-		-- tooltip:"动画轨迹工具个人优化版"
-		-- button btnFileOpen "时光机" pos:[100,122] width:45 height:30 \
-		-- tooltip:"快速打开max文件\r\n可收藏常用目录"
-		-- button btnLightTable "洋葱皮" pos:[145,122] width:45 height:30 \
-		-- toolTip:"显示运动重影 (修改自San_oOo)"
-		-- checkButton ckbPlayBlocking "跳帧播" pos:[10,152] width:45 height:30 
-		-- highlightcolor:myCheckedColor tooltip:"点击预览关键帧Blocking动画\r\n若有Link帧需按下Link?按钮" checked:false
+		toolTip:"显示隐藏 Bip\r\n所在层若隐藏则不会显示" pos:[145,97]
+		button btnImageComp "构图框" pos:[10,127] width:45 height:30 \
+		tooltip:"各种经典分割视图以辅助构图"
+		button btnTrajedit "轨迹线" pos:[55,127] width:45 height:30 \
+		tooltip:"动画轨迹工具个人优化版"
+		button btnFileOpen "时光机" pos:[100,127] width:45 height:30 \
+		tooltip:"快速打开max文件\r\n可收藏常用目录"
+		button btnLightTable "洋葱皮" pos:[145,127] width:45 height:30 \
+		toolTip:"显示运动重影 (修改自San_oOo)"
+		checkButton ckbPlayBlocking "跳帧播" pos:[10,157] width:45 height:30 
+		highlightcolor:myCheckedColor tooltip:"点击预览关键帧 Blocking 动画\r\n若有 Link 帧需要按下上面按钮" checked:false
 		timer clock "PlayClock" interval:1 active:false
-		-- button btnCSTools "CS选择" pos:[100,152] width:45 height:30 \
-		-- toolTip:"快速选择CS骨骼和调Biped等" 
-		-- button btnAnimCopyPaste "暴力贴"  pos:[145,152] width:45 height:30 \
-		-- toolTip:"动画暴力粘贴东见云优化版\r\n(有时间我也会优化或新写)" 
-		button btnLayerManager "层" pos:[10,123] width:20 height:25 \
+		button btnSpringMagic "飘带解" pos:[55,157] width:45 height:30 \
+		tooltip:"左点新版,右点旧版" 
+		button btnCSTools "CS选择" pos:[100,157] width:45 height:30 \
+		toolTip:"快速选择CS骨骼和调Biped等" 
+		button btnAnimCopyPaste "暴力贴"  pos:[145,157] width:45 height:30 \
+		toolTip:"动画暴力粘贴东见云优化版\r\n(有时间我也会优化或新写)" 
+		button btnLayerManager "层" pos:[10,187] width:20 height:30 \
 		toolTip:"模拟旧版层管理器" 
-		button btnSelectionsetTools "集" pos:[30,123] width:20 height:25 \
+		button btnSelectionsetTools "集" pos:[30,187] width:20 height:30 \
 		toolTip:"选择集工具增强版" 
-		button btnPoseTool "库" pos:[50,123] width:20 height:25 \
+		button btnPoseTool "库" pos:[50,187] width:20 height:30 \
 		toolTip:"参考库工具,待完善"
-		button btnQuickSave "备份" pos:[70,123] width:30 height:25 \
+		button btnQuickSave "备份" pos:[70,187] width:30 height:30 \
 		toolTip:"快速备份" 
-		button btnSetFps "" pos:[100,123] width:45 height:25 \
+		button btnSetFps "" pos:[100,187] width:45 height:30 \
 		toolTip:"设置帧率" 
-		button btnSetSpeed "" pos:[145,123] width:45 height:25 \
+		button btnSetSpeed "" pos:[145,187] width:45 height:30 \
 		toolTip:"设置播放速度" 
-----------------------------------------------------------------------------------------------------------
-	groupbox gbxCustomBtn "" pos:[5,148] width:190 height:70
-		button btnCustomBtn1 "" pos:[10,158] width:60 height:27.5 tooltip:"[右击指定]"
-		button btnCustomBtn2 "" pos:[70,158] width:60 height:27.5 tooltip:"[右击指定]"
-		button btnCustomBtn3 "" pos:[130,158] width:60 height:27.5 tooltip:"[右击指定]"
-		button btnCustomBtn4 "" pos:[10,186.5] width:60 height:27.5 tooltip:"[右击指定]"
-		button btnCustomBtn5 "" pos:[70,186.5] width:60 height:27.5 tooltip:"[右击指定]"
-		button btnCustomBtn6 "" pos:[130,186.5] width:60 height:27.5 tooltip:"[右击指定]"
-----------------------------------------------------------------------------------------------------------
-	groupbox gbxMinTools "" pos:[200,5] width:130 height:212
 	
-		checkbutton ckbC1 "靖" width:30 height:35 highlightcolor:myCheckedColor \
+	groupbox gbxMinTools "" pos:[200,5] width:130 height:240
+	
+		checkbutton ckbC1 "靖" width:30 height:29 highlightcolor:myCheckedColor \
 		pos:[205,15] toolTip:"" border:false
-		checkbutton ckbC2 "妖" width:30 height:35 highlightcolor:myCheckedColor \
+		checkbutton ckbC2 "妖" width:30 height:29 highlightcolor:myCheckedColor \
 		pos:[235,15] toolTip:"" border:false
-		checkbutton ckbC3 "傩" width:30 height:35 highlightcolor:myCheckedColor \
+		checkbutton ckbC3 "傩" width:30 height:29 highlightcolor:myCheckedColor \
 		pos:[265,15] toolTip:"" border:false
-		checkbutton ckbC4 "舞" width:30 height:35 highlightcolor:myCheckedColor \
+		checkbutton ckbC4 "舞" width:30 height:29 highlightcolor:myCheckedColor \
 		pos:[295,15] toolTip:"" border:false
 
-		local btnHeight = 27.5
+		local btnHeight = 32
 		local btnWidth = 60
 		local btnPos = [999999,999999]
 		button btnTemp "待添加" width:btnWidth height:btnHeight visible:false \
@@ -1152,20 +1091,6 @@ rollout rolBsKeyTools "" width:200 height:248
 		toolTip:"[已有想法待补充]\r\n方便渲染作品和练习的工具"
 		button btnCutSequence "动画分段" width:btnWidth height:btnHeight visible:false pos:btnPos \
 		toolTip:"为长动画分段动作区间 (修改自San_oOo)"
-		button btnImageComp "构图辅助" width:btnWidth height:btnHeight visible:false pos:btnPos \
-		tooltip:"各种经典分割视图以辅助构图"
-		checkButton ckbPlayBlocking "跳帧播放" width:btnWidth height:btnHeight visible:false pos:btnPos \
-		highlightcolor:myCheckedColor tooltip:"点击预览关键帧Blocking动画\r\n若有Link帧需按下Link?按钮" checked:false
-		button btnLightTable "洋葱皮影" width:btnWidth height:btnHeight visible:false pos:btnPos \
-		toolTip:"显示运动重影 (修改自San_oOo)"
-		button btnFileOpen "时光机器" width:btnWidth height:btnHeight visible:false pos:btnPos \
-		tooltip:"快速打开max文件\r\n可收藏常用目录"
-		button btnTrajedit "轨迹工具" width:btnWidth height:btnHeight visible:false pos:btnPos \
-		tooltip:"动画轨迹工具个人优化版"
-		button btnCSTools "CS选择" width:btnWidth height:btnHeight visible:false pos:btnPos \
-		toolTip:"快速选择CS骨骼和调Biped等" 
-		button btnAnimCopyPaste "暴力粘贴" width:btnWidth height:btnHeight visible:false pos:btnPos \
-		toolTip:"动画暴力粘贴东见云优化版\r\n(有时间我也会优化或新写)" 
 
 		local btnMsWidth = 72.5
 		checkbutton ckbSwitchMyScripts "切换" pos:[5,249] width:35 height:20
@@ -1187,9 +1112,9 @@ rollout rolBsKeyTools "" width:200 height:248
 		button btnMyScripts8 "<＋＋>" pos:[258,249] width:btnMsWidth height:20
 		tooltip:iniArrMyScripts[8].dir border:true visible:false
 
-	groupbox gbxTips "" pos:[5,215] width:155 height:30
+	groupbox gbxTips "" pos:[5,215] width:190 height:30
 	
-		label lblLink "2019.9[miHoYo_Bullet.S]4869" pos:[10,226] width:145 height:15
+		label lblLink "2019.9[miHoYo_Bullet.S]4869" pos:[12,226] width:145 height:15
 		button btnConfig "设置" pos:[165,222] width:30 height:22 border:true
 
 	local m_PBKeyTimeArray
@@ -1279,23 +1204,25 @@ rollout rolBsKeyTools "" width:200 height:248
 		)
 	)
 
-	fn fnSortById arrSource arrSortID =
+	fn fnSortById idBtnArr arrSortID =
 	(
-		local arrTarget = #()
-		for i in arrSortID do 
+		arrTargetTemp = #()
+		for i in arrSortID where i != undefined do 
 		(
-			append arrTarget arrSource[i]
+			local strSortID = i as string
+			if strSortID[1] == idBtnArr as string then
+			(execute ("append arrTargetTemp arrSourToolC" + strSortID[1] + "[" + strSortID[2] + strSortID[3] + "]"))
 		)
-		arrTarget
+		arrTargetTemp
 	)
 
 	fn fnReloadToolsBtn =
 	(
-		arrSourToolC1 = #(rolBsKeyTools.btnFileOpen,rolBsKeyTools.btnFastAlign,
-						rolBsKeyTools.btnAnimCopyPaste,rolBsKeyTools.btnAnimMirror,
+		arrSourToolC1 = #(rolBsKeyTools.btnColorTools,rolBsKeyTools.btnFastAlign,
+						rolBsKeyTools.btnDelDecimalKeys,rolBsKeyTools.btnAnimMirror,
 						rolBsKeyTools.btnDemoTool,rolBsKeyTools.btnBatchExport,
 						rolBsKeyTools.ckbIsoMesh,rolBsKeyTools.btnBipedTraj,
-						rolBsKeyTools.btnCSTools,rolBsKeyTools.btnSkinTools,
+						rolBsKeyTools.btnRescaleWU,rolBsKeyTools.btnSkinTools,
 						rolBsKeyTools.btnFnFrame,rolBsKeyTools.ckbFnMtlDisplay)
 		arrSourToolC2 = #(rolBsKeyTools.btnCameraFromView,rolBsKeyTools.btnMopherSlider,
 						rolBsKeyTools.btnSelBiped,rolBsKeyTools.btnSelBone,
@@ -1306,10 +1233,10 @@ rollout rolBsKeyTools "" width:200 height:248
 		arrSourToolC3 = #(rolBsKeyTools.btnMeshToBone,rolBsKeyTools.btnWinbox,
 						rolBsKeyTools.btnHideBipedTwists,rolBsKeyTools.btnQuickPrev,
 						rolBsKeyTools.btnKeyStepMode,rolBsKeyTools.btnFnKeyType,
-						rolBsKeyTools.btnCutSequence,rolBsKeyTools.btnImageComp,
-						rolBsKeyTools.ckbPlayBlocking,rolBsKeyTools.btnLightTable,
-						rolBsKeyTools.btnColorTools,rolBsKeyTools.btnTrajedit)
-		arrSourToolC4 = #(rolBsKeyTools.btnDelDecimalKeys,rolBsKeyTools.btnRescaleWU,
+						rolBsKeyTools.btnCutSequence,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp)
+		arrSourToolC4 = #(rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
 						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
 						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
 						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
@@ -1317,10 +1244,10 @@ rollout rolBsKeyTools "" width:200 height:248
 						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2)
 		
 		fnLoadToolConfig()
-		arrToolC1 = fnSortById arrSourToolC1 iniToolC1
-		arrToolC2 = fnSortById arrSourToolC2 iniToolC2
-		arrToolC3 = fnSortById arrSourToolC3 iniToolC4
-		arrToolC4 = fnSortById arrSourToolC4 iniToolC4
+		arrToolC1 = fnSortById 1 iniToolBtnAll
+		arrToolC2 = fnSortById 2 iniToolBtnAll
+		arrToolC3 = fnSortById 3 iniToolBtnAll
+		arrToolC4 = fnSortById 4 iniToolBtnAll
 	)
 
 	fn fnSwitchToolsBtn idBtn =
@@ -1334,11 +1261,11 @@ rollout rolBsKeyTools "" width:200 height:248
 		str += "	arrToolC" + idBtn as string + "[b].visible = true" + "\r\n"
 		str += "	if (mod b 2 == 1) then \r\n"
 		str += "	("
-		str += "		arrToolC" + idBtn as string + "[b].pos = " + [205,51] as string + " + [0,(b - 1) * 13.5]" + "\r\n"
+		str += "		arrToolC" + idBtn as string + "[b].pos = " + [205,45] as string + " + [0,(b - 1) * 16.5]" + "\r\n"
 		str += "	)"
 		str += "	else if (mod b 2 == 0) then"
 		str += "	("
-		str += "		arrToolC" + idBtn as string + "[b].pos = " + [265,51] as string + " + [0,(b - 2) * 13.5]" + "\r\n"
+		str += "		arrToolC" + idBtn as string + "[b].pos = " + [265,45] as string + " + [0,(b - 2) * 16.5]" + "\r\n"
 		str += "	)"
 		str += ")"
 		
@@ -1838,161 +1765,6 @@ rollout rolBsKeyTools "" width:200 height:248
 			)
 		)
 	)
-	
-	-- mapped fn fnMoveKeysAndLinkKeys obj offset =  ----https://forums.cgsociety.org/t/moving-keys-from-link-constraint-keys-access/1575053
-	-- (
-	-- 	local arrTargetID  = #()
-	-- 	moveKeys obj offset #selection  ---先移动非link帧
-	-- 	if rolBsKeyTools.btnJudgeLinkKey.checked == true then 
-	-- 	(
-	-- 		if classof obj.controller == Link_Constraint do
-	-- 		(
-	-- 			nTargets = obj.controller.getNumTargets()  ---得到link的帧数量
-	
-	-- 			if nTargets > 0 do
-	-- 			(
-	-- 				for i = nTargets to 1 by -1 do  ------如果大于0则从最后link帧开始移
-	-- 				(
-	-- 					fNumber = obj.controller.getFrameNo i
-	-- 					if ((fNumber >= keySelFirst) and (fNumber <= keySelEnd)) then
-	-- 					(
-	-- 						appendIfUnique arrTargetID i
-	-- 					)
-	-- 				)
-	-- 				if offset > 0 then  --------判断向前还是向后移动帧
-	-- 				(
-	-- 					for i = arrTargetID.count to 1 by -1 do  ------如果大于0则从最后link帧开始移
-	-- 					(
-	-- 						fNumber = obj.controller.getFrameNo arrTargetID[i]
-	-- 						obj.controller.setFrameNo i (fNumber + offset)
-	-- 					)
-	-- 				)
-	-- 				else
-	-- 				(
-	-- 					for i = 1 to arrTargetID.count do  ---如果移动帧小于0,从第一个link帧开始移
-	-- 					(
-	-- 						fNumber = obj.controller.getFrameNo arrTargetID[i]
-	-- 						obj.controller.setFrameNo i (fNumber + offset)
-	-- 					)
-	-- 				)
-	-- 			)
-	-- 		)
-	-- 	)
-	-- )
-
-	-- -- fn fnSplitSelBiped = --分开选择四肢和身体,例如同一条手臂只选择最父级的(方便移动帧)
-	-- -- (
-	-- -- 	arrSelBiped = for i in selection where classof i.controller == BipSlave_Control collect i 
-
-	-- -- )
-
-	-- fn fnMoveBipedKeys offsetFrame =  -------移动Biped帧
-	-- (
-	-- 	bipedRoot = #()   -------判断选择了几个biped骨架
-	-- 	for i in selection where ((classof i == Biped_Object) and (i.ishidden == false)) do  
-	-- 	(
-	-- 		appendIfUnique bipedRoot i.controller.rootNode  --添加到骨架数组
-	-- 	)
-	-- 	for c in bipedRoot do  ---按每个骨架处理
-	-- 	(
-	-- 		ctrlBiped = c.controller
-	-- 		bipedAll = #(biped.getNode ctrlBiped #pelvis, -----四肢同帧处理,只处理他首节biped
-	-- 					biped.getNode ctrlBiped #spine,
-	-- 					biped.getNode ctrlBiped #neck,
-	-- 					biped.getNode ctrlBiped #larm,
-	-- 					biped.getNode ctrlBiped #rarm,
-	-- 					biped.getNode ctrlBiped #lleg,
-	-- 					biped.getNode ctrlBiped #rleg,
-	-- 					biped.getNode ctrlBiped #prop1,
-	-- 					biped.getNode ctrlBiped #prop2,
-	-- 					biped.getNode ctrlBiped #prop3,
-	-- 					biped.getNode ctrlBiped #tail)
-
-	-- 		vertCtrl = ctrlBiped.vertical.controller  -----质心ctrl关键帧
-	-- 		horzCtrl = ctrlBiped.horizontal.controller
-	-- 		if (((sysinfo.GetMaxLanguage())[3]=="CHS") and ((maxVersion())[1] < 20000)) then 
-	-- 		(turnCtrl = ctrlBiped.flip.controller)
-	-- 		else(turnCtrl = ctrlBiped.turning.controller)
-	-- 		bipCtrlTemp = #(vertCtrl,horzCtrl,turnCtrl)
-	-- 		for c in bipCtrlTemp do
-	-- 		(
-	-- 			biped.moveKeys c offsetFrame #selection  -----移动选定的质心帧
-	-- 		)
-	-- 		for nodeBiped in bipedAll where nodeBiped != undefined do  -----移动其他biped的选定帧
-	-- 		(
-	-- 			biped.moveKeys nodeBiped.controller offsetFrame #selection
-	-- 		)
-	-- 	)
-	-- )		
-
-	-- mapped fn fnMoveBipedScaleKeys tempObj offsetFrame =  -------移动biped的缩放帧
-	-- (
-	-- 	ctrlBiped = tempObj.controller
-	-- 	if classof ctrlBiped == BipSlave_Control then  --------下面判定子动画是否为scaleXYZ
-	-- 	(
-	-- 		if ((ctrlBiped[1][1] != undefined) and ((getSubAnimName ctrlBiped[1][1] 1) == #ScaleXYZ)) then
-	-- 		(
-	-- 			movekeys ctrlBiped[1][1][1] offsetFrame #selection
-	-- 		)
-	-- 	)
-	-- )
-
-	-- fn fnMoveAllKeys keyMovedOffset fnRange:off =
-	-- (
-	-- 	local rangEnd = animationrange.end
-	-- 	local rangeStart = animationrange.start
-	-- 	local n = 0  --n来判定是否有选中biped
-
-	-- 	if keyMovedOffset != undefined then
-	-- 	(
-	-- 		if selection.count != 0 then
-	-- 		(
-	-- 			for i in selection where (i.ishidden == false) do
-	-- 			(
-	-- 				if classof i != Biped_Object then
-	-- 				(
-	-- 					fnMoveKeysAndLinkKeys i keyMovedOffset
-	-- 				)
-	-- 				else 
-	-- 				(
-	-- 					fnMoveBipedScaleKeys i keyMovedOffset
-	-- 					n += 1
-	-- 				)
-	-- 			)
-	-- 			if n != 0 then  ----------分开解决biped多移动的问题,傻瓜式方法
-	-- 			(
-	-- 				fnMoveBipedKeys keyMovedOffset
-	-- 			)
-	-- 		)
-	-- 		else  ---跟上面一样,只是对所有物体
-	-- 		(
-	-- 			for i in objects where (i.ishidden == false) do
-	-- 			(
-	-- 				if classof i != Biped_Object then
-	-- 				(
-	-- 					fnMoveKeysAndLinkKeys i keyMovedOffset
-	-- 				)
-	-- 				else fnMoveBipedScaleKeys i keyMovedOffset
-	-- 			)
-	-- 			fnMoveBipedKeys keyMovedOffset
-	-- 		)
-	-- 		if fnRange == on then
-	-- 		(
-	-- 			if keyMovedOffset > 0 then 
-	-- 			(
-	-- 				rangEnd = animationrange.end + keyMovedOffset
-	-- 				animationrange = interval animationrange.start rangEnd
-	-- 			)
-	-- 			else if keyMovedOffset < 0 then 
-	-- 			(
-	-- 				rangeStart = animationrange.start + keyMovedOffset
-	-- 				animationrange = interval rangeStart animationrange.end
-	-- 			)
-	-- 		)
-	-- 		keySelFirst += keyMovedOffset
-	-- 		keySelEnd  += keyMovedOffset
-	-- 	)
-	-- )
 
 	fn fnAddTrajLayer strlayerName templayerTarget =
 	(
@@ -2046,7 +1818,7 @@ rollout rolBsKeyTools "" width:200 height:248
 		(
 			numTempName = findstring nameCurrentFile "_Backup"
 			numTempVer = substring nameCurrentFile (numTempName + 7) nameCurrentFile.count
-			numTempVer
+			return numTempVer
 		)
 
 		if (matchPattern nameCurrentFile pattern:"*_Backup*" ignorCase:false) then
@@ -2120,11 +1892,11 @@ rollout rolBsKeyTools "" width:200 height:248
 	(
 		case of
 		(
-			(timeConfiguration.playbackSpeed == 1):(0.25)
-			(timeConfiguration.playbackSpeed == 2):(0.5)
-			(timeConfiguration.playbackSpeed == 3):(1)
-			(timeConfiguration.playbackSpeed == 4):(2)
-			(timeConfiguration.playbackSpeed == 5):(4)
+			(timeConfiguration.playbackSpeed == 1):(return 0.25)
+			(timeConfiguration.playbackSpeed == 2):(return 0.5)
+			(timeConfiguration.playbackSpeed == 3):(return 1)
+			(timeConfiguration.playbackSpeed == 4):(return 2)
+			(timeConfiguration.playbackSpeed == 5):(return 4)
 		)
 	)
 
@@ -2133,7 +1905,7 @@ rollout rolBsKeyTools "" width:200 height:248
 
 	fn FramToMilisecond frame = 
 	(
-		((((frame - animationRange.start) as integer) * (10.0 / 48.0) * fnGetPlaySpeedValue()) as integer)
+		return ((((frame - animationRange.start) as integer) * (10.0 / 48.0) * fnGetPlaySpeedValue()) as integer)
     )
 
 	fn AppendKeyTimeArray m_PBKeyMiliSecArray keys = 
@@ -2155,7 +1927,7 @@ rollout rolBsKeyTools "" width:200 height:248
 	(
         clock.active = false
         ckbPlayBlocking.state = false
-        ckbPlayBlocking.text = "跳帧播放"
+        ckbPlayBlocking.text = "跳帧播"
 	)
 
 	fn PlayBlocking = 
@@ -3166,11 +2938,11 @@ rollout rolBsKeyTools "" width:200 height:248
 		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
 
-	-- on btnHotAnimBtn pressed do 
-	-- (
-	-- 	try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimButton.ms"))
-	-- 	catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
-	-- )
+	on btnHotAnimBtn pressed do 
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsAnimButton.ms"))
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
+	)
 
 	on ckbShadowCut changed state do
 	(
@@ -3305,19 +3077,6 @@ rollout rolBsKeyTools "" width:200 height:248
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsSelSetTools.ms"))
 		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
-
-	on btnCustomBtn1 rightclick do 
-	(try(destroydialog rolCustomBtn)catch();Createdialog rolCustomBtn fgcolor:myFgColor pos:(iniPos+[0,rolBsKeyTools.height]);rolCustomBtn.title = "1")
-	on btnCustomBtn2 rightclick do 
-	(try(destroydialog rolCustomBtn)catch();Createdialog rolCustomBtn fgcolor:myFgColor pos:(iniPos+[0,rolBsKeyTools.height]);rolCustomBtn.title = "2")
-	on btnCustomBtn3 rightclick do 
-	(try(destroydialog rolCustomBtn)catch();Createdialog rolCustomBtn fgcolor:myFgColor pos:(iniPos+[0,rolBsKeyTools.height]);rolCustomBtn.title = "3")
-	on btnCustomBtn4 rightclick do 
-	(try(destroydialog rolCustomBtn)catch();Createdialog rolCustomBtn fgcolor:myFgColor pos:(iniPos+[0,rolBsKeyTools.height]);rolCustomBtn.title = "4")
-	on btnCustomBtn5 rightclick do 
-	(try(destroydialog rolCustomBtn)catch();Createdialog rolCustomBtn fgcolor:myFgColor pos:(iniPos+[0,rolBsKeyTools.height]);rolCustomBtn.title = "5")
-	on btnCustomBtn6 rightclick do 
-	(try(destroydialog rolCustomBtn)catch();Createdialog rolCustomBtn fgcolor:myFgColor pos:(iniPos+[0,rolBsKeyTools.height]);rolCustomBtn.title = "6")
 
 )
 if (iniPos != 0) then (Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#())

@@ -1,22 +1,37 @@
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
+global fnLoadToolConfig
+global fnSetToolConfig
+global stSetConfig
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
 (
-	attr = (GetINISetting BulletConfig nameAttrClass nameAttr) as string  --先提取文件中的记录
-	if ((nameAttr == "ArrMyScripts") or (nameAttr == "LikedFolder") \
-	or (nameAttr == "Desktop") or (matchpattern nameAttr  pattern:"RefFolder*") \
-	or (nameAttr == "LastRefFolder"))then
+	local printallelements = options.printallelements
+	attr = (with printAllElements on ((GetINISetting BulletConfig nameAttrClass nameAttr) as string))  --先提取文件中的记录
+	case of 
 	(
-		attr = substituteString attr "dir:" "dir:@"
+		((nameAttr == "ArrMyScripts") or (nameAttr == "LikedFolder") \
+		or (nameAttr == "Desktop") or (matchpattern nameAttr  pattern:"RefFolder*") \
+		or (nameAttr == "LastRefFolder")):
+		(
+			attr = substituteString attr "dir:" "dir:@"
+		)
+		(nameAttr == "ToolBtnAll"):(options.printallelements = true)
 	)
-	if attr == "" then attr = (execute valueAttr) else (attr = execute attr)  --判断记录为空与否得到需要的记录参数
+	if attr == "" then attr = (execute valueAttr)
+	else
+	(
+		attr = (execute attr) --判断记录为空与否得到需要的记录参数
+		options.printallelements = printallelements
+	)
+	attr
 )
 fn fnLoadToolConfig =
 (
-	iniToolC1 = fnGetConfig iniToolC1 "BulletKeyToolsSet"  "iniToolC1" (iniToolC1 as string)
-	iniToolC2 = fnGetConfig iniToolC2 "BulletKeyToolsSet"  "iniToolC2" (iniToolC2 as string)
-	iniToolC3 = fnGetConfig iniToolC3 "BulletKeyToolsSet"  "iniToolC3" (iniToolC3 as string)
-	iniToolC4 = fnGetConfig iniToolC4 "BulletKeyToolsSet"  "iniToolC4" (iniToolC4 as string)
+	iniToolBtnAll = fnGetConfig iniToolBtnAll "BulletKeyToolsSet" "ToolBtnAll" (with printAllElements on (iniToolBtnAll as string))
+)
+fn fnSetToolConfig =
+(
+	SetINISetting BulletConfig "BulletKeyToolsSet" "ToolBtnAll" (with printAllElements on (iniToolBtnAll as string))
 )
 
 struct stLoadConfig
@@ -81,10 +96,7 @@ struct stSetConfig
 		SetINISetting BulletConfig "BulletKeyToolsSet"  "idBtn" (idBtn as string)
 		SetINISetting BulletConfig "BulletKeyToolsSet"  "ArrMyScripts" (iniArrMyScripts as string)
 		SetINISetting BulletConfig "BulletKeyToolsSet"  "AutoCheckUpdate" (iniAutoCheckUpdate as string)
-		SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC1" (iniToolC1 as string)
-		SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC2" (iniToolC2 as string)
-		SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC3" (iniToolC3 as string)
-		SetINISetting BulletConfig "BulletKeyToolsSet"  "iniToolC4" (iniToolC4 as string)
+		fnSetToolConfig()
 	),
 	fn fnSetConfigBsAnimButton =
 	(
