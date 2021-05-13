@@ -1,9 +1,7 @@
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
-global stSetConfig
-global stLoadConfig
 global fnLoadToolBtnConfig
 global fnSetToolBtnConfig
-global fnLoadConfigBsKeyToolsAll
+global stSetConfig
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
 (
