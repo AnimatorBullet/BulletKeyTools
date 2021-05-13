@@ -1,7 +1,9 @@
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 global fnLoadToolBtnConfig
 global fnSetToolBtnConfig
-global stSetConfig
+global stSetConfigAll
+global stLoadConfigAll
+global fnGetConfig
 
 fn fnGetConfig attr nameAttrClass nameAttr valueAttr =  --设置初始信息方法
 (
@@ -24,7 +26,7 @@ fn fnSetToolBtnConfig =
 	SetINISetting BulletConfig "BulletKeyToolsSet" "ToolBtnAll" (with printAllelements on (iniToolBtnAll as string))
 )
 
-struct stLoadConfig
+struct stLoadConfigAll
 (
 	fn fnLoadConfigBsKeyToolsAll =
 	(
@@ -46,6 +48,7 @@ struct stLoadConfig
 			(myScript id:7 msName:"<＋＋>" dir:""), \
 			(myScript id:8 msName:"<＋＋>" dir:""))
 		)
+		-- print "Loaded BsKeyTools Config"
 	),
 	fn fnLoadConfigBsAnimButton =
 	(
@@ -76,7 +79,7 @@ struct stLoadConfig
 		iniPosSelSetTools = fnGetConfig iniPosSelSetTools "BsSelSetToolsSet" "PosSelSetTools" (0 as string)
 	)
 )
-struct stSetConfig
+struct stSetConfigAll
 (
 	fn fnSetConfigBsKeyTools =
 	(

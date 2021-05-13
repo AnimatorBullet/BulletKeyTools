@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-13 16:15:50
+ * @LastEditTime: 2021-05-14 01:55:56
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -15,6 +15,7 @@ try(destroydialog rolCustomBtn)catch()
 try (callbacks.removeScripts #animationRangeChange id:#UpdateTimeRange) catch ()
 try (callbacks.removeScripts #filePostOpen id:#UpdateFps) catch ()
 
+Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
 Global iniPos  	--位置保存记录
 struct myScript (id,msName,dir)
 Global iniArrMyScripts   = #((myScript id:1 msName:"<＋＋>" dir:""), \
@@ -33,22 +34,23 @@ Global iniToolBtnAll        = #(101,102,103,104,105,106,107,108,109,110,111,112,
 							201,202,203,204,205,206,207,208,209,210,211,212,
 							301,302,303,304,305,306,307,308,309,310,311,312,
 							401,402,403,404,405,406,407,408,409,410,411,412)
-Global arrToolC1 = #()
-Global arrToolC2 = #()
-Global arrToolC3 = #()
-Global arrToolC4 = #()
-Global arrSourToolC1
-Global arrSourToolC2
-Global arrSourToolC3
-Global arrSourToolC4
 
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
 catch(messagebox "加载配置失败，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
+stLoadConfigAll.fnLoadConfigBsKeyToolsAll()
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnCheckUpdate.ms"))
 catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))
 catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
-stLoadConfig.fnLoadConfigBsKeyToolsAll()
+
+Global arrToolC1 = #()
+Global arrToolC2 = #()
+Global arrToolC3 = #()
+Global arrToolC4 = #()
+Global arrSourToolC1 = #()
+Global arrSourToolC2 = #()
+Global arrSourToolC3 = #()
+Global arrSourToolC4 = #()
 
 global curVerBsKeyTools = "0.9.7"
 global verUrlBsKeyTools = "https://gitee.com/acebullet/BulletKeyTools/raw/master/_BsKeyTools/version.dat"
@@ -626,7 +628,7 @@ rollout rolAddMyScripts "我的脚本" width:205 height:220
 	fn fnRefreshBtnReAddMs btnMsName btnMsDir edtRenameMs id =
 	(
 		dirScript = getOpenFileName caption:"请选择添加的Max脚本:" historyCategory:"myScripts" \
-		types:"ms(*.ms)|*.ms|mse(*.mse)|*.mse|All(*.*)|*.*" filename:(getDir #scripts + @"\") 
+		types:"maxscript(*.ms,*.mse)|*.ms*|All(*.*)|*.*" filename:(getDir #scripts + @"\") 
 		if (dirScript != undefined) then
 		(
 			nameMyScript = getFilenameFile dirScript
@@ -1316,21 +1318,18 @@ rollout rolBsKeyTools "" width:200 height:248
 						rolBsKeyTools.btnTemp16,rolBsKeyTools.btnTemp17)
 		
 		fnLoadToolBtnConfig()
-		fn fnSortById idBtnArr arrSortID =
+		arrToolsAllTemp = arrSourToolC1 + arrSourToolC2 + arrSourToolC3 + arrSourToolC4
+		arrTargetTemp = #()
+		for i in iniToolBtnAll where i != undefined do
 		(
-			arrTargetTemp = #()
-			for i = (12 * idBtnArr - 11) to (12 * idBtnArr) do 
-			(
-				local strSortID = arrSortID[i] as string
-				local indexToolID = (strSortID[2] + strSortID[3]) as Number
-				execute ("append arrTargetTemp arrSourToolC" + strSortID[1] + "[" + (indexToolID as string) + "]")
-			)
-			arrTargetTemp
+			local strSortID = i as string
+			local indexToolID = (strSortID[1] as number - 1) * 12 + (strSortID[2] + strSortID[3]) as Number
+			append arrTargetTemp arrToolsAllTemp[indexToolID]
 		)
-		arrToolC1 = fnSortById 1 iniToolBtnAll
-		arrToolC2 = fnSortById 2 iniToolBtnAll
-		arrToolC3 = fnSortById 3 iniToolBtnAll
-		arrToolC4 = fnSortById 4 iniToolBtnAll
+		arrToolC1 = for i = 1 to arrTargetTemp.count/4 collect arrTargetTemp[i]
+		arrToolC2 = for i = (arrTargetTemp.count/4 + 1) to (2 * arrTargetTemp.count/4) collect arrTargetTemp[i]
+		arrToolC3 = for i = (2 * arrTargetTemp.count/4 + 1) to (3 * arrTargetTemp.count/4) collect arrTargetTemp[i]
+		arrToolC4 = for i = (3 * arrTargetTemp.count/4 + 1) to (4 * arrTargetTemp.count/4) collect arrTargetTemp[i]
 	)
 
 	fn fnSwitchToolsBtn idBtn =
@@ -2128,8 +2127,8 @@ rollout rolBsKeyTools "" width:200 height:248
 		-- myTimer.Start()
 		-- timeDIsTemp      = timeDisplayMode  ----小数帧还是整数帧
 		-- iniPos = (GetDialogPos rolBsKeyTools) 
-		stLoadConfig.fnLoadConfigBsKeyToolsAll ()  ---------------脚本位置赋值
-		stSetConfig.fnSetConfigBsKeyTools ()  ----------------保存位置信息到ini文件
+		stLoadConfigAll.fnLoadConfigBsKeyToolsAll ()  ---------------脚本位置赋值
+		stSetConfigAll.fnSetConfigBsKeyTools ()  ----------------保存位置信息到ini文件
 		fnReloadToolsBtn()
 		if(switchMSPanel == 0) then (ckbSwitchMyScripts.checked = false)
 		else (ckbSwitchMyScripts.checked = true)
@@ -2152,7 +2151,7 @@ rollout rolBsKeyTools "" width:200 height:248
 	on rolBsKeyTools close do -- 关闭记忆浮动窗口位置
 	(
 		iniPos = (GetDialogPos rolBsKeyTools)
-		stSetConfig.fnSetConfigBsKeyTools ()
+		stSetConfigAll.fnSetConfigBsKeyTools ()
 		try (callbacks.removeScripts #animationRangeChange id:#UpdateTimeRange) catch ()
 		try (callbacks.removeScripts #filePostOpen id:#UpdateFps) catch ()
 	)
@@ -3174,7 +3173,7 @@ fn fnUpdateTimeRange =
 callbacks.addScript #animationRangeChange "fnUpdateTimeRange()" id:#UpdateTimeRange
 callbacks.addScript #filePostOpen "fnRefFps()" id:#UpdateFps
 
--- clearListener()  ---------清除侦听器
+clearListener()  ---------清除侦听器
 
 (
 	macroScript BulletKeyTools

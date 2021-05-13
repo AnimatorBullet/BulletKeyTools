@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2020-12-29 01:12:45
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-10 12:32:51
+ * @LastEditTime: 2021-05-14 01:48:57
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -23,7 +23,7 @@ try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
 catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))
 catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
-stLoadConfig.fnLoadConfigBsRefTools ()
+stLoadConfigAll.fnLoadConfigBsRefTools ()
 
 global currentVersion = "0.1.2"
 Global BulletConfig = execute ("@\"" + (getDir #maxData) + "\\BulletConfig.ini\"")  --配置文件路径
@@ -554,7 +554,7 @@ rollout rolAddRefFolder "添加参考文件夹" width:340 height:80
 			str += "\r\nrolRefTools.btnRefDir" + tempAddFolderID + ".text = \"<" + edtAddDirName.text + ">\""
 			execute str
 			try(destroydialog rolAddRefFolder)catch()
-			stSetConfig.fnSetConfigBsRefTools ()
+			stSetConfigAll.fnSetConfigBsRefTools ()
 		)
 	)
 )
@@ -780,8 +780,8 @@ rollout rolRefTools ("[参考工具]-BsRefTools_v" + currentVersion)  width:340 
         btnRefreshFolder.images  = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,3,3,3,3,true,false)
         btnOpenCurrentDir.images = #("UVWUnwrapModes_16i.bmp","UVWUnwrapModes_16i.bmp",28,5,5,5,5,true,false)
 		btnLastFolder.images     = #("MergeAnim_24i.bmp","MergeAnim_24i.bmp",4,1,1,1,1,false,true)
-        stLoadConfig.fnLoadConfigBsRefTools ()  ---------------脚本位置等赋值
-		stSetConfig.fnSetConfigBsRefTools ()  ----------------保存位置信息到ini文件
+        stLoadConfigAll.fnLoadConfigBsRefTools ()  ---------------脚本位置等赋值
+		stSetConfigAll.fnSetConfigBsRefTools ()  ----------------保存位置信息到ini文件
 		fnRefreshFilterItems ()
 		fnFreshRefDirText ()
 		fnRefreshList iniLastRefFolder.dir
@@ -794,7 +794,7 @@ rollout rolRefTools ("[参考工具]-BsRefTools_v" + currentVersion)  width:340 
 	(
 		iniPosRefTools   = (GetDialogPos rolRefTools)
 		iniLastRefFolder.dir = edtBrowseFolder.text
-		stSetConfig.fnSetConfigBsRefTools ()
+		stSetConfigAll.fnSetConfigBsRefTools ()
 	)
 ------------------------------------------------------------------------
 	on btnRefDir1 pressed do 

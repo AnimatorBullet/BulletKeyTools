@@ -23,7 +23,7 @@ try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
 catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))
 catch(messagebox "脚本安装可能不完全,建议重新安装...        " beep:false)
-stLoadConfig.fnLoadConfigBsOpenTools ()
+stLoadConfigAll.fnLoadConfigBsOpenTools ()
 
 struct itemsFolder (name,dir)
 global dateTime = (dotNetClass "System.DateTime").Now
@@ -423,8 +423,8 @@ rollout rolBsOpenTools "" width:340 height:365
 		fnRefreshAddress ()
 		fnRefreshList maxFilePath type: arrFileType[rdoFileType.state]
 		lblCountTips.text = "文件：" + arrFiles.count as string
-		stLoadConfig.fnLoadConfigBsOpenTools ()  ---------------脚本位置等赋值
-		stSetConfig.fnSetConfigBsOpenTools ()  ----------------保存位置信息到ini文件
+		stLoadConfigAll.fnLoadConfigBsOpenTools ()  ---------------脚本位置等赋值
+		stSetConfigAll.fnSetConfigBsOpenTools ()  ----------------保存位置信息到ini文件
 		fnRefLikedFolderItems ()
 		ltbFilterPrefix.selection = 0
 		fnRefreshFilterItems ()
@@ -437,7 +437,7 @@ rollout rolBsOpenTools "" width:340 height:365
 		iniPosOpenTools   = (GetDialogPos rolBsOpenTools)
 		iniSelectedID     = rolBsOpenTools.ddlLikedFolder.selection
 		iniWidthOpenTools = rolBsOpenTools.width
-		stSetConfig.fnSetConfigBsOpenTools ()
+		stSetConfigAll.fnSetConfigBsOpenTools ()
 	)
 
 	on rolBsOpenTools mbuttondown pos do 

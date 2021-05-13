@@ -9,7 +9,7 @@ try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
 catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))
 catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
-stLoadConfig.fnLoadConfigBsAnimButton ()
+stLoadConfigAll.fnLoadConfigBsAnimButton ()
 
 Global switchAnimButtonMouState = false
 Global posAnimButtonMouMove     = [0,0]
@@ -62,8 +62,8 @@ rollout rolBsAnimButton  "BsAnimButton_v1.0"
     
     on rolBsAnimButton open do
     (
-        stLoadConfig.fnLoadConfigBsAnimButton ()  ---------------脚本位置等赋值
-		stSetConfig.fnSetConfigBsAnimButton ()  ----------------保存位置信息到ini文件
+        stLoadConfigAll.fnLoadConfigBsAnimButton ()  ---------------脚本位置等赋值
+		stSetConfigAll.fnSetConfigBsAnimButton ()  ----------------保存位置信息到ini文件
         -- dotnetTabCon.Appearance = dotnetTabCon.Appearance.Buttons
         dotnetTabCon.dock     = dotnetTabCon.dock.Fill
         dotnetTabCon.Drawmode = dotnetTabCon.Drawmode.OwnerDrawFixed
@@ -80,7 +80,7 @@ rollout rolBsAnimButton  "BsAnimButton_v1.0"
 	on rolBsAnimButton close do -- 关闭记忆浮动窗口位置
 	(
         iniPosAnimButtonTools   = (GetDialogPos rolBsAnimButton)
-        stSetConfig.fnSetConfigBsAnimButton ()
+        stSetConfigAll.fnSetConfigBsAnimButton ()
 	)
 
 	on rolBsAnimButton mbuttondown pos do 

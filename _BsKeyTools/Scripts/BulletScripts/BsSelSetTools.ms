@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2021-05-07 12:33:36
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-09 22:59:16
+ * @LastEditTime: 2021-05-14 01:49:58
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -16,7 +16,7 @@ try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnSaveLoadConfig.ms"))
 catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
 try(FileIn ((getDir #scripts) + "\\BulletScripts\\fnGetColorTheme.ms"))
 catch(messagebox "打开失败，工具可能安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装...                            " beep:false)
-stLoadConfig.fnLoadConfigSelSetTools ()
+stLoadConfigAll.fnLoadConfigSelSetTools ()
 
 global rolSelSetTools
 global rolLoadSelSet
@@ -278,8 +278,8 @@ rollout rolSelSetTools ""
 
 	on rolSelSetTools open do
 	(
-		stLoadConfig.fnLoadConfigSelSetTools()  ---------------脚本位置等赋值
-		stSetConfig.fnSetConfigSelSetTools()  ----------------保存位置信息到ini文件
+		stLoadConfigAll.fnLoadConfigSelSetTools()  ---------------脚本位置等赋值
+		stSetConfigAll.fnSetConfigSelSetTools()  ----------------保存位置信息到ini文件
 		btnCreateSelSet.images     = #("enss_tools_16i.bmp","enss_tools_16a.bmp",13,1,1,2,2,false,true)
 		btnDeleteSelSet.images     = #("enss_tools_16i.bmp","enss_tools_16a.bmp",13,3,3,4,4,false,true)
 		btnAddToSelSet.images      = #("enss_tools_16i.bmp","enss_tools_16a.bmp",13,5,5,6,6,false,true)
@@ -293,7 +293,7 @@ rollout rolSelSetTools ""
 	on rolSelSetTools close do -- 关闭记忆浮动窗口位置
 	(
 		iniPosSelSetTools   = (GetDialogPos rolSelSetTools)
-        stSetConfig.fnSetConfigSelSetTools ()
+        stSetConfigAll.fnSetConfigSelSetTools ()
 	)
 
 	on btnSaveXml pressed do
