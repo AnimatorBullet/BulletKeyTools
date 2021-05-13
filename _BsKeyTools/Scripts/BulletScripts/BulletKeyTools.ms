@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-13 03:59:47
+ * @LastEditTime: 2021-05-13 16:15:50
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -200,6 +200,7 @@ fn addToolBarButton macro cat txt remove: false =
 -----------------------------------------------------------------------------------------------------
 global arrToolNewC1 = #();global arrToolNewC2 = #();global arrToolNewC3 = #();global arrToolNewC4 = #();
 global arrToolsAll
+global arrToolsNameAll
 
 rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 (
@@ -214,14 +215,39 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 	multilistbox mlbToolBtn4 "" width:80 height:12 pos:[407,20] selection:0
 	button btnMoveUp "↑" width:30 height:81 pos:[137,20]
 	button btnMoveDown "↓" width:30 height:81 pos:[137,101]
-	button btnSetBtn ">> 确认设置排序 <<" width:350 height:25 pos:[140,185]
-	button btnResetBtn "恢复默认排序" width:140 height:25 pos:[0,185]
-	
+	button btnCollectCurrent "加载当前" width:65 height:25 pos:[105,185]
+	button btnSetBtn ">> 确认设置排序 <<" width:320 height:25 pos:[170,185]
+	button btnResetBtn "恢复默认排序" width:105 height:25 pos:[0,185]
+
+	fn fnAddToSort tarSort mlbToolBtn =
+	(
+		numSelBtn = (rolCustomBtn.mlbToolsBtnAll.selection as array).count
+		arrBtnAllTemp = join #() (mlbToolsBtnAll.items as array)
+		
+		if numSelBtn > 0 and (tarSort.count + numSelBtn) <= 12 then
+		(
+			for i in mlbToolsBtnAll.selection as array do
+			(
+				append tarSort arrBtnAllTemp[i]
+			)
+			for i in mlbToolsBtnAll.selection as array do
+			(
+				deleteitem arrBtnAllTemp (finditem arrBtnAllTemp mlbToolsBtnAll.items[i])
+			)
+			mlbToolBtn.items = tarSort
+			mlbToolsBtnAll.items = arrBtnAllTemp
+			mlbToolsBtnAll.selection = 0
+		)
+		else if (tarSort.count + numSelBtn) > 12 then (messagebox"每栏最多12个按钮...          "beep:false)
+	)
+
 	on rolCustomBtn open do 
 	(
 		local arrBtnTabCon = #(rolBsKeyTools.ckbC1.caption,rolBsKeyTools.ckbC2.caption,
 						rolBsKeyTools.ckbC3.caption,rolBsKeyTools.ckbC4.caption)
-		arrToolsAll = (arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4)
+		arrToolsAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4
+		arrToolNewC1 = #();arrToolNewC2 = #();arrToolNewC3 = #();arrToolNewC4 = #();
+		arrToolsNameAll = for i in arrToolsAll collect i.caption
 		mlbToolsBtnAll.items     = for i in arrToolsAll collect i.caption
 		dotnetBtnTabCon.dock     = dotnetBtnTabCon.dock.Fill
 		dotnetBtnTabCon.Drawmode = dotnetBtnTabCon.Drawmode.OwnerDrawFixed
@@ -238,19 +264,36 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 
 	on btnAddToSort pressed do
 	(
-		numSelBtn = (rolCustomBtn.mlbToolsBtnAll.selection as array).count
-		if numSelBtn > 0 and (arrToolNewC1.count + numSelBtn) <= 12 then
+		local curSelIndex = rolCustomBtn.dotnetBtnTabCon.SelectedIndex
+		execute ("rolCustomBtn.fnAddToSort arrToolNewC" + (curSelIndex + 1) as string + " rolCustomBtn.mlbToolBtn" + (curSelIndex + 1) as string)
+	)
+
+	on btnSetBtn pressed do 
+	(
+		local arrToolsNewAll = arrToolNewC1 + arrToolNewC2 + arrToolNewC3 + arrToolNewC4
+		local arrIniToolBtnAllNew = #()
+		for i in arrToolsNewAll do 
 		(
-			for i in mlbToolsBtnAll.selection as array do
-			(
-				append arrToolNewC1 arrToolsAll[i]
-				deleteitem arrToolsAll (finditem arrToolsAll arrToolsAll[i])
-			)
-			mlbToolBtn1.items = for i in arrToolNewC1 collect i.caption
-			mlbToolsBtnAll.items = for i in arrToolsAll collect i.caption
-			mlbToolsBtnAll.selection = 0
+			append arrIniToolBtnAllNew iniToolBtnAll[finditem arrToolsNameAll i]
 		)
-		else if (arrToolNewC1.count + numSelBtn) > 12 then (messagebox"每栏最多12个按钮...          "beep:false)
+		iniToolBtnAll = (join #() arrIniToolBtnAllNew)
+		fnSetToolBtnConfig ()
+		-- print iniToolBtnAll #nomap
+		rolBsKeyTools.fnReloadToolsBtn()
+		try(destroydialog rolCustomBtn)catch()
+		rolBsKeyTools.fnSwitchToolsBtn idBtn
+	)
+	on btnResetBtn pressed do 
+	(
+		iniToolBtnAll = #(101,102,103,104,105,106,107,108,109,110,111,112,
+						201,202,203,204,205,206,207,208,209,210,211,212,
+						301,302,303,304,305,306,307,308,309,310,311,312,
+						401,402,403,404,405,406,407,408,409,410,411,412)
+		fnSetToolBtnConfig ()
+		rolBsKeyTools.fnReloadToolsBtn()
+		try(destroydialog rolCustomBtn)catch()
+		rolBsKeyTools.fnSwitchToolsBtn idBtn
+		-- print iniToolBtnAll #nomap
 	)
 )
 --------------------------------------------------------------------------------------------------------
@@ -413,7 +456,10 @@ rcmenu menuConfig
 	on mItemUpdateLog picked do (shellLaunch "https://www.notion.so/bullet4869/4e28c488d5474a9082e164b7c5b6926c" "")
 
 	on mItemCustomSortBtn picked do 
-	(Createdialog rolCustomBtn fgcolor:myFgColor pos:((getdialogpos rolBsKeyTools)+[rolBsKeyTools.width,0]) parent:rolBsKeyTools.hwnd)
+	(
+		try(destroydialog rolCustomBtn)catch()
+		Createdialog rolCustomBtn fgcolor:myFgColor pos:((getdialogpos rolBsKeyTools)+[rolBsKeyTools.width,0]) parent:rolBsKeyTools.hwnd
+	)
 )
 
 -------------------帧率,播放速度--------------------------------------------------------------
@@ -1032,10 +1078,6 @@ rollout rolBsKeyTools "" width:200 height:248
 		local btnHeight = 32
 		local btnWidth = 60
 		local btnPos = [999999,999999]
-		button btnTemp "待添加" width:btnWidth height:btnHeight visible:false \
-		tooltip:"待添加" pos:btnPos
-		button btnTemp2 "待添加" width:btnWidth height:btnHeight visible:false \
-		tooltip:"待添加" pos:btnPos
 		button btnColorTools "颜色渐变" width:btnWidth height:btnHeight visible:false \
 		tooltip:"做 Demo 素模或特效方便~" pos:btnPos
 		checkbutton ckbIsoMesh "模型独显" width:btnWidth height:btnHeight visible:false \
@@ -1099,6 +1141,40 @@ rollout rolBsKeyTools "" width:200 height:248
 		toolTip:"[已有想法待补充]\r\n方便渲染作品和练习的工具"
 		button btnCutSequence "动画分段" width:btnWidth height:btnHeight visible:false pos:btnPos \
 		toolTip:"为长动画分段动作区间 (修改自San_oOo)"
+		button btnTemp "待添加1" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp2 "待添加2" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp3 "待添加3" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp4 "待添加4" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp5 "待添加5" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp6 "待添加6" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp7 "待添加7" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp8 "待添加8" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp9 "待添加9" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp10 "待添加10" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp11 "待添加11" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp12 "待添加12" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp13 "待添加13" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp14 "待添加14" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp15 "待添加15" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp16 "待添加16" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
+		button btnTemp17 "待添加17" width:btnWidth height:btnHeight visible:false \
+		tooltip:"待添加" pos:btnPos
 
 		local btnMsWidth = 72.5
 		checkbutton ckbSwitchMyScripts "切换" pos:[5,249] width:35 height:20
@@ -1212,19 +1288,6 @@ rollout rolBsKeyTools "" width:200 height:248
 		)
 	)
 
-	fn fnSortById arrDefaultBtn idBtnArr arrSortID =
-	(
-		arrTargetTemp = #()
-		for i in arrSortID where i != undefined do 
-		(
-			local strSortID = i as string
-			local indexToolID = (strSortID[2] + strSortID[3]) as Number
-			if strSortID[1] == idBtnArr as string then
-			append arrTargetTemp arrDefaultBtn[indexToolID]
-		)
-		arrTargetTemp
-	)
-
 	fn fnReloadToolsBtn =
 	(
 		arrSourToolC1 = #(rolBsKeyTools.btnColorTools,rolBsKeyTools.btnFastAlign,
@@ -1243,20 +1306,31 @@ rollout rolBsKeyTools "" width:200 height:248
 						rolBsKeyTools.btnHideBipedTwists,rolBsKeyTools.btnQuickPrev,
 						rolBsKeyTools.btnKeyStepMode,rolBsKeyTools.btnFnKeyType,
 						rolBsKeyTools.btnCutSequence,rolBsKeyTools.btnTemp,
-						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp,
-						rolBsKeyTools.btnTemp,rolBsKeyTools.btnTemp)
-		arrSourToolC4 = #(rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
-						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
-						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
-						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
-						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2,
-						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp2)
+						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp3,
+						rolBsKeyTools.btnTemp4,rolBsKeyTools.btnTemp5)
+		arrSourToolC4 = #(rolBsKeyTools.btnTemp6,rolBsKeyTools.btnTemp7,
+						rolBsKeyTools.btnTemp8,rolBsKeyTools.btnTemp9,
+						rolBsKeyTools.btnTemp10,rolBsKeyTools.btnTemp11,
+						rolBsKeyTools.btnTemp12,rolBsKeyTools.btnTemp13,
+						rolBsKeyTools.btnTemp14,rolBsKeyTools.btnTemp15,
+						rolBsKeyTools.btnTemp16,rolBsKeyTools.btnTemp17)
 		
 		fnLoadToolBtnConfig()
-		arrToolC1 = fnSortById arrSourToolC1 1 iniToolBtnAll
-		arrToolC2 = fnSortById arrSourToolC2 2 iniToolBtnAll
-		arrToolC3 = fnSortById arrSourToolC3 3 iniToolBtnAll
-		arrToolC4 = fnSortById arrSourToolC4 4 iniToolBtnAll
+		fn fnSortById idBtnArr arrSortID =
+		(
+			arrTargetTemp = #()
+			for i = (12 * idBtnArr - 11) to (12 * idBtnArr) do 
+			(
+				local strSortID = arrSortID[i] as string
+				local indexToolID = (strSortID[2] + strSortID[3]) as Number
+				execute ("append arrTargetTemp arrSourToolC" + strSortID[1] + "[" + (indexToolID as string) + "]")
+			)
+			arrTargetTemp
+		)
+		arrToolC1 = fnSortById 1 iniToolBtnAll
+		arrToolC2 = fnSortById 2 iniToolBtnAll
+		arrToolC3 = fnSortById 3 iniToolBtnAll
+		arrToolC4 = fnSortById 4 iniToolBtnAll
 	)
 
 	fn fnSwitchToolsBtn idBtn =
