@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-14 12:39:38
+ * @LastEditTime: 2021-05-14 20:14:16
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -245,27 +245,58 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 		mlbToolBtn3.caption = "剩余: " + (12 - mlbToolBtn3.items.count) as string
 		mlbToolBtn4.caption = "剩余: " + (12 - mlbToolBtn4.items.count) as string
 	)
-		
-	fn fnAddToSort tarSort mlbToolBtn =
+	
+	fn fnAddRemoveItems action:"add" =
 	(
-		numSelBtn = (rolCustomBtn.mlbToolsBtnAll.selection as array).count
-		arrBtnAllTemp = join #() (mlbToolsBtnAll.items as array)
+		arrToolNewC1 = mlbToolBtn1.items
+		arrToolNewC2 = mlbToolBtn2.items
+		arrToolNewC3 = mlbToolBtn4.items
+		arrToolNewC4 = mlbToolBtn4.items
+		local arrBtnSort = #(rolCustomBtn.mlbToolBtn1,rolCustomBtn.mlbToolBtn2,
+							rolCustomBtn.mlbToolBtn3,rolCustomBtn.mlbToolBtn4)
+		local arrToolNewAll = #(arrToolNewC1,arrToolNewC2,arrToolNewC3,arrToolNewC4) 
+		local arrTarSort = arrBtnSort[rolCustomBtn.dotnetBtnTabCon.SelectedIndex + 1]
+		local arrTarToolNew = arrToolNewAll[rolCustomBtn.dotnetBtnTabCon.SelectedIndex + 1]
+		local numSelAddBtn = (rolCustomBtn.mlbToolsBtnAll.selection as array).count
+		local arrBtnAllTemp = join #() (mlbToolsBtnAll.items as array)
+		local arrTarSortTemp = join #() (arrTarSort.items as array)
 		
-		if numSelBtn > 0 and (tarSort.count + numSelBtn) <= 12 then
+		if (action == "add") then 
 		(
-			for i in mlbToolsBtnAll.selection as array do
+			if numSelAddBtn > 0 and (arrTarToolNew.count + numSelAddBtn) <= 12 then
 			(
-				append tarSort arrBtnAllTemp[i]
+				for i in mlbToolsBtnAll.selection as array do
+				(
+					append arrTarToolNew arrBtnAllTemp[i]
+				)
+				for i in mlbToolsBtnAll.selection as array do
+				(
+					deleteitem arrBtnAllTemp (finditem arrBtnAllTemp mlbToolsBtnAll.items[i])
+				)
+				arrTarSort.items = arrTarToolNew
+				mlbToolsBtnAll.items = arrBtnAllTemp
+				mlbToolsBtnAll.selection = 0
 			)
-			for i in mlbToolsBtnAll.selection as array do
-			(
-				deleteitem arrBtnAllTemp (finditem arrBtnAllTemp mlbToolsBtnAll.items[i])
-			)
-			mlbToolBtn.items = tarSort
-			mlbToolsBtnAll.items = arrBtnAllTemp
-			mlbToolsBtnAll.selection = 0
+			else if (arrTarToolNew.count + numSelAddBtn) > 12 then (messagebox"每栏最多12个按钮...          "beep:false)
 		)
-		else if (tarSort.count + numSelBtn) > 12 then (messagebox"每栏最多12个按钮...          "beep:false)
+		else if (action == "remove") then 
+		(
+			if (arrTarSort.selection as array).count != 0 then 
+			(
+				for i in arrTarSort.selection as array do 
+				(
+					arrBtnAllTemp = join #(arrTarSort.items[i]) arrBtnAllTemp
+				)
+				for i in arrTarSort.selection as array do 
+				(
+					deleteitem arrTarSortTemp (finditem arrTarSortTemp arrTarSort.items[i])
+					deleteitem arrTarToolNew (finditem arrTarToolNew arrTarSortTemp[i])
+				)
+				mlbToolsBtnAll.items = arrBtnAllTemp
+				arrTarSort.items = arrTarSortTemp
+				arrTarSort.selection = 0
+			)
+		)
 	)
 	fn fnRefreshMlbToolBtn =
 	(
@@ -308,10 +339,14 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 	
 	on btnAddToSort pressed do
 	(
-		local curSelIndex = rolCustomBtn.dotnetBtnTabCon.SelectedIndex
-		execute ("rolCustomBtn.fnAddToSort arrToolNewC" + (curSelIndex + 1) as string + " rolCustomBtn.mlbToolBtn" + (curSelIndex + 1) as string)
+		fnAddRemoveItems()
 		fnToolBtnCountText()
 		mlbToolsBtnAll.text = "已选择: " + (rolCustomBtn.mlbToolsBtnAll.selection as array).count as string
+	)
+
+	on btnRemoveFromSort pressed do
+	(
+		fnAddRemoveItems action:"remove"
 	)
 
 	on btnSetBtn pressed do 
@@ -532,7 +567,7 @@ rcmenu menuConfig
 	on mItemCustomSortBtn picked do 
 	(
 		try(destroydialog rolCustomBtn)catch()
-		Createdialog rolCustomBtn fgcolor:myFgColor pos:((getdialogpos rolBsKeyTools)+[rolBsKeyTools.width,0]) parent:rolBsKeyTools.hwnd
+		Createdialog rolCustomBtn fgcolor:myFgColor pos:((getdialogpos rolBsKeyTools)+[-100,rolBsKeyTools.height]) parent:rolBsKeyTools.hwnd
 	)
 )
 
