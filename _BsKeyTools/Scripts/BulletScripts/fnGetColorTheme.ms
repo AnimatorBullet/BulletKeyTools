@@ -15,13 +15,13 @@ if (curColorThemeFile != undefined) then
 	(
 		myFgColor    = (color 0 255 92)
 		myClickColor = (color 0 255 127)
-		myCheckedColor = (color 6 135 58)
+		myCheckedColor = (color 10 140 120)
 	)
 )
 else
 (
 	myFgColor    = (color 0 255 92)
 	myClickColor = (color 0 255 127)
-	myCheckedColor = (color 6 135 58)
+	myCheckedColor = (color 10 140 120)
 )
 ----获取当前主题是深色还是浅色,来更改文字颜色 fnGetColorTheme.ms

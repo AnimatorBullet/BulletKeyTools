@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-14 01:55:56
+ * @LastEditTime: 2021-05-14 12:39:38
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -206,21 +206,46 @@ global arrToolsNameAll
 
 rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 (
-	dotNetControl dotnetBtnTabCon "System.Windows.Forms.TabControl" height:20 width:330 align:#center pos:[165,0]
+	dotNetControl dotnetBtnTabCon "System.Windows.Forms.TabControl" height:165 width:30 align:#center pos:[136,18]
 
-	multilistbox mlbToolsBtnAll "功能列表" width:100 height:12 pos:[5,4] selection:0
-	button btnAddToSort ">>>" width:30 height:81 pos:[106,20]
-	button btnRemoveFromSort "<<<" width:30 height:81 pos:[106,101]
-	multilistbox mlbToolBtn1 "" width:80 height:12 pos:[167,20] selection:0
-	multilistbox mlbToolBtn2 "" width:80 height:12 pos:[247,20] selection:0
-	multilistbox mlbToolBtn3 "" width:80 height:12 pos:[327,20] selection:0
-	multilistbox mlbToolBtn4 "" width:80 height:12 pos:[407,20] selection:0
-	button btnMoveUp "↑" width:30 height:81 pos:[137,20]
-	button btnMoveDown "↓" width:30 height:81 pos:[137,101]
-	button btnCollectCurrent "加载当前" width:65 height:25 pos:[105,185]
-	button btnSetBtn ">> 确认设置排序 <<" width:320 height:25 pos:[170,185]
-	button btnResetBtn "恢复默认排序" width:105 height:25 pos:[0,185]
-
+	multilistbox mlbToolsBtnAll "已选择:        " width:100 height:12 pos:[5,4] selection:0
+	button btnAddToSort ">>>" width:30 height:40 pos:[106,20]
+	button btnRemoveFromSort "<<<" width:30 height:40 pos:[106,60]
+	multilistbox mlbToolBtn1 "剩余:     " width:80 height:12 pos:[167,4] selection:0
+	multilistbox mlbToolBtn2 "剩余:     " width:80 height:12 pos:[247,4] selection:0
+	multilistbox mlbToolBtn3 "剩余:     " width:80 height:12 pos:[327,4] selection:0
+	multilistbox mlbToolBtn4 "剩余:     " width:80 height:12 pos:[407,4] selection:0
+	button btnMoveUp "↑" width:30 height:40 pos:[106,100]
+	button btnMoveDown "↓" width:30 height:40 pos:[106,140]
+	button btnResetBtn "重置默认" width:60 height:25 pos:[0,185]
+	button btnCollectCurrent "加载当前" width:60 height:25 pos:[60,185]
+	button btnReAdd "清空" width:50 height:25 pos:[120,185]
+	button btnSetBtn ">>> 确认设置排序（每组最多12个按钮）<<<" width:320 height:25 pos:[170,185]
+	
+	fn fnSwitchTab = 
+	(
+		local strCurIndex = (rolCustomBtn.dotnetBtnTabCon.SelectedIndex + 1) as string
+		local arrMlbToolBtn = #(mlbToolBtn1,mlbToolBtn2,mlbToolBtn3,mlbToolBtn4)
+		for i in arrMlbToolBtn do
+		(
+			if (i.name)[i.name.count] == strCurIndex then i.enabled = true
+			else i.enabled = false
+		)
+	)
+	
+	on dotnetBtnTabCon Selected arg do
+	(
+		fnSwitchTab()
+	)		
+	
+	fn fnToolBtnCountText =
+	(
+		mlbToolBtn1.caption = "剩余: " + (12 - mlbToolBtn1.items.count) as string
+		mlbToolBtn2.caption = "剩余: " + (12 - mlbToolBtn2.items.count) as string
+		mlbToolBtn3.caption = "剩余: " + (12 - mlbToolBtn3.items.count) as string
+		mlbToolBtn4.caption = "剩余: " + (12 - mlbToolBtn4.items.count) as string
+	)
+		
 	fn fnAddToSort tarSort mlbToolBtn =
 	(
 		numSelBtn = (rolCustomBtn.mlbToolsBtnAll.selection as array).count
@@ -242,32 +267,51 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 		)
 		else if (tarSort.count + numSelBtn) > 12 then (messagebox"每栏最多12个按钮...          "beep:false)
 	)
+	fn fnRefreshMlbToolBtn =
+	(
+		mlbToolBtn1.items = for i in arrToolC1 collect i.caption
+		mlbToolBtn2.items = for i in arrToolC2 collect i.caption
+		mlbToolBtn3.items = for i in arrToolC3 collect i.caption
+		mlbToolBtn4.items = for i in arrToolC4 collect i.caption
+		mlbToolsBtnAll.items = #()
+		fnToolBtnCountText()
+	)
 
 	on rolCustomBtn open do 
 	(
 		local arrBtnTabCon = #(rolBsKeyTools.ckbC1.caption,rolBsKeyTools.ckbC2.caption,
 						rolBsKeyTools.ckbC3.caption,rolBsKeyTools.ckbC4.caption)
-		arrToolsAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4
 		arrToolNewC1 = #();arrToolNewC2 = #();arrToolNewC3 = #();arrToolNewC4 = #();
+		arrToolsAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4
 		arrToolsNameAll = for i in arrToolsAll collect i.caption
-		mlbToolsBtnAll.items     = for i in arrToolsAll collect i.caption
+		mlbToolsBtnAll.items     = arrToolsNameAll
+		mlbToolsBtnAll.text = "已选择: " + (rolCustomBtn.mlbToolsBtnAll.selection as array).count as string
 		dotnetBtnTabCon.dock     = dotnetBtnTabCon.dock.Fill
 		dotnetBtnTabCon.Drawmode = dotnetBtnTabCon.Drawmode.OwnerDrawFixed
 		dotnetBtnTabCon.SizeMode = dotnetBtnTabCon.SizeMode.Fixed
-		dotnetBtnTabCon.ItemSize = dotNetobject "System.Drawing.Size" 80 20
--- 		dotnetBtnTabCon.alignment = (dotnetclass "system.Windows.Forms.Tabalignment").left
+		dotnetBtnTabCon.ItemSize = dotNetobject "System.Drawing.Size" 40 30
+		dotnetBtnTabCon.alignment = (dotnetclass "system.Windows.Forms.Tabalignment").left
         
         for aTab in arrBtnTabCon do
         (
             dotnetBtnTabCon.TabPages.add aTab
         )
         rolCustomBtn.dotnetBtnTabCon.SelectedIndex = 0
+		fnSwitchTab()
+		fnToolBtnCountText()
 	)
-
+	
+	on mlbToolsBtnAll selectionEnd do 
+	(
+		mlbToolsBtnAll.text = "已选择: " + (rolCustomBtn.mlbToolsBtnAll.selection as array).count as string
+	)
+	
 	on btnAddToSort pressed do
 	(
 		local curSelIndex = rolCustomBtn.dotnetBtnTabCon.SelectedIndex
 		execute ("rolCustomBtn.fnAddToSort arrToolNewC" + (curSelIndex + 1) as string + " rolCustomBtn.mlbToolBtn" + (curSelIndex + 1) as string)
+		fnToolBtnCountText()
+		mlbToolsBtnAll.text = "已选择: " + (rolCustomBtn.mlbToolsBtnAll.selection as array).count as string
 	)
 
 	on btnSetBtn pressed do 
@@ -287,15 +331,43 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 	)
 	on btnResetBtn pressed do 
 	(
-		iniToolBtnAll = #(101,102,103,104,105,106,107,108,109,110,111,112,
-						201,202,203,204,205,206,207,208,209,210,211,212,
-						301,302,303,304,305,306,307,308,309,310,311,312,
-						401,402,403,404,405,406,407,408,409,410,411,412)
-		fnSetToolBtnConfig ()
-		rolBsKeyTools.fnReloadToolsBtn()
-		try(destroydialog rolCustomBtn)catch()
-		rolBsKeyTools.fnSwitchToolsBtn idBtn
-		-- print iniToolBtnAll #nomap
+		if (queryBox "是否重置功能按钮默认位置？                   " \
+		title:"重置位置" beep:false) then
+		(
+			iniToolBtnAll = #(101,102,103,104,105,106,107,108,109,110,111,112,
+							201,202,203,204,205,206,207,208,209,210,211,212,
+							301,302,303,304,305,306,307,308,309,310,311,312,
+							401,402,403,404,405,406,407,408,409,410,411,412)
+			fnSetToolBtnConfig ()
+			rolBsKeyTools.fnReloadToolsBtn()
+			rolBsKeyTools.fnSwitchToolsBtn idBtn
+			-- print iniToolBtnAll #nomap
+			fnRefreshMlbToolBtn()
+			mlbToolsBtnAll.text = "已选择: " + (rolCustomBtn.mlbToolsBtnAll.selection as array).count as string
+		)
+	)
+	on btnReAdd pressed do 
+	(
+		if (queryBox "是否清空当前列表重新排序？                   " \
+		title:"清空重新排序" beep:false) then
+		(
+			arrToolsAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4
+			arrToolsNameAll = for i in arrToolsAll collect i.caption
+			mlbToolsBtnAll.items = arrToolsNameAll
+			arrToolNewC1 = #();arrToolNewC2 = #();arrToolNewC3 = #();arrToolNewC4 = #();
+			mlbToolBtn1.items = #()
+			mlbToolBtn2.items = #()
+			mlbToolBtn3.items = #()
+			mlbToolBtn4.items = #()
+			fnToolBtnCountText()
+			mlbToolsBtnAll.selection = 0
+			mlbToolsBtnAll.text = "已选择: " + (rolCustomBtn.mlbToolsBtnAll.selection as array).count as string
+		)
+	)
+	on btnCollectCurrent pressed do 
+	(
+		fnRefreshMlbToolBtn()
+		mlbToolsBtnAll.text = "已选择: " + (rolCustomBtn.mlbToolsBtnAll.selection as array).count as string
 	)
 )
 --------------------------------------------------------------------------------------------------------
