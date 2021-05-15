@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2021-05-07 12:33:36
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-15 18:44:07
+ * @LastEditTime: 2021-05-15 18:53:39
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -403,7 +403,7 @@ rollout rolSelSetTools ""
 		)
 	)
 
-	on btnRemoveFromSelSet pressed do 
+	on btnRemoveFromSelSet pressed do undo "RemoveSelSet" on
 	(
 		if (mlbSelSet.selection as array).count != 0 then
 		(

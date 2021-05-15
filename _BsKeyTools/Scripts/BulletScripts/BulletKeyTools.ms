@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-15 13:55:38
+ * @LastEditTime: 2021-05-15 17:08:54
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -1300,8 +1300,8 @@ rollout rolBsKeyTools "" width:200 height:248
 		toolTip:"[已有想法待补充]\r\n方便渲染作品和练习的工具"
 		button btnCutSequence "动画分段" width:btnWidth height:btnHeight visible:false pos:btnPos \
 		toolTip:"为长动画分段动作区间 (修改自San_oOo)"
-		button btnTemp "待添加1" width:btnWidth height:btnHeight visible:false \
-		tooltip:"待添加" pos:btnPos
+		button btnXrSkinTool "蒙皮辅助" width:btnWidth height:btnHeight visible:false \
+		tooltip:"by:东见云" pos:btnPos
 		button btnTemp2 "待添加2" width:btnWidth height:btnHeight visible:false \
 		tooltip:"待添加" pos:btnPos
 		button btnTemp3 "待添加3" width:btnWidth height:btnHeight visible:false \
@@ -1464,7 +1464,7 @@ rollout rolBsKeyTools "" width:200 height:248
 		arrSourToolC3 = #(rolBsKeyTools.btnMeshToBone,rolBsKeyTools.btnWinbox,
 						rolBsKeyTools.btnHideBipedTwists,rolBsKeyTools.btnQuickPrev,
 						rolBsKeyTools.btnKeyStepMode,rolBsKeyTools.btnFnKeyType,
-						rolBsKeyTools.btnCutSequence,rolBsKeyTools.btnTemp,
+						rolBsKeyTools.btnCutSequence,rolBsKeyTools.btnXrSkinTool,
 						rolBsKeyTools.btnTemp2,rolBsKeyTools.btnTemp3,
 						rolBsKeyTools.btnTemp4,rolBsKeyTools.btnTemp5)
 		arrSourToolC4 = #(rolBsKeyTools.btnTemp6,rolBsKeyTools.btnTemp7,
@@ -3317,7 +3317,11 @@ rollout rolBsKeyTools "" width:200 height:248
 		try(FileIn ((getDir #scripts) + "\\BulletScripts\\BsSelSetTools.ms"))
 		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
 	)
-
+	on btnXrSkinTool pressed do 
+	(
+		try(FileIn ((getDir #scripts) + "\\BulletScripts\\Quote\\Xr_SkinTool.ms"))
+		catch(messagebox "打开失败，可能脚本错误或安装不完全，\r\n\r\n建议查看设置中的帮助或重新安装，还有问题烦请联系我...                            " beep:false)
+	)
 )
 if (iniPos != 0) then (Createdialog rolBsKeyTools fgcolor:myFgColor pos:iniPos style:#())
 else (Createdialog rolBsKeyTools fgcolor:myFgColor style:#())
