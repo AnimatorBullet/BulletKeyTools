@@ -3,7 +3,7 @@
  * @Author: Bullet.S
  * @Date: 2021-05-07 12:33:36
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-14 01:49:58
+ * @LastEditTime: 2021-05-15 18:44:07
  * @Email: animator.bullet@foxmail.com
  */
 
@@ -122,8 +122,8 @@ fn fnUpdateSelSetList =
 		append arrNodesList s.name
 	)
 	qsort arrNodesList fnSortNames
-	rolSelSetTools.lbxSelSet.items = arrNodesList
-	rolSelSetTools.lbxSelSet.selection = 0
+	rolSelSetTools.mlbSelSet.items = arrNodesList
+	rolSelSetTools.mlbSelSet.selection = 0
 	rolSelSetTools.mlbSelSetNode.items = #()
 	rolSelSetTools.lblCount.text = "共 " + selectionsets.count as string + " 个选择集"
 )
@@ -152,6 +152,7 @@ rollout rolCreateSelSet "创建选择集"
 			)
 			else (selectionsets[strCreate] = arrSelection;fnUpdateSelSetList())
 		)
+		rolSelSetTools.fnAutoSetHeight()
 		try(destroydialog rolCreateSelSet)catch()
 	)
 )
@@ -182,64 +183,94 @@ rollout rolLoadSelSet "加载选择集"
 
 rollout rolSelSetTools ""
 (
-	groupbox grpMain "BsSelSetTools_v1.0--MoveMe" width:180 height:275 pos:[5,0]
+	groupbox grpMain "BsSelSetTools_v1.0--MoveMe" width:180 height:277 pos:[5,0]
 
-	listbox lbxSelSet "" width:170 height:16 pos:[10,35]
-	label lblCount "" width:170 height:16 pos:[10,20]
+	MultiListBox mlbSelSet "" width:170 height:15 pos:[10,55]
+	label lblCount "" width:170 height:15 pos:[10,40]
 	
-	button btnCloseRol "关闭" width:35 height:20 pos:[10,250]
-	button btnUpdateList "更新列表" width:90 height:20 pos:[45,250]
-	checkbutton chkMoreTools "更多" width:45 height:20 pos:[135,250]
+	button btnCloseRol "关闭" width:35 height:20 pos:[10,15]
+	button btnUpdateList "更新列表" width:90 height:20 pos:[45,15]
+	checkbutton chkMoreTools "更多" width:45 height:20 pos:[135,15]
 
-	button btnCreateSelSet "" width:30 height:25 pos:[195,10] enabled:false tooltip:"创建选择集"
-	button btnDeleteSelSet "" width:30 height:25 pos:[225,10] enabled:false tooltip:"删除选择集"
-	button btnAddToSelSet "" width:30 height:25 pos:[255,10] enabled:false tooltip:"添加所选物体到选中的选择集"
-	button btnRemoveFromSelSet "" width:30 height:25 pos:[285,10] enabled:false tooltip:"从选中的选择集中移除所选物体"
-	button btnHighlightSelObj "" width:30 height:25 pos:[315,10] enabled:false tooltip:"高亮选中物体及其所在选择集"
-	MultiListBox mlbSelSetNode "" width:160 height:16 pos:[190,35] enabled:false
-	button btnSaveXml "保存" width:60 height:20 pos:[190,250] enabled:false
-	button btnLoadXml "加载" width:60 height:20 pos:[250,250] enabled:false
-	button btnHelp "帮助" width:40 height:20 pos:[310,250] enabled:false
+	button btnCreateSelSet "" width:30 height:20 pos:[195,35] enabled:false tooltip:"创建选择集"
+	button btnDeleteSelSet "" width:30 height:20 pos:[225,35] enabled:false tooltip:"删除选择集"
+	button btnAddToSelSet "" width:30 height:20 pos:[255,35] enabled:false tooltip:"添加所选物体到选中的选择集"
+	button btnRemoveFromSelSet "" width:30 height:20 pos:[285,35] enabled:false tooltip:"从选中的选择集中移除所选物体"
+	button btnHighlightSelObj "" width:30 height:20 pos:[315,35] enabled:false tooltip:"高亮选中物体及其所在选择集"
+	MultiListBox mlbSelSetNode "" width:160 height:15 pos:[190,55] enabled:false
+	button btnSaveXml "保存" width:60 height:20 pos:[190,15] enabled:false
+	button btnLoadXml "加载" width:60 height:20 pos:[250,15] enabled:false
+	button btnHelp "帮助" width:40 height:20 pos:[310,15] enabled:false
+
+	fn fnAutoSetHeight =
+	(
+		if (not chkMoreTools.state) or (chkMoreTools.state and (mlbSelSetNode.items as array).count < 15) then 
+		(
+			if selectionsets.count <= 5 then
+			(
+				mlbSelSet.height = 72.5
+				mlbSelSetNode.height = 72.5
+			)
+			else if selectionsets.count >= 5 and selectionsets.count <= 15 then
+			(
+				mlbSelSet.height = selectionsets.count * 14.5
+				mlbSelSetNode.height = selectionsets.count * 14.5
+				
+			)
+			else if selectionsets.count > 15 then
+			(
+				mlbSelSet.height = 217
+				mlbSelSetNode.height = 217
+			)
+		)
+		else if chkMoreTools.state and (mlbSelSetNode.items as array).count > 15 then 
+		(
+			mlbSelSet.height = 217
+			mlbSelSetNode.height = 217
+		)
+		rolSelSetTools.height = mlbSelSet.height + 65
+		grpMain.height = mlbSelSetNode.height + 60
+	)
 
 	fn fnUpdateMoreToolsState =
 	(
 		if chkMoreTools.state then 
 		(rolSelSetTools.width = 360;grpMain.width = 350)
-		else
-		(rolSelSetTools.width = 190;grpMain.width = 180)
+		else (rolSelSetTools.width = 190;grpMain.width = 180)
 	)
 
-	fn fnUpdateSelSetNodeList arrTemp =
+	fn fnUpdateSelSetNodeList selSetAll =
 	(
-		local arrSelSetNodesName = (for i in arrTemp collect i.name)
+		local arrSelSetNodesName = #()
+		for i in selSetAll do
+		(
+			join arrSelSetNodesName (for i in selectionsets[mlbSelSet.items[i]] collect i.name)
+		)
+		arrSelSetNodesName = makeUniqueArray arrSelSetNodesName
 		qsort arrSelSetNodesName fnSortNames
+		-- print arrSelSetNodesName
 		mlbSelSetNode.items = arrSelSetNodesName
 		mlbSelSetNode.selection = 0
-		lblCount.text = "当中共有 " + selectionsets[lbxSelSet.selected].count as string + " 个物体"
+		lblCount.text = "当中共有 " + arrSelSetNodesName.count as string + " 个物体"
 	)
-	fn fnAddRemoveNode action =
+	fn fnAddRemoveNode tarSelSet action =
 	(
-		local arrCurSelSet = selectionsets[lbxSelSet.selected]
-		if lbxSelSet.selected != undefined then 
+		local arrSelection = getcurrentselection()
+		if arrSelection != undefined then 
 		(
-			local arrSelection = getcurrentselection()
-			if arrSelection != undefined then 
+			case of
 			(
-				case of
+				(action == "Add"):(tarSelSet = join (join #() tarSelSet) arrSelection)
+				(action == "Del"):
 				(
-					(action == "Add"):(arrCurSelSet = join (join #() arrCurSelSet) arrSelection)
-					(action == "Del"):
+					for o in arrSelection do 
 					(
-						for o in arrSelection do 
-						(
-							arrCurSelSet = for n in arrCurSelSet where n != o collect n
-						)
+						tarSelSet = for n in tarSelSet where n != o collect n
 					)
 				)
-				fnUpdateSelSetNodeList selectionsets[lbxSelSet.selected]
 			)
 		)
-		arrCurSelSet
+		tarSelSet
 	)
 
 	fn fnRefreshBtnEnabled =
@@ -278,6 +309,7 @@ rollout rolSelSetTools ""
 
 	on rolSelSetTools open do
 	(
+		
 		stLoadConfigAll.fnLoadConfigSelSetTools()  ---------------脚本位置等赋值
 		stSetConfigAll.fnSetConfigSelSetTools()  ----------------保存位置信息到ini文件
 		btnCreateSelSet.images     = #("enss_tools_16i.bmp","enss_tools_16a.bmp",13,1,1,2,2,false,true)
@@ -288,6 +320,7 @@ rollout rolSelSetTools ""
 		fnUpdateMoreToolsState()
 		fnRefreshBtnEnabled()
 		fnUpdateSelSetList()
+		fnAutoSetHeight()
 	)
 
 	on rolSelSetTools close do -- 关闭记忆浮动窗口位置
@@ -327,49 +360,75 @@ rollout rolSelSetTools ""
 	on btnUpdateList pressed do
 	(
 		fnUpdateSelSetList()
+		fnAutoSetHeight()
 	)
 
-	on lbxSelSet selected sel do
+	on mlbSelSet selectionEnd do
 	(
-		if lbxSelSet.selected != undefined then
+		if (mlbSelSet.selection as array).count != 0 then
 		(
-			local selSet = selectionSets[lbxSelSet.selected]
-			try(select selSet;fnUpdateSelSetNodeList selSet)catch()
+			clearselection()
+			for i in (mlbSelSet.selection as array) do 
+			(
+				selectmore selectionsets[mlbSelSet.items[i]]
+			)
+			fnUpdateSelSetNodeList mlbSelSet.selection
+			fnAutoSetHeight()
 		)	
 	)
 
-	on btnDeleteSelSet pressed do
+	on btnDeleteSelSet pressed do with undo "DeleteSelSet" on
 	(
-		if lbxSelSet.selected != undefined then 
+		if (mlbSelSet.selection as array).count != 0 then
 		(
-			undo "DeleteSelSet" on
+			for i in (mlbSelSet.selection as array) do 
 			(
-				deleteItem selectionSets lbxSelSet.selected
-				fnUpdateSelSetList()
+				deleteItem selectionSets mlbSelSet.items[i]
 			)
+			fnUpdateSelSetList()
+			fnAutoSetHeight()
 		)
 	)
 
 	on btnAddToSelSet pressed do
 	(
-		selectionsets[lbxSelSet.selected] = (fnAddRemoveNode "Add")
-		fnUpdateSelSetNodeList selectionsets[lbxSelSet.selected]
+		if (mlbSelSet.selection as array).count != 0 then
+		(
+			for i in (mlbSelSet.selection as array) do 
+			(
+				selectionsets[mlbSelSet.items[i]] = fnAddRemoveNode selectionsets[mlbSelSet.items[i]] "Add"
+			)
+			fnUpdateSelSetNodeList (mlbSelSet.selection as array)
+			fnAutoSetHeight()
+		)
 	)
 
 	on btnRemoveFromSelSet pressed do 
 	(
-		selectionsets[lbxSelSet.selected] = (fnAddRemoveNode "Del")
-		fnUpdateSelSetNodeList selectionsets[lbxSelSet.selected]
+		if (mlbSelSet.selection as array).count != 0 then
+		(
+			for i in (mlbSelSet.selection as array) do 
+			(
+				selectionsets[mlbSelSet.items[i]] = fnAddRemoveNode selectionsets[mlbSelSet.items[i]] "Del"
+			)
+			fnUpdateSelSetNodeList (mlbSelSet.selection as array)
+			fnAutoSetHeight()
+		)
 	)
 
 	on btnHighlightSelObj pressed do 
 	(
 		local arrCurSelection = getCurrentSelection()
-		local arrCurSelSet = (join #() selectionsets[lbxSelSet.selected])
+		local arrCurSelSet = #()
 		local arrSelIndex = #()
+		for i in (mlbSelSet.selection as array) do 
+		(
+			join arrCurSelSet selectionsets[mlbSelSet.items[i]]
+		)
+		makeUniqueArray arrCurSelSet
 		for i in arrCurSelection do 
 		(
-			local indexTemp = findItem arrCurSelSet i
+			local indexTemp = findItem mlbSelSetNode.items i.name
 			if indexTemp != 0 then append arrSelIndex indexTemp
 		)
 		mlbSelSetNode.selection = arrSelIndex
@@ -378,7 +437,7 @@ rollout rolSelSetTools ""
 
 	on btnCreateSelSet pressed do 
 	(
-		local arrSelection = getcurrentselection()
+		local arrSelection = getCurrentselection()
 		if arrSelection != undefined then 
 		(
 			iniPosSelSetTools   = (GetDialogPos rolSelSetTools)
@@ -388,7 +447,7 @@ rollout rolSelSetTools ""
 
 	on mlbSelSetNode selectionEnd do 
 	(
-		if mlbSelSetNode.selection != undefined then
+		if mlbSelSetNode.selection != 0 then
 		(
 			local strSelSetNode = for i in mlbSelSetNode.selection collect mlbSelSetNode.items[i]
 			clearselection()
@@ -400,11 +459,12 @@ rollout rolSelSetTools ""
 	(
 		fnUpdateMoreToolsState ()
 		fnRefreshBtnEnabled()
+		fnAutoSetHeight()
 	)
 
 )
 if (iniPosSelSetTools != 0) then 
-(Createdialog rolSelSetTools 360 280 fgcolor:myFgColor pos:iniPosSelSetTools style:#())
-else (Createdialog rolSelSetTools 360 280 fgcolor:myFgColor style:#())
+(Createdialog rolSelSetTools 360 295 fgcolor:myFgColor pos:iniPosSelSetTools style:#())
+else (Createdialog rolSelSetTools 360 295 fgcolor:myFgColor style:#())
 
 callbacks.addScript #filePostOpen "fnUpdateSelSetList()" id:#UpdateSelSetList

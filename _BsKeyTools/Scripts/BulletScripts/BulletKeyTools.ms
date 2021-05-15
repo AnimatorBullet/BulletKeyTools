@@ -3,7 +3,7 @@
 * @Author: Bullet.S
 * @Date: 2019-09-28 11:48:53
  * @LastEditors: Bullet.S
- * @LastEditTime: 2021-05-15 01:57:46
+ * @LastEditTime: 2021-05-15 13:55:38
 * @Email: animator.bullet@foxmail.com
 */
 
@@ -211,10 +211,10 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 	multilistbox mlbToolsBtnAll "已选择:        " width:100 height:12 pos:[5,4] selection:0
 	button btnAddToSort ">>>" width:30 height:40 pos:[106,20]
 	button btnRemoveFromSort "<<<" width:30 height:40 pos:[106,60]
-	multilistbox mlbToolBtn1 "剩余:     " width:80 height:12 pos:[167,4] selection:0
-	multilistbox mlbToolBtn2 "剩余:     " width:80 height:12 pos:[247,4] selection:0
-	multilistbox mlbToolBtn3 "剩余:     " width:80 height:12 pos:[327,4] selection:0
-	multilistbox mlbToolBtn4 "剩余:     " width:80 height:12 pos:[407,4] selection:0
+	listbox mlbToolBtn1 "剩余:     " width:80 height:12 pos:[167,4] selection:0
+	listbox mlbToolBtn2 "剩余:     " width:80 height:12 pos:[247,4] selection:0
+	listbox mlbToolBtn3 "剩余:     " width:80 height:12 pos:[327,4] selection:0
+	listbox mlbToolBtn4 "剩余:     " width:80 height:12 pos:[407,4] selection:0
 	button btnMoveUp "↑" width:30 height:40 pos:[106,100]
 	button btnMoveDown "↓" width:30 height:40 pos:[106,140]
 	button btnResetBtn "重置默认" width:60 height:25 pos:[0,185]
@@ -257,11 +257,11 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 		
 		if (action == "add") then 
 		(
-			if numSelAddBtn > 0 and (arrTarSort.count + numSelAddBtn) <= 12 then
+			if numSelAddBtn > 0 and ((arrTarSort.items as array).count + numSelAddBtn) <= 12 then
 			(
 				for i in mlbToolsBtnAll.selection as array do
 				(
-					append arrTarSort arrBtnAllTemp[i]
+					append arrTarSortTemp arrBtnAllTemp[i]
 				)
 				for i in mlbToolsBtnAll.selection as array do
 				(
@@ -269,26 +269,19 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 				)
 				arrTarSort.items = arrTarSortTemp
 				mlbToolsBtnAll.items = arrBtnAllTemp
-				mlbToolsBtnAll.selection = 0
+				-- mlbToolsBtnAll.selection = 0
 			)
-			else if (arrTarSort.count + numSelAddBtn) > 12 then (messagebox"每栏最多12个按钮...          "beep:false)
+			else if ((arrTarSort.items as array).count + numSelAddBtn) > 12 then (messagebox"每栏最多12个按钮...          "beep:false)
 		)
 		else if (action == "remove") then 
 		(
-			if (arrTarSort.selection as array).count != 0 then 
+			if arrTarSort.selection != 0 then 
 			(
-				for i in arrTarSort.selection as array do 
-				(
-					arrBtnAllTemp = join #(arrTarSort.items[i]) arrBtnAllTemp
-				)
-				for i in arrTarSort.selection as array do 
-				(
-					deleteitem arrTarSortTemp (finditem arrTarSortTemp arrTarSort.items[i])
-					deleteitem arrTarSort (finditem arrTarSort arrTarSortTemp[i])
-				)
+				arrBtnAllTemp = join #(arrTarSort.selected) arrBtnAllTemp
+				deleteitem arrTarSortTemp (finditem arrTarSortTemp arrTarSort.selected)
 				mlbToolsBtnAll.items = arrBtnAllTemp
 				arrTarSort.items = arrTarSortTemp
-				arrTarSort.selection = 0
+				-- arrTarSort.selection = 0
 			)
 		)
 	)
@@ -297,8 +290,10 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 	(
 		arrToolNewC1 = mlbToolBtn1.items
 		arrToolNewC2 = mlbToolBtn2.items
-		arrToolNewC3 = mlbToolBtn4.items
+		arrToolNewC3 = mlbToolBtn3.items
 		arrToolNewC4 = mlbToolBtn4.items
+		-- arrToolsAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4
+		-- arrToolsNameAll = for i in arrToolsAll collect i.caption
 		local arrToolsNewAll = arrToolNewC1 + arrToolNewC2 + arrToolNewC3 + arrToolNewC4
 		local arrIniToolBtnAllNew = #()
 		for i in arrToolsNewAll do 
@@ -320,6 +315,42 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 		mlbToolBtn4.items = for i in arrToolC4 collect i.caption
 		mlbToolsBtnAll.items = #()
 		fnToolBtnCountText()
+	)
+
+	fn fnCheckSort =
+	(
+		if (((mlbToolsBtnAll.items as array).count == 0) and ((mlbToolBtn1.items as array).count == 12) and
+			((mlbToolBtn1.items as array).count == 12) and ((mlbToolBtn1.items as array).count == 12) and 
+			((mlbToolBtn1.items as array).count == 12)) then (true) else (false)
+	)
+
+	fn fnMoveItems action:"MoveUp" = 
+	(
+		local arrBtnSort = #(rolCustomBtn.mlbToolBtn1,rolCustomBtn.mlbToolBtn2,
+							rolCustomBtn.mlbToolBtn3,rolCustomBtn.mlbToolBtn4)
+		local arrTarSort = arrBtnSort[rolCustomBtn.dotnetBtnTabCon.SelectedIndex + 1]
+		local arrTarSortTemp = join #() (arrTarSort.items as array)
+		
+		if arrTarSort.selection != 0 then 
+		(
+			local tarSortBtn = arrTarSort.selected
+			local tarSortBtnIndex = arrTarSort.selection
+			
+			if (action == "MoveUp") and (tarSortBtnIndex != 1) then 
+			(
+				deleteItem arrTarSortTemp tarSortBtnIndex
+				insertitem tarSortBtn arrTarSortTemp (tarSortBtnIndex - 1)
+				arrTarSort.selection = (tarSortBtnIndex - 1)
+			)
+			else if (action == "MoveDown") and (tarSortBtnIndex != 12) then
+			(
+				deleteItem arrTarSortTemp tarSortBtnIndex
+				insertitem tarSortBtn arrTarSortTemp (tarSortBtnIndex + 1)
+				arrTarSort.selection = (tarSortBtnIndex + 1)
+			)
+			arrTarSort.items = arrTarSortTemp
+			-- print arrTarSortTemp #nomap
+		)
 	)
 
 	on rolCustomBtn open do 
@@ -367,8 +398,12 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 
 	on btnSetBtn pressed do 
 	(
-		fnSaveBtnSort()
-		try(destroydialog rolCustomBtn)catch()
+		if fnCheckSort() == true then
+		(
+			fnSaveBtnSort()
+			try(destroydialog rolCustomBtn)catch()
+		)
+		else (messagebox "请确认按钮都排序完毕,才能完成设置...                    " beep:false)
 	)
 	on btnResetBtn pressed do 
 	(
@@ -384,6 +419,8 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 			rolBsKeyTools.fnSwitchToolsBtn idBtn
 			-- print iniToolBtnAll #nomap
 			fnRefreshMlbToolBtn()
+			arrToolsAll = arrToolC1 + arrToolC2 + arrToolC3 + arrToolC4
+			arrToolsNameAll = for i in arrToolsAll collect i.caption
 			mlbToolsBtnAll.text = "已选择: " + (rolCustomBtn.mlbToolsBtnAll.selection as array).count as string
 		)
 	)
@@ -406,6 +443,16 @@ rollout rolCustomBtn "自定义功能按钮位置" width:490 height:210
 	(
 		fnRefreshMlbToolBtn()
 		mlbToolsBtnAll.text = "已选择: " + (rolCustomBtn.mlbToolsBtnAll.selection as array).count as string
+	)
+	
+	on btnMoveUp pressed do 
+	(
+		fnMoveItems action:"MoveUp"
+	)
+
+	on btnMoveDown pressed do 
+	(
+		fnMoveItems action:"MoveDown"
 	)
 )
 --------------------------------------------------------------------------------------------------------
@@ -570,7 +617,7 @@ rcmenu menuConfig
 	on mItemCustomSortBtn picked do 
 	(
 		try(destroydialog rolCustomBtn)catch()
-		Createdialog rolCustomBtn fgcolor:myFgColor pos:((getdialogpos rolBsKeyTools)+[-100,rolBsKeyTools.height]) parent:rolBsKeyTools.hwnd
+		Createdialog rolCustomBtn fgcolor:myFgColor pos:((getdialogpos rolBsKeyTools)+[0,rolBsKeyTools.height]) parent:rolBsKeyTools.hwnd
 	)
 )
 

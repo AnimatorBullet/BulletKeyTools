@@ -460,7 +460,7 @@ fn fn_onions_create oni_numb=
 							(
 								LayerManager.newLayerFromName SanLightTable_layer_name
 								SanLightTable_layer=LayerManager.getLayerFromName SanLightTable_layer_name
-								SanLightTable_layer.lock=true
+								SanLightTable_layer.lock=(not SanLightTable.ckbUnFreeze.state)
 								
 -- 								SanLightTable_layer.display=4
 -- 								SanLightTable_layer.showFrozenInGray=false
@@ -476,7 +476,7 @@ fn fn_onions_create oni_numb=
 												local oni = Mesher radius:2 pos:i.transform.pos renderTimeOnly:off --isSelected:off
 												oni.pick = i
 												oni.backfacecull=true
-												oni.renderable=false
+												oni.renderable=SanLightTable.ckbRenderGhost.state
 												oni.showFrozenInGray = false
 -- 												oni.visibility = bezier_float()
 -- 												oni.visibility.controller.value = execute (expr_val)
@@ -1093,12 +1093,18 @@ rollout SanLightTable ("[运动重影]_LightTable_v "+SanLightTable_version) wid
 	radioButtons rdo_mode_frame "" pos:[85,240] width:82 height:48 labels:#("帧", "关键帧 (step)", "关键帧 (spline)") columns:1
 	button bt_help "?" pos:[0,1] width:16 height:15 toolTip:"鼠标左击 = 帮助\r\nCtrl+鼠标左击 = 打开 .config 设置文件的目录\r\nShift+鼠标左击 = 打开设置文件\r\nRight+鼠标左击 = “播放时显示重影”开关切换"
 
-	checkbox ckbRenderGhost "渲染可见" pos:[336,254] width:96 height:16 checked:false visible: true
+	checkbox ckbUnFreeze "解除冻结" pos:[336,240] width:96 height:16 checked:false visible: true
+	checkbox ckbRenderGhost "渲染可见" pos:[336,256] width:96 height:16 checked:false visible: true
 	checkbox ch_hide_on_play "播放时隐藏" pos:[336,272] width:96 height:16 checked:true visible: true 
 	checkButton ch_shaded "平面材质"  pos:[440,252] width:72 height:20 highlightcolor: ch_colors tooltip: "显示平面材质重影" --visible: false 
 	checkButton ch_alpha "不透明贴图"  pos:[440,272] width:72 height:20 highlightcolor: ch_colors tooltip: "在重影上使用材质不透明度贴图\r\n仅对Standard材质有效" --visible: false
 -- ) 
 -- createdialog SanLightTable
+	on ckbUnFreeze changed state do 
+	(
+		SanLightTable_layer.lock = (not state)
+	)
+
 	on ckbRenderGhost changed state do
 	(
 		local arrGhostLight = $'ghost_*'
